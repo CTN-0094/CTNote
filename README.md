@@ -1,5 +1,5 @@
 
-# CTNote
+# CTNote: CTN Outcomes, Treatments and Endpoints
 
 <!-- badges: start -->
 <!-- badges: end -->
