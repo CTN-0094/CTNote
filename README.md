@@ -4,7 +4,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of CTNote is to ...
+The goal of CTNote is to ...do stuff (layla's commit)
 
 ## Installation
 
