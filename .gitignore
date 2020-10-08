@@ -73,3 +73,4 @@ vignettes/*.pdf
 # VSC
 www/.vscode/
 
+inst/doc
