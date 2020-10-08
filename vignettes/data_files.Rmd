@@ -1,0 +1,111 @@
+---
+title: "Data files needed for CTNote"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Data files needed for CTNote}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, echo = FALSE}
+#library(CTNote)
+```
+
+# Data
+CTNote assumes that you have you data organized into tables called: rand, demo, drugs, diagnoses, withdrawal.
+
+All tables have the following variables:
+
++ project = integer for study number (i.e., CTN-0030 is 30)
++ who = character string with a study id
++ when = date
+
+## `rand` 
+
+`rand` has information on study arm treatment.
+
++ treatment = character string with description of treatment arm
+
+## `demo` 
+
+This needs to be harmonized
+
++ age = integer with age in years
++ race = character string with permitted values "White",
++ eth = character string with permitted values 
+  * "Hispanic" 
+  * "Not Hispanic 
+
+## `drugs` 
+
++ source = where drug was noted
+  * UDS
+  * TLFB
+  * Treatment
++ what = name of drug "Coke",
++ route = how drug is ingested "Nose",
++ unit  
+  * "oz"
++ amount = integer with amount given the units 
+
+## `diagnoses` 
++ issue = character string with name of comorbid diagnoses (e.g.) 
++ result = result of psychatric diagnosis testing 
+  * "Y"
+  * "N"
+  * "U"
+
+## `withdrawl` 
+
++ severity = "Bad",
++ instrument = "Cows Veresion X" 
+
+```{r er_diagram, echo = FALSE}
+rand <- data.frame(project = c(1), who = c("x"), 
+                   when = c(format(Sys.Date(), "%a %b %d")), 
+                   treatment = c("Nacos"))
+demo <- data.frame(project = c(1), who = c("x"), 
+                   when = c(format(Sys.Date(), "%a %b %d")), 
+                   age = c(1),
+                   race = "White",
+                   eth = "Hispanic")                   
+drugs <- data.frame(project = c(1), who = c("x"), 
+                    when = c(format(Sys.Date(), "%a %b %d")), 
+                    what = "Coke",
+                    route = "Nose",
+                    unit = "oz",
+                    amount = 1) 
+psych <- data.frame(project = c(1), who = c("x"), 
+                    when = c(format(Sys.Date(), "%a %b %d")), 
+                    issue = "Depression",
+                    result = "Y") 
+withdrawl <- data.frame(project = c(1), who = c("x"), 
+                        when = c(format(Sys.Date(), "%a %b %d")), 
+                        severity = "Bad",
+                        instrument = "Cows") 
+
+library(dm)
+ctnote_dm_no_keys <- dm(rand, demo, drugs, psych, withdrawl)
+
+ctnote_dm_only_pks <- 
+  ctnote_dm_no_keys %>% 
+  dm_add_pk(rand, who) 
+
+ctnote_dm_all_keys <- 
+  ctnote_dm_no_keys %>% 
+  dm_add_pk(rand, who) %>% 
+  dm_add_fk(demo, who, rand) %>% 
+  dm_add_fk(drugs, who, rand) %>% 
+  dm_add_fk(psych, who, rand) %>% 
+  dm_add_fk(withdrawl, who, rand) 
+
+ctnote_dm_all_keys %>% 
+  dm_draw(view_type = "all")
+```
