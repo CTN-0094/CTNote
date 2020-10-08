@@ -67,7 +67,8 @@ This needs to be harmonized
 + severity = "Bad",
 + instrument = "Cows Veresion X" 
 
-```{r er_diagram, echo = FALSE}
+# Structure of the data CTNote expects
+```{r er_diagram, echo = FALSE, fig.cap="Entity Relationship diagram for data required for CTNote."}
 rand <- data.frame(project = c(1), who = c("x"), 
                    when = c(format(Sys.Date(), "%a %b %d")), 
                    treatment = c("Nacos"))
@@ -91,7 +92,7 @@ withdrawl <- data.frame(project = c(1), who = c("x"),
                         severity = "Bad",
                         instrument = "Cows") 
 
-library(dm)
+suppressPackageStartupMessages(library(dm))
 ctnote_dm_no_keys <- dm(rand, demo, drugs, psych, withdrawl)
 
 ctnote_dm_only_pks <- 

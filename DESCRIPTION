@@ -16,5 +16,8 @@ RoxygenNote: 7.1.1
 Suggests: 
     knitr,
     rmarkdown,
-    dm
+    dm,
+    DiagrammeRsvg
 VignetteBuilder: knitr
+Imports: 
+    DiagrammeR
