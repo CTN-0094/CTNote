@@ -2,11 +2,16 @@ Package: CTNote
 Title: What the Package Does (One Line, Title Case)
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "Raymond",
-           family = "Balise",
-           role = c("aut", "cre"),
-           email = "balise@miami.edu",
-           comment = c(ORCID = "0000-0002-9856-5901"))
+  c(
+  person(
+    given = "Gabriel", family = "Odom", email = "gabriel.odom@fiu.edu",
+    role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9856-5901")
+  ),
+  person(
+    given = "Raymond", family = "Balise", email = "balise@miami.edu",
+    role = c("aut"), comment = c(ORCID = "0000-0002-9856-5901")
+  )
+  )
 Description: What the package does (one paragraph).
 License: GPL-3
 Encoding: UTF-8
