@@ -21,6 +21,8 @@ knitr::opts_chunk$set(
 # Data
 CTNote assumes that you have you data organized into tables called: rand, demo, drugs, diagnoses, withdrawal.
 
+UPDATE 2021-05-06: currently, the tables in `CTN0094/Harmonization/Nate/dataConversion/data/` have two fixed columns: `who` and `what`. Time-dependent data sets have a `days_since_date_x` column which measures days since some event (but I don't know what that event is). I think that we need a preliminary step to create an analysis data table from the data sets of interest.
+
 All tables have the following variables:
 
 + project = integer for study number (i.e., CTN-0030 is 30)
@@ -110,3 +112,34 @@ ctnote_dm_all_keys <-
 ctnote_dm_all_keys %>% 
   dm_draw(view_type = "all")
 ```
+
+
+# What Data Sets we Require of Users
+In order to standardize treatment records across subjects, we we need the PI to supply the following data components per person:
+
+- "Day 0": when does the surveillance "begin" for that subject? This could be first contact, randomization, induction (start or end).
+- What day of the week is Day 0? This will be critical for any regularly scheduled clinic visits that should happen within a week (for example, MWF for first two weeks, once weekly thereafter)
+- Observation rule timings:
+    + "subject will present on MWF for first two weeks, ..."
+    + "Between day 14-27 (`<TIME PERIOD>`), we expect 2 (`<COUNT>`) visits, ..."
+    + Start and stop days for each rule (Rule A is active for day 0 to 13, Rule B is active for weeks 2-6, etc.)
+- Observation rule evaluation:
+    + "A failure is any number of positive or missing UDS within this window ..."
+    + " A failure is more than 2 positive UDS within this window ..."
+
+
+## Grammar?
+"During time period X, when we observe Y, count it as state Z."  
+- When is it?
+- What do we observe?
+    + which variable?
+    + adjective: largest, longest consecutive?
+- How should we interpret it?
+    + metric for success
+
+
+1. Highlight set of days
+2. Specify variable (UDS / TLFB)
+3. measuring successes or failures? Missings?
+4. consecutive events? Y/N
+5. How many individual observed events should mark the highlighted date range as a failure/success?
