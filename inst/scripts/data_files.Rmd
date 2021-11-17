@@ -24,7 +24,7 @@ CTNote assumes that you have you data organized into tables called: rand, demo, 
 UPDATE 2021-05-06: currently, the tables in `CTN0094/Harmonization/Nate/dataConversion/data/` have two fixed columns: `who` and `what`. Time-dependent data sets have a `days_since_date_x` column which measures days since some event (but I don't know what that event is). I think that we need a preliminary step to create an analysis data table from the data sets of interest.
 UPDATE 2021-05-11: there were some issues with the original directory, so I copied the directory to `CTN0094/Harmonization/GabrielOdom/ctn0094Data/`, then I modified the DESCRIPTION and NAMESPACE so that this package builds.
 ```{r load_data_package}
-library(ctn0094Data)
+library(ctn0094data)
 # data(package = "ctn0094Data")
 ```
 ```
