@@ -1,28 +1,34 @@
 Package: CTNote
-Title: What the Package Does (One Line, Title Case)
-Version: 0.0.0.9000
-Authors@R: 
+Title: CTN Outcomes, Treatments, and Endpoints
+Description: CTNote is a coded collection of substance use disorder clinical
+  trial outcomes. These coded outcome functions are used to compare and cluster
+  different clinical outcome functions based on daily or weekly subject urine
+  screenings. Note that we abbreviate urine drug screen as "UDS" and urine
+  opioid screen as "UOS". For the example data sets (based on clinical trials
+  data harmonized in CTN-0094), UDS and UOS are largely interchangable.
+Version: 0.0.0.9001
+Authors@R:
   c(
-  person(
-    given = "Gabriel", family = "Odom", email = "gabriel.odom@fiu.edu",
-    role = c("aut", "cre"), comment = c(ORCID = "0000-0003-1341-4555")
-  ),
-  person(
-    given = "Raymond", family = "Balise", email = "balise@miami.edu",
-    role = c("aut"), comment = c(ORCID = "0000-0002-9856-5901")
+    person(
+      given = "Gabriel", family = "Odom", email = "gabriel.odom@fiu.edu",
+      role = c("aut", "cre"), comment = c(ORCID = "0000-0003-1341-4555")
+    ),
+    person(
+      given = "Raymond", family = "Balise", email = "balise@miami.edu",
+      role = c("aut"), comment = c(ORCID = "0000-0002-9856-5901")
+    )
   )
-  )
-Description: What the package does (one paragraph).
 License: GPL-3
 Encoding: UTF-8
-LazyData: true
-Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.1.1
+RoxygenNote: 7.1.2
+Depends: R (>= 3.1.0)
+Imports: 
+  ctn0094data,
+  ctn0094DataExtra,
+  stringr
 Suggests: 
     knitr,
-    rmarkdown,
-    dm,
-    DiagrammeRsvg
+    rmarkdown
 VignetteBuilder: knitr
-Imports: 
-    DiagrammeR
+LazyData: true
+Roxygen: list(markdown = TRUE)
