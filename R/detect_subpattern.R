@@ -8,6 +8,7 @@
 #' @param subpattern A character string containing the sub-pattern of interest.
 #'   For example, if study dropout is seven consecutive missing UDS, then the
 #'   sub-pattern would be "ooooooo".
+#' @param weeksBeforeRandomization
 #' @param start These two arguments give the integer range wherein to look for
 #'   the use sub-pattern of interest. Usually, start should be the week of
 #'   randomization
@@ -41,16 +42,21 @@
 #'   detect_subpattern(
 #'     cleanPattern_char,
 #'     subpattern = "----",
-#'     start = abs(-5) + 1 + 1,
-#'     end = abs(-5) + 1 + 12
+#'     # Week -5 to week 0 is 6 weeks pre-randomization
+#'     weeksBeforeRandomization = 6,
+#'     start = 1, 
+#'     end = 12
 #'   )
 #'   
-detect_subpattern <- function(use_pattern, subpattern, start, end = -1) {
+detect_subpattern <- function(use_pattern,
+                              subpattern,
+                              weeksBeforeRandomization,
+                              start, end = -1) {
   
   use_pattern_trimmed <- str_sub(
     string = use_pattern,
-    start = start,
-    end = end
+    start = weeksBeforeRandomization + start,
+    end = weeksBeforeRandomization + end
   )
   str_detect(use_pattern_trimmed, pattern = fixed(subpattern))
   
