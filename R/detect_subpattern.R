@@ -8,7 +8,6 @@
 #' @param subpattern A character string containing the sub-pattern of interest.
 #'   For example, if study dropout is seven consecutive missing UDS, then the
 #'   sub-pattern would be "ooooooo".
-#' @param weeksBeforeRandomization
 #' @param start These two arguments give the integer range wherein to look for
 #'   the use sub-pattern of interest. Usually, start should be the week of
 #'   randomization
@@ -25,39 +24,53 @@
 #'   use weeks, the sub-pattern would be set to \code{"+++"}. 
 #'   
 #' 
-#' @importFrom stringr str_sub str_detect fixed
+#' @importFrom stringr str_length str_sub str_detect fixed
 #' @export
 #'
 #' @examples 
-#'   # This pattern represents 6 weeks before randomization (week -5 to week 0),
-#'   #   followed by 26 weeks of treatment UDS
-#'   pattern_char <- "_____++++++o-------+--+-o-o-o+o+"
+#'   # This pattern represents 26 weeks of treatment UDS
+#'   pattern_char <- "+++++o-------+--+-o-o-o+o+"
 #'   
 #'   # Replace any missing UDS ("o") with positive
 #'   cleanPattern_char <- recode_missing(pattern_char)
 #'   
-#'   # Detect if the subject was able to stay clean for at least 4 weeks after
-#'   #   randomization (week 6), but before the end of a 12-week observation
+#'   # Example: detect if the subject was able to stay clean for at least 4
+#'   #   weeks after randomization but before the end of a 12-week observation
 #'   #   period
 #'   detect_subpattern(
 #'     cleanPattern_char,
 #'     subpattern = "----",
-#'     # Week -5 to week 0 is 6 weeks pre-randomization
-#'     weeksBeforeRandomization = 6,
 #'     start = 1, 
 #'     end = 12
 #'   )
 #'   
+#'   # Example: detect if the subject was abstinent during the last 3 weeks
+#'   detect_subpattern(
+#'     cleanPattern_char,
+#'     subpattern = "---",
+#'     start = -3, 
+#'     end = -1
+#'   )
+#'   
 detect_subpattern <- function(use_pattern,
                               subpattern,
-                              weeksBeforeRandomization,
                               start, end = -1) {
+  
+  # If start or end are > the length of use_pattern, then error
+  nChars <- str_length(use_pattern)
+  if (abs(start) > nChars | abs(end) > nChars) {
+    stop(
+      "start and end must be less than the length of use_pattern",
+      call. = FALSE
+    )
+  }
   
   use_pattern_trimmed <- str_sub(
     string = use_pattern,
-    start = weeksBeforeRandomization + start,
-    end = weeksBeforeRandomization + end
+    start = start,
+    end = end
   )
+  
   str_detect(use_pattern_trimmed, pattern = fixed(subpattern))
   
 }

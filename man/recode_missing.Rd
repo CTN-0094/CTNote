@@ -4,7 +4,11 @@
 \alias{recode_missing}
 \title{Recode Missing or Ambiguous UDS in a Subject Use Pattern}
 \usage{
-recode_missing(use_pattern, missing_is = "o", missing_as = c("+", "", "-"))
+recode_missing(
+  use_pattern,
+  missing_is = "o",
+  missing_becomes = c("+", "", "-")
+)
 }
 \arguments{
 \item{use_pattern}{A character string showing the daily, by visit, or weekly
@@ -13,8 +17,8 @@ substance use pattern for a single subject}
 \item{missing_is}{Which single character is used to mark missing UDS in a
 use pattern string? Defaults to \code{"o"}.}
 
-\item{missing_as}{How should missing UDS be treated? Defaults to marking the
-subject as positive for that missing period. Options are \code{"+"} for
+\item{missing_becomes}{How should missing UDS be treated? Defaults to marking
+the subject as positive for that missing period. Options are \code{"+"} for
 positive, \code{""} for ignore, or \code{"-"} for negative (note that this
 last option should only be used in case where the "missing" UDS is a
 regular and expected artefact of the study design and the preceeding and
@@ -23,14 +27,18 @@ following UDS are both negative).}
 \value{
 A character string with all missing UDS values (marked as \code{"o"}
 unless a different value is supplied to \code{missing_is}) replaces by the
-value supplied to \code{missing_as}.
+value supplied to \code{missing_becomes}.
 }
 \description{
 Replace all missing UDS \code{"o"} in a use pattern string
 }
 \examples{
-  pattern_char <- "_____+++++*o-------+--+-o-o-o+o+"
+  pattern_char <- "++++*o-------+--+-o-o-o+o+"
+  
+  # Default: change all missing weeks to positive
   recode_missing(pattern_char)
-  recode_missing(pattern_char, missing_is = "_", missing_as = "")
+  
+  # Other example: remove all weeks with no UDS by design
+  recode_missing(pattern_char, missing_is = "_", missing_becomes = "")
   
 }

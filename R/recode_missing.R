@@ -22,15 +22,25 @@
 #' 
 #'
 #' @examples
-#'   pattern_char <- "_____+++++*o-------+--+-o-o-o+o+"
+#'   pattern_char <- "__++++*o-------+--+-o-o-o+o+"
+#'   
+#'   # Default: change all missing weeks to positive
 #'   recode_missing(pattern_char)
-#'   recode_missing(pattern_char, missing_is = "_", missing_as = "")
+#'   
+#'   # Other example: remove all weeks with no UDS by design
+#'   recode_missing(pattern_char, missing_is = "_", missing_becomes = "")
 #'   
 recode_missing <- function(use_pattern, 
                            missing_is = "o",
                            missing_becomes = c("+", "", "-")) {
+  # browser()
   
-  missing_becomes <- match.arg(missing_becomes)
+  ###  Avoid "" in match.arg()  ###
+  # https://stackoverflow.com/questions/41441170/failure-of-match-arg-for-the-empty-string
+  if ( !identical(missing_becomes, "") ) {
+    missing_becomes <- match.arg(missing_becomes)
+  }
+  
   str_replace_all(
     string = use_pattern,
     pattern = fixed(missing_is),
