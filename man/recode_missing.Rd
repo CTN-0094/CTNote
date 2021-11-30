@@ -31,5 +31,6 @@ Replace all missing UDS \code{"o"} in a use pattern string
 \examples{
   pattern_char <- "_____+++++*o-------+--+-o-o-o+o+"
   recode_missing(pattern_char)
+  recode_missing(pattern_char, missing_is = "_", missing_as = "")
   
 }
