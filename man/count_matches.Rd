@@ -4,7 +4,15 @@
 \alias{count_matches}
 \title{Count Periods of Substance Use / Abstinence}
 \usage{
-count_matches(use_pattern, match_is, start, end = -1, proportion = FALSE)
+count_matches(
+  use_pattern,
+  match_is,
+  start,
+  end = -1,
+  mixed_results_are = NULL,
+  mixed_weight = 0.5,
+  proportion = FALSE
+)
 }
 \arguments{
 \item{use_pattern}{A character string showing the daily, by visit, or weekly
@@ -20,6 +28,17 @@ randomization}
 \item{end}{The end of the detection range. This is often the end of followup
 (denoted by -1, which represents the last item in the string), or this
 could be a set number of weeks or visits, such as 12 weeks or 48 visits.}
+
+\item{mixed_results_are}{A single character value indicating a partial use
+week; e.g. \code{"*"} means that the subject had at least one positive and
+at least one negative test of the substance(s) of interest for that week.
+Defaults to \code{NULL}.}
+
+\item{mixed_weight}{A fraction showing the proportional use value for a
+mixed result week. For example, some studies state that a positive UDS
+counts as three days of use (3/7), while other studies regard a positive
+UDS as five days of use (5/7). This value should be substance-specific,
+but we default to 0.5.}
 
 \item{proportion}{Should this function return the count or proportion of
 matching use periods? Defaults to \code{FALSE}, signifying that the count
@@ -39,7 +58,7 @@ pattern contains a certain substance use indicator
 }
 \examples{
   # This pattern represents 26 weeks of treatment UDS
-  pattern_char <- "+++++o-------+--+-o-o-o+o+"
+  pattern_char <- "++++*o-------+--+-o-o-o+o+"
   
   # Replace any missing UDS ("o") with positive
   cleanPattern_char <- recode_missing(pattern_char)
@@ -52,6 +71,8 @@ pattern contains a certain substance use indicator
     match_is = "-",
     start = 1,
     end = 12,
+    mixed_results_are = "*",
+    mixed_weight = 0.5,
     proportion = TRUE
   )
   

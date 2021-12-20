@@ -33,7 +33,7 @@ value supplied to \code{missing_becomes}.
 Replace all missing UDS \code{"o"} in a use pattern string
 }
 \examples{
-  pattern_char <- "++++*o-------+--+-o-o-o+o+"
+  pattern_char <- "__++++*o-------+--+-o-o-o+o+"
   
   # Default: change all missing weeks to positive
   recode_missing(pattern_char)
