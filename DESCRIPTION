@@ -25,6 +25,7 @@ Depends: R (>= 3.1.0)
 Imports: 
   ctn0094data,
   ctn0094DataExtra,
+  stringi,
   stringr
 Suggests: 
     knitr,

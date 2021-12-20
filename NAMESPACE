@@ -2,10 +2,13 @@
 
 export(count_matches)
 export(detect_subpattern)
+export(measure_retention)
 export(recode_missing)
+importFrom(stringi,stri_locate_last_fixed)
 importFrom(stringr,fixed)
 importFrom(stringr,str_count)
 importFrom(stringr,str_detect)
 importFrom(stringr,str_length)
 importFrom(stringr,str_replace_all)
+importFrom(stringr,str_split)
 importFrom(stringr,str_sub)

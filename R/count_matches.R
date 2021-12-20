@@ -9,10 +9,11 @@
 #'   e.g. \code{"+"} is use positive or \code{"-"} is use negative.
 #' @param start These two arguments give the integer range wherein to look for
 #'   the use sub-pattern of interest. Usually, start should be the week of
-#'   randomization
+#'   randomization. Defaults to 1.
 #' @param end The end of the detection range. This is often the end of followup
-#'   (denoted by -1, which represents the last item in the string), or this
-#'   could be a set number of weeks or visits, such as 12 weeks or 48 visits.
+#'   (denoted by -1, the default value, which represents the last item in the
+#'   string), or this could be a set number of weeks or visits, such as 12 weeks
+#'   or 48 visits.
 #' @param mixed_results_are A single character value indicating a partial use
 #'    week; e.g. \code{"*"} means that the subject had at least one positive and
 #'    at least one negative test of the substance(s) of interest for that week.
@@ -51,7 +52,6 @@
 #'   count_matches(
 #'     cleanPattern_char,
 #'     match_is = "-",
-#'     start = 1,
 #'     end = 12,
 #'     mixed_results_are = "*",
 #'     mixed_weight = 0.5,
@@ -62,27 +62,27 @@
 #'   #   after being clean at least one week
 #'   count_matches(
 #'     cleanPattern_char,
-#'     match_is = "-+",
-#'     start = 1,
-#'     end = -1
+#'     match_is = "-+"
 #'   )
 #'   
 count_matches <- function(use_pattern,
                           match_is,
-                          start, end = -1,
+                          start = 1, end = -1,
                           mixed_results_are = NULL,
                           mixed_weight = 0.5,
                           proportion = FALSE) {
   
   ###  Subset  ###
-  # If start or end are > the length of use_pattern, then error
-  nChars <- str_length(use_pattern)
-  if (abs(start) > nChars | abs(end) > nChars) {
-    stop(
-      "start and end must be less than the length of use_pattern",
-      call. = FALSE
-    )
-  }
+  # # UPDATE 2021-12-20: because we are removing the "baseline" pattern, we
+  # #   don't need to check for bad values here
+  # # If start or end are > the length of use_pattern, then error
+  # nChars <- str_length(use_pattern)
+  # if (abs(start) > nChars | abs(end) > nChars) {
+  #   stop(
+  #     "start and end must be less than the length of use_pattern",
+  #     call. = FALSE
+  #   )
+  # }
   use_pattern_trimmed <- str_sub(
     string = use_pattern,
     start = start,

@@ -7,7 +7,7 @@
 count_matches(
   use_pattern,
   match_is,
-  start,
+  start = 1,
   end = -1,
   mixed_results_are = NULL,
   mixed_weight = 0.5,
@@ -23,11 +23,12 @@ e.g. \code{"+"} is use positive or \code{"-"} is use negative.}
 
 \item{start}{These two arguments give the integer range wherein to look for
 the use sub-pattern of interest. Usually, start should be the week of
-randomization}
+randomization. Defaults to 1.}
 
 \item{end}{The end of the detection range. This is often the end of followup
-(denoted by -1, which represents the last item in the string), or this
-could be a set number of weeks or visits, such as 12 weeks or 48 visits.}
+(denoted by -1, the default value, which represents the last item in the
+string), or this could be a set number of weeks or visits, such as 12 weeks
+or 48 visits.}
 
 \item{mixed_results_are}{A single character value indicating a partial use
 week; e.g. \code{"*"} means that the subject had at least one positive and
@@ -69,7 +70,6 @@ pattern contains a certain substance use indicator
   count_matches(
     cleanPattern_char,
     match_is = "-",
-    start = 1,
     end = 12,
     mixed_results_are = "*",
     mixed_weight = 0.5,
@@ -80,9 +80,7 @@ pattern contains a certain substance use indicator
   #   after being clean at least one week
   count_matches(
     cleanPattern_char,
-    match_is = "-+",
-    start = 1,
-    end = -1
+    match_is = "-+"
   )
   
 }
