@@ -44,7 +44,7 @@
 #'   pattern_char <- "++++*o-------+--+-o-o-o+o+"
 #'   
 #'   # Replace any missing UDS ("o") with positive
-#'   cleanPattern_char <- recode_missing(pattern_char)
+#'   cleanPattern_char <- recode_missing_visits(pattern_char)
 #'   
 #'   # Example: find the proportion of the subject's negative use weeks after
 #'   #   randomization but before the end of a 12-week observation

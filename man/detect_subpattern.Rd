@@ -4,7 +4,7 @@
 \alias{detect_subpattern}
 \title{Detect a Consecutive Sub-Pattern}
 \usage{
-detect_subpattern(use_pattern, subpattern, start, end = -1)
+detect_subpattern(use_pattern, subpattern, start = 1, end = -1)
 }
 \arguments{
 \item{use_pattern}{A character string showing the daily, by visit, or weekly
@@ -16,11 +16,12 @@ sub-pattern would be "ooooooo".}
 
 \item{start}{These two arguments give the integer range wherein to look for
 the use sub-pattern of interest. Usually, start should be the week of
-randomization}
+randomization. Defaults to 1.}
 
 \item{end}{The end of the detection range. This is often the end of followup
-(denoted by -1, which represents the last item in the string), or this
-could be a set number of weeks or visits, such as 12 weeks or 48 visits.}
+(denoted by -1, the default value, which represents the last item in the
+string), or this could be a set number of weeks or visits, such as 12 weeks
+or 48 visits.}
 }
 \value{
 A single logical value indicating if the use subpattern is present in
@@ -41,7 +42,7 @@ use weeks, the sub-pattern would be set to \code{"+++"}.
   pattern_char <- "+++++o-------+--+-o-o-o+o+"
   
   # Replace any missing UDS ("o") with positive
-  cleanPattern_char <- recode_missing(pattern_char)
+  cleanPattern_char <- recode_missing_visits(pattern_char)
   
   # Example: detect if the subject was able to stay clean for at least 4
   #   weeks after randomization but before the end of a 12-week observation
@@ -49,7 +50,6 @@ use weeks, the sub-pattern would be set to \code{"+++"}.
   detect_subpattern(
     cleanPattern_char,
     subpattern = "----",
-    start = 1, 
     end = 12
   )
   

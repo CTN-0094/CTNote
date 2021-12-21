@@ -25,14 +25,14 @@
 #'   pattern_char <- "__++++*o-------+--+-o-o-o+o+"
 #'   
 #'   # Default: change all missing weeks to positive
-#'   recode_missing(pattern_char)
+#'   recode_missing_visits(pattern_char)
 #'   
 #'   # Other example: remove all weeks with no UDS by design
-#'   recode_missing(pattern_char, missing_is = "_", missing_becomes = "")
+#'   recode_missing_visits(pattern_char, missing_is = "_", missing_becomes = "")
 #'   
-recode_missing <- function(use_pattern, 
-                           missing_is = "o",
-                           missing_becomes = c("+", "", "-")) {
+recode_missing_visits <- function(use_pattern, 
+                                  missing_is = "o",
+                                  missing_becomes = c("+", "", "-")) {
   # browser()
   
   ###  Avoid "" in match.arg()  ###
