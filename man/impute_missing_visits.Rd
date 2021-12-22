@@ -7,7 +7,9 @@
 impute_missing_visits(
   use_pattern,
   method = c("locf", "locfD", "mode"),
-  missing_is = "o"
+  missing_is = "o",
+  mixed_is = "*",
+  tiebreaker = "+"
 )
 }
 \arguments{
@@ -21,6 +23,15 @@ options are \code{"locf"} (last observation carried forward),
 
 \item{missing_is}{Which single character is used to mark missing UDS in a
 use pattern string? Defaults to \code{"o"}.}
+
+\item{mixed_is}{Which single character is used to mark mixed UDS (both
+positive and negative UDS for the visit block) in a use pattern string?
+Defaults to \code{"*"}. When imputing by the mode, all mixed result UDS
+will be assigned the \code{tiebreaker} value in order to calculate the mode
+but will remain unchanged in the returned use pattern string.}
+
+\item{tiebreaker}{In the event of ties between two modes, should positive or
+negative UDS be the mode? Defaults to positive (\code{"+"}).}
 }
 \value{
 A use pattern string the same length as \code{use_pattern} with

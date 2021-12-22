@@ -11,6 +11,13 @@
 #'   \code{"mode"} (most common non-missing value).
 #' @param missing_is Which single character is used to mark missing UDS in a 
 #'   use pattern string? Defaults to \code{"o"}.
+#' @param mixed_is Which single character is used to mark mixed UDS (both
+#'   positive and negative UDS for the visit block) in a use pattern string?
+#'   Defaults to \code{"*"}. When imputing by the mode, all mixed result UDS
+#'   will be assigned the \code{tiebreaker} value in order to calculate the mode
+#'   but will remain unchanged in the returned use pattern string.
+#' @param tiebreaker In the event of ties between two modes, should positive or
+#'   negative UDS be the mode? Defaults to positive (\code{"+"}).
 #'
 #' @return A use pattern string the same length as \code{use_pattern} with 
 #'   missing values imputed according to the chosen imputation method.
@@ -42,7 +49,9 @@
 #'   
 impute_missing_visits <- function(use_pattern,
                                   method = c("locf", "locfD", "mode"),
-                                  missing_is = "o") {
+                                  missing_is = "o",
+                                  mixed_is = "*",
+                                  tiebreaker = "+") {
   # browser()
   
   
@@ -94,7 +103,12 @@ impute_missing_visits <- function(use_pattern,
     },
     
     mode  = {
-      .impute_mode(all_chars, missing_is = missing_is)
+      .impute_mode(
+        all_chars,
+        missing_is = missing_is,
+        mixed_is = mixed_is,
+        tiebreaker = tiebreaker
+      )
     }
   )
   
@@ -129,12 +143,27 @@ impute_missing_visits <- function(use_pattern,
 
 
 ######  Mode  #################################################################
-.impute_mode <- function(x, missing_is){
+.impute_mode <- function(x, missing_is, mixed_is, tiebreaker){
+  # browser()
   
   clean_x <- x[x != missing_is]
-  most_common <- which.max( table(clean_x) )
-  # If there are ties, take the first
-  uds_mode <- names(most_common)[1]
+  
+  # All mixed results UDS will be assigned the tiebreaker value
+  clean_x[clean_x == mixed_is] <- tiebreaker
+  # which.max() gives priority to the 1st mode; in the case of ties, we need to
+  #   allow the user to control this
+  most_common <- c(
+    which.max( table(clean_x) ),
+    which.max( rev( table(clean_x) ) )
+  )
+  uds_mode <- names(most_common)
+  # If there are ties, take the tiebreaker
+  if (tiebreaker %in% uds_mode) {
+    uds_mode <- tiebreaker
+  } else {
+    # This will be a problem if there is a third major category
+    uds_mode <- uds_mode[1]
+  }
   
   imputed_x <- x
   imputed_x[imputed_x == missing_is] <- uds_mode
