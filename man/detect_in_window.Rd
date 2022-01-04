@@ -8,6 +8,7 @@ detect_in_window(
   use_pattern,
   window_width = 4L,
   threshold = 3L,
+  offset = window_width - threshold,
   match_is = c("+", "-")
 )
 }
@@ -20,13 +21,19 @@ four visits.}
 \item{threshold}{How many successes or failures are required within the
 specified window? Defaults to three.}
 
+\item{offset}{In the case of an event, where in the detection window should
+the event time be recorded? Defaults to \code{window_width - threshold};
+that is, the start of the actual pattern. Another option would be 0, which
+indicates that the event should be recorded at the start of the window in
+which it was detected.}
+
 \item{match_is}{What constitutes the outcome of interest? \code{"+"}
 represents positive UDS as the visit event of interest, while \code{"-"}
 is negative.}
 }
 \value{
 A two column data frame with (a) column \code{time} representing the
-number of visits \strong{before} the first window with a match and (b)
+number of visits until the first window with a match is detected and (b)
 column \code{event} indicating if the match occurs in any window of the use
 pattern.
 }
@@ -42,18 +49,33 @@ represent a definition of relapse ("three or more positive UDS within a
 four-week window"). Thus, the output of this function under default values
 would be time until first relapse and a relapse indicator.
 
-At current, we allow for many symbols in the use pattern "word", such as
-"_" for missing by study design, "o" missing for protocol non-compliance
-(the most common form of missing), "+" for positive, "-" for negative, and
-"*" for mixed positive and negative results (this usually comes up when the
-visit represents multiple days and there are both positive and negative
-results in those days; for example, a subject is tested weekly; they
-provided a positive test on Tuesday but came back to provide a negative
-test the following day).
+Concerning the \code{offset} argument: take, for example, the use pattern
+"-------++++". The subject began to use the substance(s) of interest by
+week 8. If our relapse definition was to detect 4 weeks of use in a 4-week
+window, then the relapse time would be recorded at week 8. Similarly, we
+would expect that if our relapse definition was to detect 2 or 3 weeks of
+use in a 4 week window, that the relapse time would also be week 8. This is
+why the default value of the \code{offset} argument is what it is: we
+"shift" the detection of the use until the start of the use. However, if
+you see the pattern above and believe that the relapse should be recorded
+at week 7 for relapse defined as 3 weeks of use in a 4-week window or at
+week 6 for 2 weeks of use in a 4-week window, then set \code{offset = 0}.
+
+Defining the use symbols: at current, we allow for many symbols in the use
+pattern "word", such as "_" for missing by study design, "o" missing for
+protocol non-compliance (the most common form of missing), "+" for
+positive, "-" for negative, and "*" for mixed positive and negative results
+(this usually comes up when the visit represents multiple days and there
+are both positive and negative results in those days; for example, a
+subject is tested weekly; they provided a positive test on Tuesday but came
+back to provide a negative test the following day).
 }
 \examples{
   # Find the first relapse event
   detect_in_window("o-o+++")
+  
+  # Find the start of the window that contains the first relapse event
+  detect_in_window("o-o+++", offset = 0)
   
   # Find the first positive UDS
   detect_in_window("o-o+++", window_width = 1L, threshold = 1L)
