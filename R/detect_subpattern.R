@@ -24,6 +24,15 @@
 #'   supply urine). For example, to detect if the subject had three consecutive
 #'   use weeks, the sub-pattern would be set to \code{"+++"}. 
 #'   
+#'   At current, we allow for many symbols in the use pattern "word", such as
+#'   "_" for missing by study design, "o" missing for protocol non-compliance
+#'   (the most common form of missing), "+" for positive, "-" for negative, and
+#'   "*" for mixed positive and negative results (this usually comes up when the
+#'   visit represents multiple days and there are both positive and negative
+#'   results in those days; for example, a subject is tested weekly; they
+#'   provided a positive test on Tuesday but came back to provide a negative
+#'   test the following day).
+#'   
 #' 
 #' @importFrom stringr str_length str_sub str_detect fixed
 #' @export
