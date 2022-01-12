@@ -9,7 +9,8 @@ impute_missing_visits(
   method = c("locf", "locfD", "mode"),
   missing_is = "o",
   mixed_is = "*",
-  tiebreaker = "+"
+  tiebreaker = "+",
+  quietly = FALSE
 )
 }
 \arguments{
@@ -32,6 +33,8 @@ but will remain unchanged in the returned use pattern string.}
 
 \item{tiebreaker}{In the event of ties between two modes, should positive or
 negative UDS be the mode? Defaults to positive (\code{"+"}).}
+
+\item{quietly}{Should warning messages be muted? Defaults to \code{FALSE}}
 }
 \value{
 A use pattern string the same length as \code{use_pattern} with

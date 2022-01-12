@@ -18,6 +18,7 @@
 #'   but will remain unchanged in the returned use pattern string.
 #' @param tiebreaker In the event of ties between two modes, should positive or
 #'   negative UDS be the mode? Defaults to positive (\code{"+"}).
+#' @param quietly Should warning messages be muted? Defaults to \code{FALSE}
 #'
 #' @return A use pattern string the same length as \code{use_pattern} with 
 #'   missing values imputed according to the chosen imputation method.
@@ -60,7 +61,8 @@ impute_missing_visits <- function(use_pattern,
                                   method = c("locf", "locfD", "mode"),
                                   missing_is = "o",
                                   mixed_is = "*",
-                                  tiebreaker = "+") {
+                                  tiebreaker = "+",
+                                  quietly = FALSE) {
   # browser()
   
   
@@ -70,7 +72,9 @@ impute_missing_visits <- function(use_pattern,
   unique_chars <- unique(all_chars)
   unique_chars <- unique_chars[unique_chars != missing_is]
   if (length(unique_chars) == 0) {
-    warning("No non-missing visits. No imputation done.", call. = FALSE)
+    if (!quietly) {
+      warning("No non-missing visits. No imputation done.", call. = FALSE)
+    }
     return(use_pattern)
   }
   
@@ -130,13 +134,19 @@ impute_missing_visits <- function(use_pattern,
 
 ######  LOCF  #################################################################
 .impute_locf <- function(x, missing_is){
+  # browser()
+  
+  nX <- length(x)
+  if (nX == 1L) {
+    return(x)
+  }
   
   # Initialise
-  imputed_visits <- character(length = length(x))
+  imputed_visits <- character(length = nX)
   imputed_visits[1] <- x[1]
   
   # Loop
-  for (visit in 2:length(imputed_visits)) {
+  for (visit in 2:nX) {
     if (x[visit] == missing_is) {
       imputed_visits[visit] <- imputed_visits[visit - 1]
     } else {

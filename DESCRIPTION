@@ -6,7 +6,7 @@ Description: CTNote is a coded collection of substance use disorder clinical
   screenings. Note that we abbreviate urine drug screen as "UDS" and urine
   opioid screen as "UOS". For the example data sets (based on clinical trials
   data harmonized in CTN-0094), UDS and UOS are largely interchangable.
-Version: 0.0.0.9007
+Version: 0.0.0.9008
 Authors@R:
   c(
     person(
@@ -28,8 +28,10 @@ Imports:
   stringi,
   stringr
 Suggests: 
+    testthat (>= 3.0.0),
     knitr,
     rmarkdown
 VignetteBuilder: knitr
 LazyData: true
 Roxygen: list(markdown = TRUE)
+Config/testthat/edition: 3
