@@ -24,11 +24,14 @@ test_that("mode imputation works", {
   )
 })
 
-test_that("kNN imputation works", {
+
+
+######  kNN  ##################################################################
+test_that("basic kNN imputation works", {
   expect_equal(
-    "++++**-------+--+oo---*+++oooo",
+    "++++**-------+--+oo---*++++*oo",
     impute_missing_visits(
-      "++++*o-------+--+oo-o-o+o+oooo",
+      "++++*o-------+--+oo-o-o+o+o*oo",
       method = "kNN",
       quietly = TRUE
     )

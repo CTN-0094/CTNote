@@ -75,6 +75,19 @@ you may need to call \code{\link{recode_missing_visits}} in a pipeline
 after this function to replace or remove the remaining non-imputable
 missing visits.
 
+If you are using the kNN imputation option, there are some caveats to
+consider. Due to rounding rules, any rounding ties are broken by order of
+the values to the \code{knnWeights_num} vector. For instance, consider a
+subject who had a negative UDS in one week, then a missing UDS for the next
+week, and then two UDS in the following week (of which one was positive and
+the other was negative). This is represented by the use pattern
+\code{"-o*"}. The default behavior of the kNN method is to impute this to
+\code{"-**"} because the order of the \code{knnWeights_num} vector has
+\code{"+"}, then \code{"*"}, then \code{"-"} UDS values. In this order, a
+positive result trumps a mixed result, and a mixed result trumps a negative
+result. Similarly, the use pattern \code{"+o*"} will be imputed to
+\code{"++*"} by default.
+
 At current, we allow for many symbols in the use pattern "word", such as
 "_" for missing by study design, "o" missing for protocol non-compliance
 (the most common form of missing), "+" for positive, "-" for negative, and
