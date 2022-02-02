@@ -7,8 +7,9 @@
 #'   substance use pattern for a single subject
 #' @param method Which naive imputation method should be used? Current supported
 #'   options are \code{"locf"} (last observation carried forward),
-#'   \code{"locfD"} (last observation carried forward until dropout), and
-#'   \code{"mode"} (most common non-missing value).
+#'   \code{"locfD"} (last observation carried forward until dropout),
+#'   \code{"mode"} (most common non-missing value), and \code{"kNN"} (k nearest
+#'   neighbors).
 #' @param missing_is Which single character is used to mark missing UDS in a 
 #'   use pattern string? Defaults to \code{"o"}.
 #' @param mixed_is Which single character is used to mark mixed UDS (both
@@ -18,6 +19,19 @@
 #'   but will remain unchanged in the returned use pattern string.
 #' @param tiebreaker In the event of ties between two modes, should positive or
 #'   negative UDS be the mode? Defaults to positive (\code{"+"}).
+#' @param k The number of neighbors to use in kNN imputation. This defaults to
+#'   1; we recommend that this parameter stays at 1 unless the use patterns in
+#'   your data have extraordinarily few missing values.
+#' @param knnWeights_num A named vector matching the use pattern word "letters"
+#'   to their numerical use values. The names of this vector should match the
+#'   "letters" of the use pattern word exactly; use backticks to escape special
+#'   characters. For example, if the study protocol counts a mixed result (one
+#'   positive and one negative UDS in a single observation period \[week\]) as
+#'   worth three "use days", then mixed results should have a  weight of 3/7.
+#'   Additionally, a study protocol may count missing values as five "use days"
+#'   out of a week. The defaults for this function are to leave \code{"o"} as
+#'   missing (\code{NA}), and give weights of 1, 1/2, and 0 for visits with
+#'   \code{"+"}, \code{"*"}, and \code{"-"} UDS, respectively.
 #' @param quietly Should warning messages be muted? Defaults to \code{FALSE}
 #'
 #' @return A use pattern string the same length as \code{use_pattern} with 
@@ -28,8 +42,9 @@
 #'   \code{\link{recode_missing_visits}} instead. Furthermore, there will most
 #'   likely still be missing values in the use pattern even after imputation.
 #'   This would occur if all the values are missing, if the first values of the
-#'   use pattern are missing (if LOCF is used), or if the first and/or last
-#'   values of the use pattern are missing (if LOCF-D) is used. Because of this,
+#'   use pattern are missing (if LOCF is used), if the first and/or last values
+#'   of the use pattern are missing (if LOCF-D is used), or if there are back to
+#'   back missing visits (if kNN with \code{k = 1} is used). Because of this,
 #'   you may need to call \code{\link{recode_missing_visits}} in a pipeline 
 #'   after this function to replace or remove the remaining non-imputable
 #'   missing visits.
@@ -132,9 +147,12 @@ impute_missing_visits <- function(use_pattern,
     },
     
     kNN  = {
-      warning("kNN imputation in beta development. Expect bugs.", call. = FALSE)
+      if (!quietly) {
+        warning("kNN imputation in development. Expect bugs.", call. = FALSE)
+      }
       .impute_kNN(
         all_chars,
+        missing_is = missing_is,
         k = k,
         weights_num = knnWeights_num
       )
@@ -209,7 +227,7 @@ impute_missing_visits <- function(use_pattern,
 
 
 ######  kNN  ##################################################################
-.impute_kNN <- function(x, k = 1, weights_num){
+.impute_kNN <- function(x, missing_is, k = 1, weights_num){
   # browser()
   
   # The case_when() syntax works great here when we are coding interactively;
@@ -254,7 +272,7 @@ impute_missing_visits <- function(use_pattern,
   for ( i in seq_along(newVals_num) ) {
     xOut_char[xRound_num == newVals_num[i]] <- origVals_char[i]
   }
-  xOut_char[is.na(xRound_num)] <- "o"
+  xOut_char[is.na(xRound_num)] <- missing_is
   
   # Return
   xOut_char
@@ -274,9 +292,3 @@ impute_missing_visits <- function(use_pattern,
   values_num[unlist(mins_ls)]
   
 }
-
-# # Test
-# impute_missing_visits(
-#   use_pattern = "++++*o-------+--+oo-o-o+o+",
-#   method = "kNN"
-# )
