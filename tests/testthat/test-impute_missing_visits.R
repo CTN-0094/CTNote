@@ -26,13 +26,13 @@ test_that("mode imputation works", {
 
 
 
-######  kNN  ##################################################################
-test_that("basic kNN imputation works", {
+######  kNV  ##################################################################
+test_that("basic kNV imputation works", {
   expect_equal(
     "++++**-------+--+oo---*++++*oo",
     impute_missing_visits(
       "++++*o-------+--+oo-o-o+o+o*oo",
-      method = "kNN",
+      method = "kNV",
       quietly = TRUE
     )
   )

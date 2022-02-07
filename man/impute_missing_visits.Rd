@@ -6,12 +6,12 @@
 \usage{
 impute_missing_visits(
   use_pattern,
-  method = c("locf", "locfD", "mode", "kNN"),
+  method = c("locf", "locfD", "mode", "kNV"),
   missing_is = "o",
   mixed_is = "*",
   tiebreaker = "+",
   k = 1,
-  knnWeights_num = c(o = NA, `+` = 1, `*` = 0.5, `-` = 0),
+  knvWeights_num = c(o = NA, `+` = 1, `*` = 0.5, `-` = 0),
   quietly = FALSE
 )
 }
@@ -22,8 +22,8 @@ substance use pattern for a single subject}
 \item{method}{Which naive imputation method should be used? Current supported
 options are \code{"locf"} (last observation carried forward),
 \code{"locfD"} (last observation carried forward until dropout),
-\code{"mode"} (most common non-missing value), and \code{"kNN"} (k nearest
-neighbors).}
+\code{"mode"} (most common non-missing value), and \code{"kNV"} (k nearest
+visits).}
 
 \item{missing_is}{Which single character is used to mark missing UDS in a
 use pattern string? Defaults to \code{"o"}.}
@@ -37,11 +37,11 @@ but will remain unchanged in the returned use pattern string.}
 \item{tiebreaker}{In the event of ties between two modes, should positive or
 negative UDS be the mode? Defaults to positive (\code{"+"}).}
 
-\item{k}{The number of neighbors to use in kNN imputation. This defaults to
-1; we recommend that this parameter stays at 1 unless the use patterns in
-your data have extraordinarily few missing values.}
+\item{k}{The number of neaest visits to use in kNV imputation. This defaults
+to 1; we recommend that this parameter stays at 1 unless the use patterns
+in your data have extraordinarily few missing values.}
 
-\item{knnWeights_num}{A named vector matching the use pattern word "letters"
+\item{knvWeights_num}{A named vector matching the use pattern word "letters"
 to their numerical use values. The names of this vector should match the
 "letters" of the use pattern word exactly; use backticks to escape special
 characters. For example, if the study protocol counts a mixed result (one
@@ -70,19 +70,19 @@ likely still be missing values in the use pattern even after imputation.
 This would occur if all the values are missing, if the first values of the
 use pattern are missing (if LOCF is used), if the first and/or last values
 of the use pattern are missing (if LOCF-D is used), or if there are back to
-back missing visits (if kNN with \code{k = 1} is used). Because of this,
+back missing visits (if kNV with \code{k = 1} is used). Because of this,
 you may need to call \code{\link{recode_missing_visits}} in a pipeline
 after this function to replace or remove the remaining non-imputable
 missing visits.
 
-If you are using the kNN imputation option, there are some caveats to
+If you are using the kNV imputation option, there are some caveats to
 consider. Due to rounding rules, any rounding ties are broken by order of
-the values to the \code{knnWeights_num} vector. For instance, consider a
+the values to the \code{knvWeights_num} vector. For instance, consider a
 subject who had a negative UDS in one week, then a missing UDS for the next
 week, and then two UDS in the following week (of which one was positive and
 the other was negative). This is represented by the use pattern
-\code{"-o*"}. The default behavior of the kNN method is to impute this to
-\code{"-**"} because the order of the \code{knnWeights_num} vector has
+\code{"-o*"}. The default behavior of the kNV method is to impute this to
+\code{"-**"} because the order of the \code{knvWeights_num} vector has
 \code{"+"}, then \code{"*"}, then \code{"-"} UDS values. In this order, a
 positive result trumps a mixed result, and a mixed result trumps a negative
 result. Similarly, the use pattern \code{"+o*"} will be imputed to
