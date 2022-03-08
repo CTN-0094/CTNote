@@ -1,0 +1,61 @@
+---
+title: "Overview of the CTNote Library"
+author: "Gabriel Odom, Laura Brandt, and Ray Balise"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Introduction and Motivation
+
+- Background and Motivation:
+    + opioid epidemic and deaths from OUD
+    + accurate evaluation of medication-based treatments for OUD (MOUD)
+    + health disparities in treatments and treatment outcomes
+    + wide variety of treatment 'endpoints' (Table 1)
+- Significance and Impact:
+    + first empirical (data driven) comparison of MOUD clinical trial endpoints
+    + only standard and code-based library of treatment outcome definitions
+    + Racial/ethnic sensitivity analysis of clinical trial outcome definitions
+
+
+*******************************************************************************
+</br>
+
+
+# Methods
+
+- Defining a Use Pattern "Word"
+    + The data structure required (weekly or more frequently drawn UDS for each participant)
+    + Tuning parameters (grace period and study length)
+    + Usee Pattern Examples
+- The `CTNote::` Package Helper Functions
+    + Handling missing data: `recode_missing_visits()` and `impute_missing_visits()`
+    + Accounting for the study observation design: `collapse_lattice()` and `view_by_lattice()`
+    + Detecting a use pattern: `detect_subpattern()` and `detect_in_window()`
+    + Measuring lengths of consecutive behavior: `measure_retention()` and `measure_abstinence_period()`
+    + Counting substance use events: `count_matches()`
+
+
+*******************************************************************************
+</br>
+
+
+# Results
+
+- Examples of Treatment Outcome Definitions
+- Clustering Treatment Outcomes
+- Assessing Racial/Ethnic Sensitivity in Outcomes
+
+
+*******************************************************************************
+</br>
+
+
+# Discussion
