@@ -21,7 +21,7 @@ use pattern string? Defaults to \code{"o"}.}
 the subject as positive for that missing period. Options are \code{"+"} for
 positive, \code{""} for ignore, or \code{"-"} for negative (note that this
 last option should only be used in case where the "missing" UDS is a
-regular and expected artefact of the study design and the preceeding and
+regular and expected artefact of the study design and the preceding and
 following UDS are both negative).}
 }
 \value{
