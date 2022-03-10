@@ -3,9 +3,13 @@ title: "Overview of the CTNote Library"
 author: "Gabriel Odom, Laura Brandt, and Ray Balise"
 date: "`r Sys.Date()`"
 output:
-  html_document:
+  rmarkdown::html_vignette:
     toc: true
     toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{CTNote Overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
 ---
 
 ```{r setup, include=FALSE}
