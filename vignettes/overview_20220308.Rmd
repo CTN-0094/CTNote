@@ -33,8 +33,8 @@ knitr::opts_chunk$set(echo = TRUE)
 
 - Defining a Use Pattern "Word"
     + The data structure required (weekly or more frequently drawn UDS for each participant)
-    + Tuning parameters (grace period and study length)
-    + Usee Pattern Examples
+    + Tuning parameters (grace period and study length). MOVE TO ctn0094DataExtra vignette; we will assume that the use pattern word already exists
+    + Use Pattern Examples (Table 2: 5 interesting people)
 - The `CTNote::` Package Helper Functions
     + Handling missing data: `recode_missing_visits()` and `impute_missing_visits()`
     + Accounting for the study observation design: `collapse_lattice()` and `view_by_lattice()`
@@ -51,6 +51,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 - Examples of Treatment Outcome Definitions
 - Clustering Treatment Outcomes
+    + Resampled Dendrogram (Figure 1)
 - Assessing Racial/Ethnic Sensitivity in Outcomes
 
 
