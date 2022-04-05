@@ -53,6 +53,7 @@ vignettes/*.pdf
 *.xlsx
 *.xls
 !inst/suppl_docs/definitions_20220210.xlsx
+!inst/suppl_docs/definitions_20220405.xlsx
 
 # R data
 *.rds
