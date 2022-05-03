@@ -31,8 +31,6 @@ library(tidyverse)
 
 Over 750,000 Americans have died from a drug overdose [since 1990](https://www.hhs.gov/opioids/about-the-epidemic/opioid-crisis-statistics/index.html). [Since 2018](https://www.pewtrusts.org/en/research-and-analysis/fact-sheets/2020/12/medications-for-opioid-use-disorder-improve-patient-outcomes), 2 in 3 drug overdose deaths have been from an opioid (almost 50,000 deaths). Nearly 1.3 million Americans are currently using one or more of the following medications to treat opioid use disorder (OUD): methadone, buprenorphine, and naltrexone. The [National Institute on Drug Abuse](https://nida.nih.gov/)'s [Clinical Trials Network](https://nida.nih.gov/about-nida/organization/cctn/clinical-trials-network-ctn) have funded over 100 clinical trials and clinical trial supplemental studies to study the effects of new and existing medications to treat addiction. Furthermore, opioid use disorder has in the past been predominately a disease of [middle-class white Americans](http://www.doi.org/10.1007/s11013-016-9496-5). However, these demographics have been shifting, and with this shift come exacerbated [health disparities](https://www.addictioncenter.com/news/2019/10/racial-disparities-opioid-addiction-treatment/). 
 
-> Clinically meaningful, patient-centric endpoints beyond abstinence are needed to define success in clinical trials. - Dr. Nora Vulkow, Address to CTN, April 2022
-
 Clinical trials assess the effectiveness of medication-based treatments for OUD (MOUD). A wide variety of treatment outcomes have been used in clinical trials since 1972 (Table 1 shows outcomes from 41 papers assessing MOUD). These endpoints all assess participant success or failure in treatment via the results from scheduled *urine drug screenings* (UDS) or *urine opioid screenings* (UOS). Accurately measuring the efficacy of MOUD for clinical trial participants is paramount, but no "gold standard" trial outcomes exist.
 
 Moreover, trial outcomes commonly used in CTN trials have not been widely assessed for racial / ethnic measurement variance, but some such effects have already been described. For example, racial/ethnic bias was assessed for [OUD trial completion rates](https://www.doi.org/10.1016/j.drugalcdep.2018.06.006), and this treatment outcome was found to change disproportionately based on participant race/ethnicity in large US cities. In clinical trials for OUD, if a treatment outcome has latent racial/ethnic bias (after controlling for relevant clinical factors), then one of two scenarios will occur: (1) if minority subjects are disproportionately marked as treatment successes in error, then the observed quality of an otherwise ineffective therapeutic will be inflated for that subgroup; conversely, (2) if minority subjects are disproportionately marked as treatment failures in error, then the observed quality of an otherwise effective experimental therapeutic will be diminished. Treatment outcomes which depend on race/ethnicity will lead to inequitable over/under-treatment of minority individuals who suffer from OUD.
@@ -73,20 +71,13 @@ tab1_df %>%
 Each row of Table 1 is an outcome used in a past clinical trial for MOUD. As preliminary work, our clinical team grouped these by clinical practice into three classes: *abstinence*, *relapse*, and substance use *reduction*. These classes were further split into subclasses based on their clinical interpretation. Of note, these metrics also differed in how they considered a scheduled but incomplete UDS (i.e. a "missing" UDS). We removed outcomes which could not be used to measure subject-specific outcomes (e.g. "proportion of subjects in treatment group with positive UDS in study week 3"); we removed outcomes which could not yield a univariate metric of subject success (e.g. "number of positive UDS per three-week window over time"); we split papers which assessed multiple outcomes (e.g. complete abstinence between weeks 5-12 AND total number of abstinent weeks), and we combined papers which used identical outcomes. At the end of our literature search, we have `r nrow(tab1_df)` outcomes from registered clinical trials to consider.
 
 
-## Motivation
+## Objectives
 
-Some treatment outcomes may be needlessly sensitive to protected health attributes (such as race, ethnicity, age, and/or sex), which could exacerbate existing health disparities.
+> Clinically meaningful, patient-centric endpoints beyond abstinence are needed to define success in clinical trials. - Dr. Nora Vulkow, Address to CTN, April 2022
 
+This is the first large-scale, empirical (data driven) comparison of MOUD clinical trial endpoints, and to our knowledge, this is the first racial/ethnic sensitivity analysis of multiple clinical trial outcome definitions. Furthermore, this is the only standard and code-based library of treatment outcome definitions to date, and we believe it will be useful to all future substance use disorder clinical trials in NIDA's [Clinical Trials Network](https://nida.nih.gov/about-nida/organization/cctn/clinical-trials-network-ctn) (CTN) and in other substance use disorder research.
 
-    + accurate evaluation of medication-based treatments for OUD (MOUD)
-    + health disparities in treatments and treatment outcomes
-    + wide variety of treatment 'endpoints' (Table 1)
-- Significance and Impact:
-    + first empirical (data driven) comparison of MOUD clinical trial endpoints
-    + only standard and code-based library of treatment outcome definitions
-    + Racial/ethnic sensitivity analysis of clinical trial outcome definitions
-
-
+Our scientific questions are as follows: (1) When applied to the same clinical trials data, do these outcomes follow the same clinically intuitive clusters (abstinence, relapse, use reduction)? (2) When applied to the same clinical trials data, *and* controlling for clinically relevant confounders, are some of these outcomes more sensitive to race/ethnicity than others?
 
 
 *******************************************************************************
@@ -94,6 +85,16 @@ Some treatment outcomes may be needlessly sensitive to protected health attribut
 
 
 # Methods
+
+
+## The Clinical Trials Data
+The [CTN-0094 Project](http://ctndisseminationlibrary.org/protocols/ctn0094.htm) research team harmonized data from 3 large-scale MOUD clinical trials: [CTN-0027](http://ctndisseminationlibrary.org/protocols/ctn0027.htm): "Starting reatment with Agonist Replacement Therapies (START)"; [CTN-0030](http://ctndisseminationlibrary.org/protocols/ctn0030.htm): "Prescription Opiate Abuse Treatment Study (POATS)"; and [CTN-0051](http://ctndisseminationlibrary.org/protocols/ctn0051.htm): "Extended-Release Naltrexone vs. Buprenorphine for Opioid Treatment (X:BOT)". These three are nationally representative, prospective clinical trials with over 3600 combined participants. These trials treated participants for 16-24 weeks, and collected rich baseline substance use data, demographics, and medical/psychiatric evaluations. 
+
+We have `r nrow(derived_weeklyOpioidPattern)` fully de-identified subjects with demographics and weekly UDS results for the months they were in treatment, 2492 of whom completed randomization to a treatment arm. This harmonized data will be released in the R packages `ctn0094data` and [`ctn0094DataExtra`](https://github.com/CTN-0094/ctn0094DataExtra). To simplify our analysis of endpoint sensitivity to race/ethnicity, we coded race and ethnicity conjointly as "Non-Hispanic White" ($n_W = 2484$), "Non-Hispanic Black" ($n_B = 347$), "Hispanic" ($n_H = 507$), and "Other" ($n_O = 222$). In order to summarize complex substance use patterns over the weeks of the multiple clinical trials, we standardized all dates to the day of trial consent, and we coded the urinalysis results for each day/week as a "word".
+
+
+## Substance Use Pattern "Word"
+As described in detail in [Odom et al, (2022)](<ctn0094DataExtra Vignette / Publication here>), we create a [sufficient statistic](https://doi.org/10.1098/rsta.1922.0009) of all weekly UDS results. For a substance of interest (opioids in our case), this statistic is a compact representation of the full pattern of substance use for an individual participant.
 
 - Defining a Use Pattern "Word"
     + The data structure required (weekly or more frequently drawn UDS for each participant)
