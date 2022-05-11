@@ -21,16 +21,20 @@ Authors@R:
 License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.1.2
-Depends: R (>= 3.1.0)
-Imports: 
+Depends:
+  R (>= 3.1.0),
   ctn0094data,
-  ctn0094DataExtra,
+  ctn0094DataExtra
+Imports: 
   stringi,
   stringr
 Suggests: 
-    testthat (>= 3.0.0),
-    knitr,
-    rmarkdown
+  kableExtra,
+  knitr,
+  readxl,
+  rmarkdown,
+  testthat (>= 3.0.0),
+  tidyverse
 VignetteBuilder: knitr
 LazyData: true
 Roxygen: list(markdown = TRUE)
