@@ -9,7 +9,7 @@ detect_in_window(
   window_width = 4L,
   threshold = 3L,
   offset = window_width - threshold,
-  match_is = c("+", "-")
+  match_is = c("+", "o", "-")
 )
 }
 \arguments{
@@ -28,8 +28,9 @@ indicates that the event should be recorded at the start of the window in
 which it was detected.}
 
 \item{match_is}{What constitutes the outcome of interest? \code{"+"}
-represents positive UDS as the visit event of interest, while \code{"-"}
-is negative.}
+represents positive UDS as the visit event of interest, \code{"-"} is
+negative, and \code{"o"} means that the subject did not provide a valid UDS
+during the time period in question.}
 }
 \value{
 A two column data frame with (a) column \code{time} representing the

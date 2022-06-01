@@ -15,8 +15,9 @@
 #'   indicates that the event should be recorded at the start of the window in
 #'   which it was detected. 
 #' @param match_is What constitutes the outcome of interest? \code{"+"}
-#'   represents positive UDS as the visit event of interest, while \code{"-"}
-#'   is negative.
+#'   represents positive UDS as the visit event of interest, \code{"-"} is
+#'   negative, and \code{"o"} means that the subject did not provide a valid UDS
+#'   during the time period in question.
 #'   
 #' @return A two column data frame with (a) column \code{time} representing the
 #'   number of visits until the first window with a match is detected and (b)
@@ -68,7 +69,7 @@ detect_in_window <- function(use_pattern,
                              window_width = 4L,
                              threshold = 3L,
                              offset = window_width - threshold,
-                             match_is = c("+", "-")){
+                             match_is = c("+", "o", "-")){
   # browser()
   
   match_is <- match.arg(match_is)
