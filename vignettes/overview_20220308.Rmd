@@ -25,7 +25,11 @@ library(kableExtra)
 library(tidyverse)
 ```
 
+
+
+
 # Introduction and Motivation
+
 
 ## Background
 
@@ -88,18 +92,73 @@ Our scientific questions are as follows: (1) When applied to the same clinical t
 
 
 ## The Clinical Trials Data
+
 The [CTN-0094 Project](http://ctndisseminationlibrary.org/protocols/ctn0094.htm) research team harmonized data from 3 large-scale MOUD clinical trials: [CTN-0027](http://ctndisseminationlibrary.org/protocols/ctn0027.htm): "Starting reatment with Agonist Replacement Therapies (START)"; [CTN-0030](http://ctndisseminationlibrary.org/protocols/ctn0030.htm): "Prescription Opiate Abuse Treatment Study (POATS)"; and [CTN-0051](http://ctndisseminationlibrary.org/protocols/ctn0051.htm): "Extended-Release Naltrexone vs. Buprenorphine for Opioid Treatment (X:BOT)". These three are nationally representative, prospective clinical trials with over 3600 combined participants. These trials treated participants for 16-24 weeks, and collected rich baseline substance use data, demographics, and medical/psychiatric evaluations. 
 
 We have `r nrow(derived_weeklyOpioidPattern)` fully de-identified subjects with demographics and weekly UDS results for the months they were in treatment, 2492 of whom completed randomization to a treatment arm. This harmonized data will be released in the R packages `ctn0094data` and [`ctn0094DataExtra`](https://github.com/CTN-0094/ctn0094DataExtra). To simplify our analysis of endpoint sensitivity to race/ethnicity, we coded race and ethnicity conjointly as "Non-Hispanic White" ($n_W = 2484$), "Non-Hispanic Black" ($n_B = 347$), "Hispanic" ($n_H = 507$), and "Other" ($n_O = 222$). In order to summarize complex substance use patterns over the weeks of the multiple clinical trials, we standardized all dates to the day of trial consent, and we coded the urinalysis results for each day/week as a "word".
 
 
 ## Substance Use Pattern "Word"
-As described in detail in [Odom et al, (2022)](<ctn0094DataExtra Vignette / Publication here>), we create a [sufficient statistic](https://doi.org/10.1098/rsta.1922.0009) of all weekly UDS results. For a substance of interest (opioids in our case), this statistic is a compact representation of the full pattern of substance use for an individual participant.
 
-- Defining a Use Pattern "Word"
-    + The data structure required (weekly or more frequently drawn UDS for each participant)
-    + Tuning parameters (grace period and study length). MOVE TO ctn0094DataExtra vignette; we will assume that the use pattern word already exists
-    + Use Pattern Examples (Table 2: 5 interesting people)
+As described in detail in [Odom et al, (2022)](<ctn0094DataExtra Vignette / Publication here>), we create a [sufficient statistic](https://doi.org/10.1098/rsta.1922.0009) of all weekly UDS results. For a substance of interest (opioids in our case), this statistic is a compact representation of the full pattern of substance use for an individual participant. To be of use, this summary statistic must have the following properties:
+
+1. It can be directly parsed by a computer
+2. It can be directly interpreted by a human
+3. It represents all of the same information about participant use of a substance or group of substances that would be present in a medical summary of the participant
+
+
+### Pattern Definition
+In order to compactly summarize a participant's pattern of use for a particular substance over time, we first define the following legend:
+
+- **+**: positive for the substance(s) in a specified window of time (a day, week, month, etc.) by urine screen (or self report, if such data are of interest)
+- **–**: negative for the substance(s)
+- **o**: subject failed to provide a urine sample
+- <b>_</b>: no specimens required (weekends, holidays, pre-randomization period, alternating visit days/weeks)
+- <b>*</b>: inconclusive results or mixed results (e.g. subject provided more than one urine sample in the time interval, and they did not agree)
+
+
+### Use Pattern Examples
+```{r}
+egWho_int <- 2089L
+```
+
+We will first observe the recorded opioid use data via urine screen for subject `r egWho_int` after randomization.
+```{r results='asis'}
+ctn0094data::all_drugs %>% 
+  filter(who == egWho_int) %>% 
+  filter(source == "UDSAB") %>% 
+  filter(when >= 0) %>% 
+  arrange(when) %>% 
+  kable() %>% 
+  scroll_box(width = "500px", height = "500px") 
+```
+
+While we observe that this participant used various substances throughout the clinical trial, it's difficult to make clinical judgement using the data in this form. On the one hand, this data can be clearly parsed by a computer, and it represents all of the opioid use for this subject. However, data in this form is not easy to directly interpret by a clinician.
+
+Now observe the opioid use pattern summary for this participant: 
+```{r}
+egUsePattern_char <- 
+  ctn0094DataExtra::derived_weeklyOpioidPattern %>% 
+  filter(who == egWho_int) %>% 
+  # select(who, `Weeks of Treatment` = endWeek, `Opioid Use Pattern` = Phase_1)
+  pull(Phase_1)
+egUsePattern_char
+```
+
+Using the basic pattern definition above, we can clearly see that this subject had a challenging first month (`++++`), improved in the second month (`---+`), and then remained abstinent from opioids for the remainder of the clinical trial (`--------------o-`). Participant substance use pattern data in this form *is* easy to directly interpret by a clinician. Moreover, this symbolic representation of substance use can be parsed and summarized by a computer. Finally, notice that this pattern represents the entire course of treatment for subject `r egWho_int` without loss of any clinically relevant information about their opioid addiction/dependence.
+
+
+### Use Pattern Limitations    
+While this substance use pattern summary satisfies the three conditions necessary to be a "sufficient" statistic mentioned previously, there are three main limitations:
+
+The first limitation surrounds the idea of poly-drug use. These use pattern summaries are substance or substance group specific. Notice that, while this participant does appear to curb their weekly opioid and heroin use during the course of treatment, their cocaine use does *not* decrease over the same time interval. However, the **opioid** use pattern summary can not display information about concurrent **cocaine** use. While this is a current limitation, one of our current areas of research involves expanding the support of substance use pattern "words" to include poly-substance use in a meaningful way (including thee ability to preserve cross-substance correlations).
+
+The second limitation is one of parsimony. In order to ensure that use pattern summaries work regardless of a computer's locale or operating system, we limit the symbols in the "word" to proper symbols from the [American Standard Code for Information Interchange](https://www.ascii-code.com/) (ASCII) list. Technically speaking, there are 128 [7-bit ASCII](https://www.ibm.com/docs/en/aix/7.1?topic=support-ascii-characters) symbols, but only 96 are visible (printable) characters. Put simply, these 96 characters are all the symbols that a traditional North American computer keyboard can make. Therefore, we could define a substance use pattern "word" with any combination of these 96 printable symbols. However, such a visual summary would be incredibly challenging to interpret, consequently failing to meet the requirement that our summary be easily read by a clinician. In the interest of simplicity, we chose the five symbols mentioned above (`+`, `-`, `o`, `*`, and `_`). We recognize that different clinical trial designs may necessitate the introduction of additional symbols to this use pattern summary, but we strongly recommend (due to human [memory constraints](https://doi.org/10.1037/h0043158)) that such lists be kept to seven symbols or fewer. As an example, we discussed the benefit of adding a special symbol for a "missing but excused" clinic visit, but we ultimately did not because such instances were rare in our data.
+
+The third limitation is due to the cold and unfeeling logic of a computer. The computer cannot understand the many extenuating circumstances that pervade our human experience. Worth repeating is the old maxim of computing: "computers give you what you ask for, not what you want." Consider a concrete example: assume a participant was supposed to visit the clinic for a weekly urine test on Thursday, but they came on Wednesday instead due to a conflict at their work; their urine sample from Wednesday came back "clean". What would a nurse at the substance use clinic do in this case? Most people are reasonable; they would count the urine screen for that week as negative for opioids. What would a computer do? Without the direct input of a human to override the clinical trial protocol, a computer would count the negative urine on Wednesday but still mark the participant as a "failure to appear" / "missing urine screen" on Thursday. In many clinical trial protocols, missing urine screens are imputed as "positive" for the substance of interest, so now this participant's use pattern summary is marked `*` (mixed results) instead of `-` (negative results) for that week.
+
+
+## Analyzing Use Patterns with `CTNote`
 - The `CTNote::` Package Helper Functions
     + Handling missing data: `recode_missing_visits()` and `impute_missing_visits()`
     + Accounting for the study observation design: `collapse_lattice()` and `view_by_lattice()`
