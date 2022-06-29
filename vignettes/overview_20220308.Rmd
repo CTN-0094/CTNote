@@ -31,6 +31,7 @@ library(tidyverse)
 # Introduction and Motivation
 
 
+
 ## Background
 
 Over 750,000 Americans have died from a drug overdose [since 1990](https://www.hhs.gov/opioids/about-the-epidemic/opioid-crisis-statistics/index.html). [Since 2018](https://www.pewtrusts.org/en/research-and-analysis/fact-sheets/2020/12/medications-for-opioid-use-disorder-improve-patient-outcomes), 2 in 3 drug overdose deaths have been from an opioid (almost 50,000 deaths). Nearly 1.3 million Americans are currently using one or more of the following medications to treat opioid use disorder (OUD): methadone, buprenorphine, and naltrexone. The [National Institute on Drug Abuse](https://nida.nih.gov/)'s [Clinical Trials Network](https://nida.nih.gov/about-nida/organization/cctn/clinical-trials-network-ctn) have funded over 100 clinical trials and clinical trial supplemental studies to study the effects of new and existing medications to treat addiction. Furthermore, opioid use disorder has in the past been predominately a disease of [middle-class white Americans](http://www.doi.org/10.1007/s11013-016-9496-5). However, these demographics have been shifting, and with this shift come exacerbated [health disparities](https://www.addictioncenter.com/news/2019/10/racial-disparities-opioid-addiction-treatment/). 
@@ -75,6 +76,7 @@ tab1_df %>%
 Each row of Table 1 is an outcome used in a past clinical trial for MOUD. As preliminary work, our clinical team grouped these by clinical practice into three classes: *abstinence*, *relapse*, and substance use *reduction*. These classes were further split into subclasses based on their clinical interpretation. Of note, these metrics also differed in how they considered a scheduled but incomplete UDS (i.e. a "missing" UDS). We removed outcomes which could not be used to measure subject-specific outcomes (e.g. "proportion of subjects in treatment group with positive UDS in study week 3"); we removed outcomes which could not yield a univariate metric of subject success (e.g. "number of positive UDS per three-week window over time"); we split papers which assessed multiple outcomes (e.g. complete abstinence between weeks 5-12 AND total number of abstinent weeks), and we combined papers which used identical outcomes. At the end of our literature search, we have `r nrow(tab1_df)` outcomes from registered clinical trials to consider.
 
 
+
 ## Objectives
 
 > Clinically meaningful, patient-centric endpoints beyond abstinence are needed to define success in clinical trials. - Dr. Nora Vulkow, Address to CTN, April 2022
@@ -91,11 +93,13 @@ Our scientific questions are as follows: (1) When applied to the same clinical t
 # Methods
 
 
+
 ## The Clinical Trials Data
 
 The [CTN-0094 Project](http://ctndisseminationlibrary.org/protocols/ctn0094.htm) research team harmonized data from 3 large-scale MOUD clinical trials: [CTN-0027](http://ctndisseminationlibrary.org/protocols/ctn0027.htm): "Starting reatment with Agonist Replacement Therapies (START)"; [CTN-0030](http://ctndisseminationlibrary.org/protocols/ctn0030.htm): "Prescription Opiate Abuse Treatment Study (POATS)"; and [CTN-0051](http://ctndisseminationlibrary.org/protocols/ctn0051.htm): "Extended-Release Naltrexone vs. Buprenorphine for Opioid Treatment (X:BOT)". These three are nationally representative, prospective clinical trials with over 3600 combined participants. These trials treated participants for 16-24 weeks, and collected rich baseline substance use data, demographics, and medical/psychiatric evaluations. 
 
 We have `r nrow(derived_weeklyOpioidPattern)` fully de-identified subjects with demographics and weekly UDS results for the months they were in treatment, 2492 of whom completed randomization to a treatment arm. This harmonized data will be released in the R packages `ctn0094data` and [`ctn0094DataExtra`](https://github.com/CTN-0094/ctn0094DataExtra). To simplify our analysis of endpoint sensitivity to race/ethnicity, we coded race and ethnicity conjointly as "Non-Hispanic White" ($n_W = 2484$), "Non-Hispanic Black" ($n_B = 347$), "Hispanic" ($n_H = 507$), and "Other" ($n_O = 222$). In order to summarize complex substance use patterns over the weeks of the multiple clinical trials, we standardized all dates to the day of trial consent, and we coded the urinalysis results for each day/week as a "word".
+
 
 
 ## Substance Use Pattern "Word"
@@ -158,13 +162,34 @@ The second limitation is one of parsimony. In order to ensure that use pattern s
 The third limitation is due to the cold and unfeeling logic of a computer. The computer cannot understand the many extenuating circumstances that pervade our human experience. Worth repeating is the old maxim of computing: "computers give you what you ask for, not what you want." Consider a concrete example: assume a participant was supposed to visit the clinic for a weekly urine test on Thursday, but they came on Wednesday instead due to a conflict at their work; their urine sample from Wednesday came back "clean". What would a nurse at the substance use clinic do in this case? Most people are reasonable; they would count the urine screen for that week as negative for opioids. What would a computer do? Without the direct input of a human to override the clinical trial protocol, a computer would count the negative urine on Wednesday but still mark the participant as a "failure to appear" / "missing urine screen" on Thursday. In many clinical trial protocols, missing urine screens are imputed as "positive" for the substance of interest, so now this participant's use pattern summary is marked `*` (mixed results) instead of `-` (negative results) for that week.
 
 
-## Analyzing Use Patterns with `CTNote`
-- The `CTNote::` Package Helper Functions
-    + Handling missing data: `recode_missing_visits()` and `impute_missing_visits()`
-    + Accounting for the study observation design: `collapse_lattice()` and `view_by_lattice()`
-    + Detecting a use pattern: `detect_subpattern()` and `detect_in_window()`
-    + Measuring lengths of consecutive behavior: `measure_retention()` and `measure_abstinence_period()`
-    + Counting substance use events: `count_matches()`
+### Computing Treatment Outcomes with `CTNote`
+We mentioned above that these use pattern summaries are "computable" (that a computer can parse them). The software package `CTNote::` for the R computing language is one such tool to enable computers to parse these use patterns. This software package contains the following groups of routines (also known as functions):
+
+- Handle missing UDS data with `recode_missing_visits()` and `impute_missing_visits()`
+- Account for the study observation design or trial visit protocol with `collapse_lattice()` and `view_by_lattice()`
+- Detect a substance use pattern with `detect_subpattern()` and `detect_in_window()`
+- Measure the longest periods of consecutive behavior with `measure_retention()` and `measure_abstinence_period()`
+- Count the substance use events with `count_matches()`
+
+By executing various combinations of these routines, we were able write algorithms to define each of the treatment outcome definitions in Table 1. For example, the Schottenfeld et al. (2008) treatment endpoint definition is "the length of the longest period of consecutive opioid abstinence", where missing clinic visits are imputed to represent a urine screen positive for the substance of interest. Therefore, the algorithm to calculate this definition for subject `r egWho_int` would be
+```{r, echo=TRUE, eval=FALSE}
+# The participant's use pattern summary; the %>% symbol is read "and then"
+"++++---+--------------o-" %>% 
+  # change all missing visits to positive
+  recode_missing_visits(missing_becomes = "+") %>% 
+  # find the length of the longest abstinent period, in weeks
+  measure_abstinence_period()
+```
+
+In our supplemental material, we include a "library" of algorithms to calculate each definition listed in Table 1. The input of each algorithm is a set of substance use pattern summaries for all clinical trial participants; the output of each algorithm is a calculated treatment endpoint for each participant included in the input.
+
+
+
+## Analyzing Treatment Outcomes from Use Patterns 
+
+Now that we have an opioid-specific use pattern for each participant in these three harmonized clinical trials, and we also have a suite of computer functions to calculate each treatment endpoint, we can answer further questions about measuring treatment success or failure. Note that by treatment failure, we mean that the treatment failed to help the participant, not that the participant themselves is a failure in treatment. 
+
+
 
 
 *******************************************************************************
