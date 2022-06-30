@@ -1,0 +1,591 @@
+---
+title: "CTNote Library: Reduction Outcomes"
+author: "Gabriel Odom, Laura Brandt, Sean Luo, and Ray Balise"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+vignette: >
+  %\VignetteIndexEntry{CTNote Library Reduction}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, cache = TRUE)
+```
+
+```{r, load-packages, include=FALSE}
+library(ctn0094data)
+library(ctn0094DataExtra)
+library(CTNote)
+library(readxl)
+library(kableExtra)
+library(tidyverse)
+```
+
+
+
+# Introduction
+This document contains the algorithms necessary to code all the outcomes which measure "substance use reduction". These outcomes are:
+```{r, import-table-one, include=FALSE}
+pathToTable1_char <- system.file(
+  "suppl_docs", "definitions_20220405.xlsx", package = "CTNote", mustWork = TRUE
+)
+tab1_df <- readxl::read_xlsx(pathToTable1_char) 
+```
+
+```{r, tidy-table-one, include=FALSE}
+tabTidy1_df <- 
+  tab1_df %>% 
+  select(-`Frequency of UOS`, -`Coded column name`, -DOI) %>% 
+  rename(
+    Group = `Outcome Group`,
+    Endpoint = `Primary Endpoint`,
+    Class = `Numeric Class`,
+    Definition = `Definition/Assessment of Outcome`,
+    `Missing is` = `Missing UOS coded as`
+  ) %>% 
+  mutate(
+    Group = case_when(
+      str_detect(Group, "Abstinence") ~ "Abstinence",
+      str_detect(Group, "Relapse") ~ "Relapse",
+      str_detect(Group, "Reduction") ~ "Reduction",
+    )
+  ) %>% 
+  filter(Group == "Reduction") %>% 
+  arrange(Reference)
+
+defns_char <- tabTidy1_df$Definition
+names(defns_char) <- tabTidy1_df$Reference
+```
+
+
+```{r, show-table-one-reduction, results='asis', echo=FALSE}
+tabTidy1_df  %>% 
+  kable("html") %>%
+  column_spec(1:4, width = "3cm") %>%
+  column_spec(5, width = "5cm") %>%
+  kable_styling("striped", font_size = 11) %>%
+  kable_minimal() %>% 
+  # All styling and spec calls have to come BEFORE this line.
+  scroll_box(width = "1000px", height = "500px") 
+```
+
+We will use the table of participant opioid use patterns from the `ctn0094DataExtra::` package to calculate these endpoints. Importantly, if you wish to apply these algorithms to calculate endpoints for your data, the participants' substance use patterns must be stored in the "substance use pattern word" format shown here. We also show a subset of the data to visualize a variety of different real substance use patterns.
+```{r}
+###  Full Data  ###
+udsOutcomes_df <- 
+	ctn0094DataExtra::derived_weeklyOpioidPattern %>% 
+	group_by(who) %>% 
+	mutate(usePatternUDS = paste0(Phase_1, Phase_2, collapse = "")) %>% 
+	ungroup() %>% 
+  select(who, usePatternUDS)
+
+# Make a copy
+outcomes_df <- udsOutcomes_df
+
+
+###  Examples  ###
+examplePeople_int <- c(1, 163, 210, 242, 4, 17, 13, 1103, 233, 2089)
+outcomes_df %>% 
+  filter(who %in% examplePeople_int)
+```
+
+
+
+*******************************************************************************
+</br>
+
+# Substance Use Reduction Endpoints
+
+
+## Comer et al., 2006
+**Definition**: `r defns_char["Comer et al., 2006"]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+	mutate(
+		comer2006_red = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			# first 8 weeks of treatment
+			start = 1, end = 8,
+			proportion = TRUE
+		)
+	) %>%
+	select(who, comer2006_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, comer2006_red)
+```
+
+
+## Eissenberg et al., 1997
+**Definition**: `r defns_char["Eissenberg et al., 1997"]`
+
+From [their paper](https://pubmed.ncbi.nlm.nih.gov/9200635/), we read "Where urinalysis data were missing for an entire week (5 of 1836 data points; 0.3%) the average of that patient's results from the 2 weeks surrounding the missing week was substituted for the missing value." Also, because some of our trials only retained subjects for 15-16 weeks, we changed the cutoff to 15 weeks in order to apply this definition to our data.
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Check for 15 weeks of participation
+  mutate(
+		completedProtocol = measure_retention(usePatternUDS) >= 15
+	) %>% 
+	# Impute local missings
+	mutate(
+		useImputed = impute_missing_visits(
+			use_pattern = usePatternUDS,
+			method = "kNV",
+			knvWeights_num = c(`o` = NA, `+` = 1, `*` = 0.5, `-` = 0),
+			quietly = TRUE
+		)
+	) %>% 
+	# detect 4 consecutive negative UDS
+	mutate(
+		consecNeg = detect_subpattern(
+			use_pattern = useImputed,
+			subpattern = "----",
+			# we use 15 weeks of study (instead of 17)
+			start = 1, end = 15
+		)
+	) %>% 
+	# non-participation penalty: if the participant didn't stay in the study the
+  #   whole time, then the treatment was a failure
+	mutate(
+		eissenberg1997_isAbs = case_when(
+			completedProtocol  ~ consecNeg,
+			!completedProtocol ~ FALSE
+		)
+	) %>% 
+	select(who, eissenberg1997_isAbs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, eissenberg1997_isAbs)
+```
+
+
+## Fiellin et al., 2006
+**Definition**: `r defns_char["Fiellin et al., 2006"]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		fiellin2006_red = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			proportion = TRUE
+		)
+	) %>%
+	select(who, fiellin2006_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, fiellin2006_red)
+```
+
+
+## Fudala et al., 2003
+**Definition**: `r defns_char["Fudala et al., 2003"]`; they exclude missing values.
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Drop weeks with missing UDS
+  mutate(
+		usePatternPresent = recode_missing_visits(
+			usePatternUDS,
+			missing_becomes = ""
+		)
+	) %>%
+	mutate(
+		fudala2003_red = count_matches(
+			use_pattern = usePatternPresent,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			proportion = TRUE
+		)
+	) %>% 
+	select(who, fudala2003_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, fudala2003_red)
+```
+
+
+## Haight et al., 2019
+**Definition**: `r defns_char["Haight et al., 2019"]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		haight2019_red = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			# The end-of-protocol for our trials is 15-16 weeks
+			start = 5, end = 15,
+			proportion = TRUE
+		)
+	) %>%
+	select(who, haight2019_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, haight2019_red)
+```
+
+
+## Jaffe et al., 1972
+**Definition**: `r defns_char["Jaffe et al., 1972"]`; and missing values were imputed to the mode for each participant.
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Mark if participants completed 8 weeks of treatment; remove those who do not
+  #   (but we will add them back in at the end)
+  mutate(lastWeek_idx = measure_retention(use_pattern = usePatternUDS)) %>% 
+	filter(lastWeek_idx >= 8) %>% 
+	# For participants who stayed in the trials at least 8 weeks, impute their
+  #   missing weeks to their personal most common UDS result; in the event of a
+  #   tie between a negative and a positive result for the mode, the tiebreaker
+  #   is a positive result.
+	mutate(
+		usePatternImputed = impute_missing_visits(
+			use_pattern = usePatternUDS,
+			method = "mode"
+		)
+	) %>% 
+	mutate(
+		jaffe1972_red = count_matches(
+			usePatternImputed,
+			match_is = "-",
+			mixed_results_are = "*",
+			mixed_weight = 0.5,
+			proportion = TRUE
+		)
+	) %>% 
+	select(who, jaffe1972_red) %>% 
+	left_join(outcomes_df, ., by = "who") %>% 
+	# Lots of NAs from the participants who did not make it to week 8; replace
+	#   these NAs with 0
+	replace_na(list(jaffe1972_red = 0))
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, jaffe1972_red)
+```
+
+
+## Johnson et al., 1992
+**Definitions**: `r defns_char["Johnson et al., 1992"]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		johnson1992_red = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			proportion = TRUE
+		)
+	) %>% 
+	select(who, johnson1992_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, johnson1992_red)
+```
+
+
+## Kosten et al., 1993
+**Definition**: `r defns_char['Kosten et al., 1993']`; missing UDS are excluded
+
+Note: there are multiple definitions of treatment failure in this paper; we provide an algorithm for the definition which results in a single value for each participant.
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Exclude missing visits
+  mutate(
+		usePatternPresent = recode_missing_visits(
+			usePatternUDS,
+			missing_becomes = ""
+		)
+	) %>%
+	mutate(
+		kosten1993B_prop = count_matches(
+			use_pattern = usePatternPresent,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			start = 1,
+			end = 15,
+			proportion = TRUE
+		)
+	) %>% 
+	mutate(kosten1993B_red = kosten1993B_prop >= 0.7) %>% 
+	select(who, kosten1993B_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, kosten1993B_red)
+```
+
+
+## Ling et al., 1998 (A) and (C)
+```{r, include=FALSE}
+whichLing_idx <- which(
+  names(defns_char) == "Ling et al., 1998"
+)
+```
+
+There are two definitions from [this paper](https://pubmed.ncbi.nlm.nih.gov/9684386/) which we include in the reduction section our library: `r defns_char[[whichLing_idx[1]]]` and `r defns_char[[whichLing_idx[2]]]`. Both of these outcome definitions **exclude** missing UDS. We also include an abstinence endpoint from this paper in our "abstinence and relapse endpoints" section.
+
+### Ling et al., 1998 (A)
+**Definition**: `r defns_char[whichLing_idx[1]]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Exclude missing UDS
+  mutate(
+		usePatternPresent = recode_missing_visits(
+			usePatternUDS,
+			missing_becomes = ""
+		)
+	) %>%
+	mutate(
+		ling1998A_red = count_matches(
+			use_pattern = usePatternPresent,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			start = 1, end = 15,
+			proportion = TRUE
+		)
+	) %>% 
+	select(who, ling1998A_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, ling1998A_red)
+```
+
+### Ling et al., 1998 (C)
+**Definition**: `r defns_char[whichLing_idx[2]]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		ling1998C_red = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "-",
+			end = 15,
+			mixed_results_are = "*",
+			mixed_weight = 0.5
+		)
+	) %>% 
+	select(who, ling1998C_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, ling1998C_red)
+```
+
+
+## Ling et al., 2010
+**Definition**: `r defns_char["Ling et al., 2010"]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		ling2010_red = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			# We only have 15 weeks of data from some arms
+			start = 1, end = 15,
+			proportion = TRUE
+		)
+	) %>% 
+	select(who, ling2010_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, ling2010_red)
+```
+
+
+
+## Ling, Charuvastra, Kaim, & Klett, 1976
+**Definition**: `r defns_char["Ling, Charuvastra, Kaim, & Klett, 1976"]`
+
+### Original
+The definition in [this paper](https://doi.org/10.1001/archpsyc.1976.01770060043007) is quite complex, but very well thought out. It is one of our favorite MOUD treatment endpoints.
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Rule 1: mark induction failures
+  # The Ling et al. protocol lasted 40 weeks while requiring 7 weeks of data for
+  #   the subjects to be counted as "estimable participants"; our 3 studies each
+	#   lasted at least 15 weeks. Therefore, we should require at least
+  #   (7/40) * 15) ~= 3 weeks of data to consider a participant "estimable"
+	mutate(
+		inductFail = measure_retention(usePatternUDS) <= 3
+	) %>% 
+	mutate(
+		usePatternTrunc = str_sub(usePatternUDS, end = 15)
+	) %>% 
+	# Rules 2-4: weighting and scaling visits. The flexibility here is amazing.
+	#   If we think that dropout is worse than positive, then we can reflect that
+	#   in the weights. Ling et al. counted a missing visit as 0.22 of a positive;
+  #   and they use a step function to increase the penalty of a positive UDS 
+  #   over time.
+	mutate(
+		ling1976o22_use = weight_positive_visits(
+			use_pattern = usePatternTrunc,
+			weights_num = c(`+` = 1.0, `*` = 0.5, `o` = 0.22, `-` = 0),
+			posPenalty_num = rep(1:5, each = 3) # step function for 15 weeks
+		)
+	) %>% 
+	mutate(
+		ling1976o22_use = case_when(
+			inductFail  ~ 120,
+			!inductFail ~ ling1976o22_use
+		),
+		ling1976o22_abs = 120 - ling1976o22_use
+	) %>%
+	select(who, ling1976o22_abs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, ling1976o22_abs)
+```
+
+### A Variant
+We also include a variant of this definition which includes a greater penalty for missing values and a smooth function to increase weights of positive UDS.
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+	mutate(
+		inductFail = measure_retention(usePatternUDS) <= 3
+	) %>% 
+	mutate(
+		usePatternTrunc = str_sub(usePatternUDS, end = 15)
+	) %>% 
+	mutate(
+		ling1976o100_use = weight_positive_visits(
+			use_pattern = usePatternTrunc,
+			# Higher weight for missing values
+			weights_num = c(`+` = 0.8, `*` = 0.4, `o` = 1.0, `-` = 0),
+			# Smooth penalty function for increasing positive UDS
+			posPenalty_num = seq(
+				from = 1, to = 5, length.out = str_length(usePatternTrunc)
+			)
+		)
+	) %>% 
+	mutate(
+	  ling1976o100_use = case_when(
+			inductFail  ~ 120,
+			!inductFail ~ ling1976o100_use
+		),
+		ling1976o100_abs = 120 - ling1976o100_use
+	) %>%
+	select(who, ling1976o100_abs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, ling1976o100_abs)
+```
+
+
+## Lofwall et al., 2018
+**Definition**: `r defns_char["Lofwall et al., 2018"]`; but urine screens are collected each week for the first 12 weeks, then every other week for weeks 13-24. 
+We project this onto a 15-16 week protocol by requiring UDS each week for the first 7 weeks, then every other week for the next 8. Then, we impute the skipped weeks to be whatever the value of the UDS was from the last visit.
+```{r}
+###  Define a Visit Pattern (Lattice)  ###
+lofwallLattice_char <- collapse_lattice(
+	lattice_patterns = c("o", "_o"),
+	times = c(7, 4)
+)
+lofwallLattice_char
+
+
+###  Calculate the Endpoint  ###
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Mark all missing UDS as positive
+	mutate(
+		udsPattern = recode_missing_visits(usePatternUDS)
+	) %>% 
+  # View the current use pattern "through" the Lofwall protocol
+	mutate(
+		udsLattice = view_by_lattice(
+			use_pattern = udsPattern,
+			lattice_pattern = str_sub(lofwallLattice_char, end = 15) # first 15 weeks
+		)
+	) %>% 
+  # Impute the visits from the "unobserved" weeks to the last observed week
+	mutate(
+		udsLatticeLOCF = impute_missing_visits(
+			use_pattern = udsLattice,
+			method = "locf",
+			# This is only imputing values that we wouldn't have seen because of the
+			#   protocol ("_" means missing by design; "o" means missing)
+			missing_is = "_",
+			quietly = TRUE
+		)
+	) %>% 
+	mutate(
+		lofwall2018_red = count_matches(
+			use_pattern = udsLatticeLOCF,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			start = 1, end = 15, # first 15 weeks
+			proportion = TRUE
+		)
+	) %>%
+	select(who, lofwall2018_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, lofwall2018_red)
+```
+
