@@ -589,3 +589,159 @@ outcomes_df %>%
   select(who, usePatternUDS, lofwall2018_red)
 ```
 
+
+## Mattick et al., 2003
+```{r, include=FALSE}
+whichMattick_idx <- which(
+  names(defns_char) == "Mattick et al., 2003"
+)
+```
+
+There are also two definitions from [this paper](https://pubmed.ncbi.nlm.nih.gov/12653814/) included in our library. 
+
+### Mattick et al., 2003 (A)
+**Definition**: `r defns_char[whichMattick_idx[1]]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Find out how long the participant stayed in the study
+  mutate(lastWeek_idx = measure_retention(use_pattern = usePatternUDS)) %>% 
+	mutate(
+		mattick2003A_red = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			# Measure proportion of negative UDS only during study participation
+			start = 1, end = lastWeek_idx,
+			proportion = TRUE
+		)
+	) %>%
+	select(who, mattick2003A_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, mattick2003A_red)
+```
+
+
+### Mattick et al., 2003 (B)
+**Definition**: `r defns_char[whichMattick_idx[2]]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		mattick2003B_red = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			# They used a 13-week protocol
+			start = 1, end = 13,
+			proportion = TRUE
+		)
+	) %>%
+	select(who, mattick2003B_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, mattick2003B_red)
+```
+
+
+## Pani, Maremmani, Pirastu, Tagliamonte, & Gessa, 2000
+```{r, include=FALSE}
+whichPani_idx <- which(
+  names(defns_char) == "Pani, Maremmani, Pirastu, Tagliamonte, & Gessa, 2000"
+)
+```
+
+There are also two definitions from [this paper](https://doi.org/10.1016/S0376-8716(00)80006-X) included in our library. 
+
+### Pani et al., 2000 (A)
+**Definition**: `r defns_char[whichPani_idx[1]]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Remove weeks where participant failed to provide UDS
+  mutate(
+		usePatternPresent = recode_missing_visits(
+			usePatternUDS,
+			missing_becomes = ""
+		)
+	) %>%
+	mutate(
+		pani2000A_red = count_matches(
+			use_pattern = usePatternPresent,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			proportion = TRUE
+		)
+	) %>% 
+	select(who, pani2000A_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, pani2000A_red)
+```
+
+
+### Pani et al., 2000 (B)
+**Definition**: `r defns_char[whichPani_idx[2]]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		pani2000B_red = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			proportion = TRUE
+		)
+	) %>% 
+	select(who, pani2000B_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, pani2000B_red)
+```
+
+
+## Petitjean et al. 2001
+**Definition**: `r defns_char["Petitjean et al., 2001"]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		udsPattern = recode_missing_visits(usePatternUDS)
+	) %>% 
+	mutate(
+		petitjean2001_use = count_matches(
+			use_pattern = udsPattern,
+			match_is = "+",
+			mixed_results_are = "*",
+			proportion = TRUE
+		)
+	) %>% 
+	mutate(
+		petitjean2001_abs = 1 - petitjean2001_use
+	) %>% 
+	select(who, petitjean2001_abs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, petitjean2001_abs)
+```
+
