@@ -28,7 +28,7 @@ library(tidyverse)
 
 
 # Introduction
-This document contains the algorithms necessary to code all the outcomes which measure "substance use reduction". These outcomes are:
+This document contains the algorithms necessary to code all the outcomes which measure "substance use reduction". We only include outcomes which result in a single value per subject. These outcomes are:
 ```{r, import-table-one, include=FALSE}
 pathToTable1_char <- system.file(
   "suppl_docs", "definitions_20220405.xlsx", package = "CTNote", mustWork = TRUE
@@ -590,7 +590,7 @@ outcomes_df %>%
 ```
 
 
-## Mattick et al., 2003
+## Mattick et al., 2003 (A) and (B)
 ```{r, include=FALSE}
 whichMattick_idx <- which(
   names(defns_char) == "Mattick et al., 2003"
@@ -653,7 +653,7 @@ outcomes_df %>%
 ```
 
 
-## Pani, Maremmani, Pirastu, Tagliamonte, & Gessa, 2000
+## Pani, Maremmani, Pirastu, Tagliamonte, & Gessa, 2000 (A) and (B)
 ```{r, include=FALSE}
 whichPani_idx <- which(
   names(defns_char) == "Pani, Maremmani, Pirastu, Tagliamonte, & Gessa, 2000"
@@ -744,4 +744,501 @@ outcomes_df %>%
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, petitjean2001_abs)
 ```
+
+
+## Preston, Umbricht, & Epstein, 2000
+**Definition**: `r defns_char["Preston, Umbricht, & Epstein, 2000"]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		preston2000_red = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			# 13-week protocol used
+			end = 13,
+			proportion = TRUE
+		)
+	) %>% 
+	select(who, preston2000_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, preston2000_red)
+```
+
+
+## Schottenfeld et al., 2005
+**Definition**: `r defns_char["Schottenfeld et al., 2005"]`; exclude missing UDS
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Exclude missing
+  mutate(
+		usePatternPresent = recode_missing_visits(
+			usePatternUDS,
+			missing_becomes = ""
+		)
+	) %>%
+  # Count negative
+	mutate(
+		schottenfeld2005_red = count_matches(
+			use_pattern = usePatternPresent,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			proportion = TRUE
+		)
+	) %>% 
+	select(who, schottenfeld2005_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, schottenfeld2005_red)
+```
+
+
+## Schwartz et al., 2006
+**Definition**: `r defns_char["Schwartz et al., 2006"]`
+
+This definition is a cohort-level definition, not an individual definition. The individual endpoint would be "was this participant abstinent from the substance of interest at the 120-day follow-up? (17 weeks from randomization). Our participants do not uniformly have 17 weeks of data, so we will assess them at week 15 instead.
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+  	schwartz2006_abs = count_matches(
+  		use_pattern = usePatternUDS,
+  		match_is = "-",
+  		start = 15, end = 15,
+  		mixed_results_are = "*"
+  	)
+  ) %>% 
+	ungroup() %>% 
+	mutate(
+		schwartz2006_isAbs = schwartz2006_abs == 1
+	) %>% 
+	select(who, schwartz2006_isAbs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, schwartz2006_isAbs)
+```
+
+
+## Shufman et al., 1994
+**Definition**: `r defns_char["Shufman et al., 1994"]`; missing is ignored
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Count "+" UDS; 0 could be complete dropout or all negative
+	mutate(
+		shufman1994_useP = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "+",
+			mixed_results_are = "*",
+			proportion = TRUE
+		)
+	) %>% 
+	mutate(shufman1994_absP = 1 - shufman1994_useP) %>% 
+	select(who, shufman1994_absP) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, schwartz2006_isAbs)
+```
+
+
+## Soyka, Zingg, Koller, & Kuefner, 2008
+**Definition**: `r defns_char["Soyka, Zingg, Koller, & Kuefner, 2008"]`; missing is ignored
+
+The paper is [here](https://pubmed.ncbi.nlm.nih.gov/18205978/).
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Ignore missing UDS
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+			missing_becomes = ""
+		)
+	) %>% 
+	# Count "+" UDS; 0 could be complete dropout or all negative
+	mutate(
+		soyka2008_use = count_matches(
+			use_pattern = udsPattern,
+			match_is = "+",
+			mixed_results_are = "*",
+			mixed_weight = 0.5,
+			proportion = TRUE
+		)
+	) %>% 
+	mutate(soyka2008_abs = 1 - soyka2008_use) %>% 
+	ungroup() %>% 
+	select(who, soyka2008_abs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, soyka2008_abs)
+```
+
+
+## Strain, Stitzer, Liebson, & Bigelow, 1993
+**Definition**: `r defns_char["Strain, Stitzer, Liebson, & Bigelow, 1993"]`; missing is not defined
+
+Paper [here](https://doi.org/10.7326/0003-4819-119-1-199307010-00004)
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Count "+" UDS; 0 could be complete dropout or all negative
+	mutate(
+		strain1993_use = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "+",
+			# The stable dosing period began in week 6
+			start = 6, end = 15,
+			mixed_results_are = "*"
+		)
+	) %>% 
+	mutate(strain1993_abs = 1 - strain1993_use) %>% 
+	select(who, strain1993_abs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, strain1993_abs)
+```
+
+
+## Strain, Stitzer, Liebson, & Bigelow, 1994
+**Definition**: `r defns_char["Strain, Stitzer, Liebson, & Bigelow, 1994"]`; missing is ignored
+
+Paper [here](https://doi.org/10.1176/ajp.151.7.1025)
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+	# Ignore missing
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+			missing_becomes = ""
+		)
+	) %>% 
+  # Count "+" UDS; 0 could be complete dropout or all negative
+	mutate(
+		strain1994_use = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "+",
+			mixed_results_are = "*",
+			proportion = TRUE
+		)
+	) %>% 
+	mutate(strain1994_abs = 1 - strain1994_use) %>% 
+	select(who, strain1994_abs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, strain1994_abs)
+``` 
+
+
+## Strain, Stitzer, Liebson, & Bigelow, 1996
+**Definition**: `r defns_char["Strain, Stitzer, Liebson, & Bigelow, 1996"]`; missing is ignored
+
+Because the "two-weeks blocks" definition results in more than one value per participant, we do not provide it in our library. This definition is now identical to that of Strain, Stitzer, Liebson, & Bigelow (1994).
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+	# Ignore missing
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+			missing_becomes = ""
+		)
+	) %>% 
+	# Count "+" UDS; 0 could be complete dropout or all negative
+	mutate(
+		strain1996_use = count_matches(
+			use_pattern = udsPattern,
+			match_is = "+",
+			mixed_results_are = "*",
+			proportion = TRUE
+		)
+	) %>% 
+	mutate(strain1996_abs = 1 - strain1996_use) %>% 
+	select(who, strain1996_abs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, strain1996_abs)
+```
+
+
+## Strain, Bigelow, Liebson, & Stitzer, 1999
+**Definition**: `r defns_char["Strain, Bigelow, Liebson, & Stitzer, 1999"]`
+
+[This paper](https://doi.org/10.1001/jama.281.11.1000) gave no commentary on *how* the missing values would be processed, only that the statistical software SAS was capable of handling missing values. SAS, by default, [excludes missing values](https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.5/proc/n026epq8bpz1f9n10oeb7zen7s1e.htm) from analyses. Therefore, this definition will also be identical to that of Strain, Stitzer, Liebson, & Bigelow (1994).
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+	# Ignore missing
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+			missing_becomes = ""
+		)
+	) %>% 
+  # Count "+" UDS; 0 could be complete dropout or all negative
+	mutate(
+		strain1999_use = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "+",
+			mixed_results_are = "*",
+			proportion = TRUE
+		)
+	) %>% 
+	mutate(strain1999_abs = 1 - strain1999_use) %>% 
+	select(who, strain1999_abs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, strain1999_abs)
+```
+
+
+## Strang et al., 2010
+**Definitions**: `r defns_char["Strang et al., 2010"]`
+
+Our protocols do not uniformly contain 26 weeks of data, so we apply this definition as "the last 12 weeks of the protocol."
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		cleanProp = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			# Syntax to select the LAST visits uses a negative sign; this means "12
+			#   weeks before the end of the data" to "the last week of the data"
+			start = -12, end = -1,
+			proportion = TRUE
+		)
+	) %>% 
+	mutate(strang2010_hasRed = cleanProp >= 0.5) %>% 
+	ungroup() %>% 
+	select(who, strang2010_hasRed) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, strang2010_hasRed)
+```
+
+
+## Strang et al., 2019
+**Definition**: `r defns_char["Strang et al., 2019"]`
+
+Paper [here](https://pubmed.ncbi.nlm.nih.gov/30702059/)
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		strang2019_red = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			# Only look at the first 12 weeks after randomization
+			start = 1, end = 12,
+			proportion = TRUE
+		)
+	) %>%
+	select(who, strang2019_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, strang2019_red)
+```
+
+
+## Tanum et al., 2017
+**Definition**: `r defns_char["Tanum et al., 2017"]`
+
+Note that this definition as written is a group outcome, not a participant outcome. Therefore, we calculate this for each subject as the "rate of negative UOS for the time that the patient remained in the study."
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # How long was each subject retained?
+  mutate(lastWeek_idx = measure_retention(use_pattern = usePatternUDS)) %>% 
+	mutate(
+		tanum2017_red = count_matches(
+			use_pattern = usePatternUDS,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			start = 1, end = lastWeek_idx,
+			proportion = TRUE
+		)
+	) %>%
+	select(who, tanum2017_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, tanum2017_red)
+```
+
+
+## Wolstein et al., 2009
+**Definition**: `r defns_char["Wolstein et al., 2009"]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Because we are measuring outcomes only while "participating", remove missing
+	#   weeks from the use pattern
+	mutate(
+		usePatternPresent = recode_missing_visits(
+			usePatternUDS,
+			missing_becomes = ""
+		)
+	) %>%   
+	mutate(
+		wolstein2009_red = count_matches(
+			use_pattern = usePatternPresent,
+			match_is = "-",
+			# Mixed results weeks count as half of a negative week
+			mixed_results_are = "*", mixed_weight = 0.5,
+			proportion = TRUE
+		)
+	) %>%
+	select(who, wolstein2009_red) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, wolstein2009_red)
+```
+
+
+## Woody et al., 2008
+**Definition**: `r defns_char["Woody et al., 2008"]`
+
+[This paper](https://doi.org/10.1001/jama.2008.574) contains rather exotic methods for missing value imputation, but the authors remark that setting "missing is positive" did not change their final results. We may include their imputation method in future versions of this code library.
+```{r}
+###  Define a Visit Pattern (Lattice)  ###
+woodyLattice_char <- collapse_lattice(lattice_patterns = "___o", times = 3)
+woodyLattice_char
+
+
+###  Calculate the Endpoint  ###
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Only observe scheduled UDS
+  mutate(
+		udsLattice = view_by_lattice(
+			use_pattern = usePatternUDS,
+			lattice_pattern = woodyLattice_char
+		)
+	) %>% 
+	# Remove the non-protocol weeks
+	mutate(
+		udsLattice2 = recode_missing_visits(
+			use_pattern = udsLattice,
+			missing_is = "_",
+			missing_becomes = ""
+		)
+	) %>% 
+	# Mark missing UDS as "+"
+	mutate(
+		udsLattice3 = recode_missing_visits(use_pattern = udsLattice2)
+	) %>% 
+	# Count "+" UDS; 0 could be complete dropout or all negative
+	mutate(
+		woody2008_use = count_matches(
+			use_pattern = udsLattice3,
+			match_is = "+",
+			mixed_results_are = "*",
+			proportion = TRUE
+		)
+	) %>% 
+	mutate(woody2008_abs = 1 - woody2008_use) %>% 
+	select(who, woody2008_abs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, woody2008_abs)
+```
+
+
+## Zaks, Fink, & Freedman, 1972
+**Definition**: `r defns_char["Zaks, Fink, & Freedman, 1972"]`; missing is ignored
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Ignore missing
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+			missing_becomes = ""
+		)
+	) %>% 
+	# Count "+" UDS; 0 could be complete dropout or all negative
+	mutate(
+		zaks1972_use = count_matches(
+			use_pattern = udsPattern,
+			match_is = "+",
+			mixed_results_are = "*"
+		)
+	) %>% 
+	ungroup() %>% 
+  # For each participant, the "abstinent" metric is the number of total weeks
+  #   of study participation - the number of positive weeks
+	mutate(zaks1972_abs = str_length(udsPattern) - zaks1972_use) %>% 
+	select(who, zaks1972_abs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, zaks1972_abs)
+```
+
+
+
+*******************************************************************************
+</br>
+
+# Comments
+
+```{r, include=FALSE, eval=FALSE}
+write_csv(outcomes_df, file = "../inst/extdata/outcomes_reduction_20220701.csv")
+```
+
+
 
