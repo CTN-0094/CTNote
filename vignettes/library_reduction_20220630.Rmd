@@ -6,6 +6,7 @@ output:
   rmarkdown::html_vignette:
     toc: true
     toc_depth: 2
+    code_folding: hide
 vignette: >
   %\VignetteIndexEntry{CTNote Library Reduction}
   %\VignetteEngine{knitr::rmarkdown}
