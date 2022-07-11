@@ -101,38 +101,299 @@ outcomes_df %>%
 
 # Abstinence from Substance Use Endpoints
 
-## Zaks, Fink, & Freedman, 1972
-**Definition**: `r defns_char["Zaks, Fink, & Freedman, 1972"]`; missing is ignored
-```{r, eval=FALSE}
+## Fiellin et al., 2006
+**Definition**: `r defns_char["Fiellin et al., 2006"]`; missing is positive
+```{r}
 outcomes_df <- 
 	outcomes_df %>%
   rowwise() %>% 
-  # Ignore missing
 	mutate(
 		udsPattern = recode_missing_visits(
 			use_pattern = usePatternUDS,
-			missing_becomes = ""
 		)
 	) %>% 
-	# Count "+" UDS; 0 could be complete dropout or all negative
+  # mixed results != abstinence
 	mutate(
-		zaks1972_use = count_matches(
+		udsPattern = recode_missing_visits(
 			use_pattern = udsPattern,
-			match_is = "+",
-			mixed_results_are = "*"
+			missing_is = "*"
 		)
 	) %>% 
-	ungroup() %>% 
-  # For each participant, the "abstinent" metric is the number of total weeks
-  #   of study participation - the number of positive weeks
-	mutate(zaks1972_abs = str_length(udsPattern) - zaks1972_use) %>% 
-	select(who, zaks1972_abs) %>% 
+  # We did not code this definition with an "end", so participants with longer
+  #   stays in treatment could have higher scores
+	mutate(
+		fiellin2006_abs = count_matches(
+			use_pattern = udsPattern,
+			match_is = "-"
+		)
+	) %>% 
+	select(who, fiellin2006_abs) %>% 
 	left_join(outcomes_df, ., by = "who")
 
 outcomes_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, zaks1972_abs)
+  select(who, usePatternUDS, fiellin2006_abs)
 ```
+
+
+## Kosten et al., 1993
+**Definition**: `r defns_char["Kosten et al., 1993"]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		kosten1993_isAbs = detect_subpattern(
+			usePatternUDS,
+			subpattern = "---" 
+		)
+	) %>% 
+	select(who, kosten1993_isAbs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, kosten1993_isAbs)
+```
+
+
+## Krupitsky et al., 2011 (A) and (C)
+```{r, include=FALSE}
+whichKrupitsky_idx <- which(
+  names(defns_char) == "Krupitsky et al., 2011"
+)
+```
+
+There are two definitions from [this paper](https://doi.org/DOI:10.1016/S0140-6736(11)60358-9) which we include in the reduction section our library: `r defns_char[[whichKrupitsky_idx[1]]]` and `r defns_char[[whichKrupitsky_idx[2]]]`. 
+
+### Krupitsky et al., 2011 (A)
+**Definition**: `r defns_char[[whichKrupitsky_idx[1]]]`
+
+A comment on our algorithm: we do not know how long each protocol is exactly, so a pattern match approach (while intuitive at first) would not work. We will instead recode the use pattern as "negative" or "non-negative", and then check that the proportion of non-negative UDS is 0%.
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+		)
+	) %>% 
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = udsPattern,
+			missing_is = "*"
+		)
+	) %>% 
+	mutate(
+		useProp = count_matches(
+			use_pattern = udsPattern,
+			match_is = "+",
+			start = 5L,
+			# Set this to the length of your protocol, or 24, whichever is shorter
+			end = 15L,
+			proportion = TRUE
+		)
+	) %>% 
+	mutate(krupitsky2011A_isAbs = useProp == 0) %>% 
+	select(who, krupitsky2011A_isAbs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, krupitsky2011A_isAbs)
+```
+
+### Krupitsky et al., 2011 (B)
+**Definition**: `r defns_char[[whichKrupitsky_idx[2]]]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+		)
+	) %>% 
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = udsPattern,
+			missing_is = "*"
+		)
+	) %>% 
+	mutate(
+		krupitsky2011B_abs = count_matches(
+			use_pattern = udsPattern,
+			match_is = "-",
+			start = 5L,
+			# This trial protocol has a clear end date; we adjust it to our data
+			end = 15L
+		)
+	) %>% 
+	select(who, krupitsky2011B_abs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, krupitsky2011B_abs)
+```
+
+
+## Ling et al., 1998
+**Definition**: `r defns_char["Ling et al., 1998"]`; urine was screened 3 times per week
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		ling1998_isAbs = detect_subpattern(
+			use_pattern = usePatternUDS,
+			# 13 consecutive UDS at 3x per week is 4.3 weeks
+			subpattern = "----"
+		)
+	) %>% 
+	select(who, ling1998_isAbs) %>% 
+	left_join(outcomes_df, ., by = "who")
+  
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, ling1998_isAbs)
+```
+
+
+## Lofwall et al., 2018
+**Definition**: `r defns_char["Lofwall et al., 2018"]`
+
+[In their paper](https://doi.org/10.1001/jamainternmed.2018.1052), abstinence was defined as 2 of 3 negative UDS for weeks 9, 10, and 11; negative UDS in week 12; and 5 or 6 UDS negative during weeks 13-24 (with alternating week visits, yielding 6 visits in this Phase II period). Because we have 15 weeks of data guaranteed, we scale this window and lattice. Their definition of abstinence is quite complex. Because we only have 15 weeks of data for most subjects, we shift their 12-week Phase I endpoint to week 7, and treat weeks 8-15 as Phase II. Also, we calculate these as proportions and not counts; this is so that these rules can be applied to windows of other sizes. The proportions would be the same---only the window of observation would change.
+```{r}
+###  Define 15-week Lattice  ###
+lofwallLattice_char <- collapse_lattice(
+	lattice_patterns = c("o", "_o"),
+	# For the lattice as defined over 24 weeks, you need 12 weeks of weekly visits
+	#   and 6 sets of alternating "no visit" and "visit" week pairs, or c(12, 6).
+	#   For us, we want 7 weeks straight of weekly visits followed by 4 pairs of
+	#   alternating visits (8 weeks) for a total of 15 weeks.
+	times = c(7, 4)
+)
+lofwallLattice_char
+
+
+###  Calculate Weighted Abstinence  ###
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Change mixed and missing results to positive
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+			missing_is = "*"
+		)
+	) %>% 
+  mutate(
+    udsPattern = recode_missing_visits(udsPattern)
+  ) %>% 
+  # "observe" only the UDS that would have been caught by the protocol
+	mutate(
+		udsLattice = view_by_lattice(
+			use_pattern = udsPattern,
+			lattice_pattern = str_sub(lofwallLattice_char, end = 15) # first 15 weeks
+		)
+	) %>% 
+	# Impute the visits that were not "observed"
+	mutate(
+		udsLatticeLOCF = impute_missing_visits(
+			use_pattern = udsLattice,
+			method = "locf",
+			missing_is = "_",
+			quietly = TRUE
+		)
+	) %>% 
+  # Count for Weeks 5-7; Week 8; and Weeks 9-15
+	mutate(
+		prop57 = count_matches(
+			udsLatticeLOCF,
+			match_is = "-",
+			start = 5L,
+			end = 7L,
+			proportion = TRUE
+		),
+		clean8 = count_matches(
+			udsLatticeLOCF,
+			match_is = "-",
+			start = 8L,
+			end = 8L
+		),
+		prop915 = count_matches(
+			udsLatticeLOCF,
+			match_is = "-",
+			start = 9L,
+			end = 15L,
+			proportion = TRUE
+		),
+	) %>% 
+  # Check interval counts/proportions
+	mutate(
+		lofwall2018_isAbs = (prop57 >= 2/3) & (clean8 == 1) & (prop915 >= 5/6)
+	) %>% 
+	select(who, lofwall2018_isAbs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, lofwall2018_isAbs)
+```
+
+
+## Mokri, Chawarski, Taherinakhost, & Schottenfeld, 2016
+**Definition**: `r defns_char["Mokri, Chawarski, Taherinakhost, & Schottenfeld, 2016"]`; missing is positive
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS
+		)
+	) %>%
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = udsPattern,
+			missing_is = "*"
+		)
+	) %>%
+  # Find the number of weeks until the first "+"
+	mutate(
+		mokri2016_abs = detect_in_window(
+			use_pattern = udsPattern,
+			window_width = 1L,
+			threshold = 1L
+		)
+	) %>%
+	unnest(cols = "mokri2016_abs", names_sep = "_") %>%
+	select(who, starts_with("mokri2016_abs")) %>%
+	left_join(outcomes_df, ., by = "who")
+  
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, starts_with("mokri2016_abs"))
+```
+
+If you are more comfortable using "survival" or "time-to-event" data structures, then the above definition can be modified by the following code:
+```{r}
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  mutate(
+    mokri2016_wksAbst = survival::Surv(
+      time = mokri2016_abs_time,
+      event = mokri2016_abs_event
+    )
+  ) %>% 
+  select(who, usePatternUDS, mokri2016_wksAbst)
+```
+
+
+
 
 
 

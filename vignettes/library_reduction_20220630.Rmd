@@ -541,6 +541,10 @@ We project this onto a 15-16 week protocol by requiring UDS each week for the fi
 ###  Define a Visit Pattern (Lattice)  ###
 lofwallLattice_char <- collapse_lattice(
 	lattice_patterns = c("o", "_o"),
+	# For the lattice as defined over 24 weeks, you need 12 weeks of weekly visits
+	#   and 6 sets of alternating "no visit" and "visit" week pairs, or c(12, 6).
+	#   For us, we want 7 weeks straight of weekly visits followed by 4 pairs of
+	#   alternating visits (8 weeks) for a total of 15 weeks.
 	times = c(7, 4)
 )
 lofwallLattice_char
