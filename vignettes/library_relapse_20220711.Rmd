@@ -1,0 +1,149 @@
+---
+title: "CTNote Library: Relapse Outcomes"
+author: "Gabriel Odom, Laura Brandt, Sean Luo, and Ray Balise"
+date: "`r Sys.Date()`"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+    code_folding: hide
+vignette: >
+  %\VignetteIndexEntry{CTNote Library Relapse}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r, load-packages, include=FALSE}
+library(ctn0094data)
+library(ctn0094DataExtra)
+library(CTNote)
+library(readxl)
+library(kableExtra)
+library(tidyverse)
+```
+
+
+
+# Introduction
+This document contains the algorithms necessary to code all the outcomes which measure "abstinence from substance use" or "relapse to substance use". We only include outcomes which result in a single value per subject. These outcomes are:
+```{r, import-table-one, include=FALSE}
+pathToTable1_char <- system.file(
+  "suppl_docs", "definitions_20220405.xlsx", package = "CTNote", mustWork = TRUE
+)
+tab1_df <- readxl::read_xlsx(pathToTable1_char) 
+```
+
+```{r, tidy-table-one, include=FALSE}
+tabTidy1_df <- 
+  tab1_df %>% 
+  select(-`Frequency of UOS`, -`Coded column name`, -DOI) %>% 
+  rename(
+    Group = `Outcome Group`,
+    Endpoint = `Primary Endpoint`,
+    Class = `Numeric Class`,
+    Definition = `Definition/Assessment of Outcome`,
+    `Missing is` = `Missing UOS coded as`
+  ) %>% 
+  mutate(
+    Group = case_when(
+      str_detect(Group, "Abstinence") ~ "Abstinence",
+      str_detect(Group, "Relapse") ~ "Relapse",
+      str_detect(Group, "Reduction") ~ "Reduction",
+    )
+  ) %>% 
+  filter(Group == "Relapse") %>% 
+  arrange(Reference)
+
+defns_char <- tabTidy1_df$Definition
+names(defns_char) <- tabTidy1_df$Reference
+```
+
+
+```{r, show-table-one-reduction, results='asis', echo=FALSE}
+tabTidy1_df  %>% 
+  kable("html") %>%
+  column_spec(1:4, width = "3cm") %>%
+  column_spec(5, width = "5cm") %>%
+  kable_styling("striped", font_size = 11) %>%
+  kable_minimal() %>% 
+  # All styling and spec calls have to come BEFORE this line.
+  scroll_box(width = "1000px", height = "500px") 
+```
+
+We will use the table of participant opioid use patterns from the `ctn0094DataExtra::` package to calculate these endpoints. Importantly, if you wish to apply these algorithms to calculate endpoints for your data, the participants' substance use patterns must be stored in the "substance use pattern word" format shown here. We also show a subset of the data to visualize a variety of different real substance use patterns.
+```{r}
+###  Full Data  ###
+udsOutcomes_df <- 
+	ctn0094DataExtra::derived_weeklyOpioidPattern %>% 
+	group_by(who) %>% 
+	mutate(usePatternUDS = paste0(Phase_1, Phase_2, collapse = "")) %>% 
+	ungroup() %>% 
+  select(who, usePatternUDS)
+
+# Make a copy
+outcomes_df <- udsOutcomes_df
+
+
+###  Examples  ###
+examplePeople_int <- c(1, 163, 210, 242, 4, 17, 13, 1103, 233, 2089)
+outcomes_df %>% 
+  filter(who %in% examplePeople_int)
+```
+
+
+
+*******************************************************************************
+</br>
+
+# Relase to Substance Use Endpoints
+
+## Zaks, Fink, & Freedman, 1972
+**Definition**: `r defns_char["Zaks, Fink, & Freedman, 1972"]`; missing is ignored
+```{r, eval=FALSE}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Ignore missing
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+			missing_becomes = ""
+		)
+	) %>% 
+	# Count "+" UDS; 0 could be complete dropout or all negative
+	mutate(
+		zaks1972_use = count_matches(
+			use_pattern = udsPattern,
+			match_is = "+",
+			mixed_results_are = "*"
+		)
+	) %>% 
+	ungroup() %>% 
+  # For each participant, the "abstinent" metric is the number of total weeks
+  #   of study participation - the number of positive weeks
+	mutate(zaks1972_abs = str_length(udsPattern) - zaks1972_use) %>% 
+	select(who, zaks1972_abs) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, zaks1972_abs)
+```
+
+
+
+*******************************************************************************
+</br>
+
+# Comments
+
+```{r, include=FALSE, eval=FALSE}
+write_csv(outcomes_df, file = "../inst/extdata/outcomes_relapse_20220711.csv")
+```
+
+
+
