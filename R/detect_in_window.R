@@ -31,12 +31,12 @@
 #'   would be time until first relapse and a relapse indicator.
 #'   
 #'   Concerning the \code{offset} argument: take, for example, the use pattern
-#'   "-------++++". The subject began to use the substance(s) of interest by 
-#'   week 8. If our relapse definition was to detect 4 weeks of use in a 4-week
-#'   window, then the relapse time would be recorded at week 8. Similarly, we
-#'   would expect that if our relapse definition was to detect 2 or 3 weeks of
-#'   use in a 4 week window, that the relapse time would also be week 8. This is
-#'   why the default value of the \code{offset} argument is what it is: we
+#'   \code{"-------++++"}. The subject began to use the substance(s) of interest 
+#'   by week 8. If our relapse definition was to detect 4 weeks of use in a 4
+#'   week window, then the relapse time would be recorded at week 8. Similarly, 
+#'   we would expect that if our relapse definition was to detect 2 or 3 weeks
+#'   of use in a 4 week window, that the relapse time would also be week 8. This
+#'   is why the default value of the \code{offset} argument is what it is: we
 #'   "shift" the detection of the use until the start of the use. However, if
 #'   you see the pattern above and believe that the relapse should be recorded
 #'   at week 7 for relapse defined as 3 weeks of use in a 4-week window or at

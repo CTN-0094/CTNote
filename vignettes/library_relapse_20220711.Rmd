@@ -202,6 +202,108 @@ outcomes_df %>%
 ```
 
 
+## Krupitsky et al., 2004/2006
+**Definition**: `r defns_char["Krupitsky et al., 2004"]`; missing is positive (their papers do not explicitly state what to do with missing UDS, but their previous protocols treated missing as positive).
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+		)
+	) %>% 
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = udsPattern,
+			missing_is = "*"
+		)
+	) %>% 
+	mutate(
+		krupitsky2004_hasRel = detect_subpattern(
+			use_pattern = udsPattern,
+			subpattern = "+++"
+		)
+	) %>% 
+	select(who, krupitsky2004_hasRel) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, krupitsky2004_hasRel)
+```
+
+
+## Lee et al., 2016
+**Definition**: `r defns_char["Lee et al., 2016"]`; missing is positive
+
+We interpret their outcome as "two or more positive weekly UDS in a 4-week window".
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS
+		)
+	) %>% 
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = udsPattern,
+			missing_is = "*"
+		)
+	) %>% 
+	mutate(
+		lee2016_rel = detect_in_window(
+			use_pattern = udsPattern,
+			window_width = 4L,
+			threshold = 2L
+		)
+	) %>% 
+	unnest(cols = "lee2016_rel", names_sep = "_") %>% 
+	select(who, starts_with("lee2016_rel")) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, starts_with("lee2016_rel"))
+```
+
+
+## Schottenfeld et al., 2008
+**Definition**: `r defns_char["Schottenfeld et al., 2008"]`; missing is positive
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS
+		)
+	) %>% 
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = udsPattern,
+			missing_is = "*"
+		)
+	) %>% 
+	mutate(
+		schottenfeld2008_rel = detect_in_window(
+			use_pattern = udsPattern,
+			window_width = 3L,
+			threshold = 3L
+		)
+	) %>% 
+	unnest(cols = "schottenfeld2008_rel", names_sep = "_") %>% 
+	select(who, starts_with("schottenfeld2008_rel")) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, starts_with("schottenfeld2008_rel"))
+```
+
+
 *******************************************************************************
 </br>
 
