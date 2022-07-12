@@ -157,7 +157,7 @@ outcomes_df %>%
 ```
 
 
-## Krupitsky et al., 2011 (A) and (C)
+## Krupitsky et al., 2011 (A) and (B)
 ```{r, include=FALSE}
 whichKrupitsky_idx <- which(
   names(defns_char) == "Krupitsky et al., 2011"
@@ -389,11 +389,201 @@ outcomes_df %>%
       event = mokri2016_abs_event
     )
   ) %>% 
+  # FOR PRINTING THE TABLE ONLY. DO NOT USE NEXT LINE IN PRACTICE!!!
+  mutate(mokri2016_wksAbst = as.character(mokri2016_wksAbst)) %>% 
   select(who, usePatternUDS, mokri2016_wksAbst)
 ```
 
 
+## Schottenfeld et al., 2005
+**Definition**: `r defns_char["Schottenfeld et al., 2005"]`, missing is ignored
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Ignore missing visits
+  mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+			missing_becomes = ""
+		)
+	) %>% 
+  # Mixed are positive
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = udsPattern,
+			missing_is = "*"
+		)
+	) %>% 
+  # Measure the length of the longest period of continuous abstinence
+	mutate(
+		schottenfeld2005_abs = measure_abstinence_period(
+			use_pattern_binary = udsPattern
+		)
+	) %>% 
+	select(who, schottenfeld2005_abs) %>% 
+	left_join(outcomes_df, ., by = "who")
+  
 
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, schottenfeld2005_abs)
+```
+
+
+## Schottenfeld et al., 2008 (A) and (B)
+
+There are two definitions from [this paper](https://doi.org/10.1016/S0140-6736(08)60954-X) which we include in the reduction section our library: `r defns_char["Schottenfeld et al., 2008"]` and `r defns_char["Schottenfeld, Chawarski, & Mazlan, 2008"]`. 
+
+### Schottenfeld, Chawarski, & Mazlan, 2008 (A)
+**Definition**: `r defns_char["Schottenfeld, Chawarski, & Mazlan, 2008"]`, missing is positive
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS
+		)
+	) %>% 
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = udsPattern,
+			missing_is = "*"
+		)
+	) %>% 
+	mutate(
+		schottenfeld2008A_abs = detect_in_window(
+			use_pattern = udsPattern,
+			window_width = 1L,
+			threshold = 1L
+		)
+	) %>% 
+	unnest(cols = "schottenfeld2008A_abs", names_sep = "_") %>% 
+	select(who, starts_with("schottenfeld2008A_abs")) %>% 
+	left_join(outcomes_df, ., by = "who")
+  
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, starts_with("schottenfeld2008A_abs"))
+```
+
+
+### Schottenfeld et al., 2008 (B)
+**Definition**: `r defns_char["Schottenfeld et al., 2008"]`, missing is positive
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS
+		)
+	) %>% 
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = udsPattern,
+			missing_is = "*"
+		)
+	) %>%
+	mutate(
+		schottenfeld2008B_abs = measure_abstinence_period(
+			use_pattern_binary = udsPattern
+		)
+	) %>% 
+	select(who, schottenfeld2008B_abs) %>% 
+	left_join(outcomes_df, ., by = "who")
+  
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, schottenfeld2008B_abs)
+```
+
+
+## Shufman et al., 1994
+**Definition**: `r defns_char["Shufman et al., 1994"]`, missing is ignored (but treated as negative in order to count the weeks properly)
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # Set "o" to "-"
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+			missing_becomes = "-"
+		)
+	) %>% 
+	# Set "*" to "+"
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = udsPattern,
+			missing_is = "*"
+		)
+	) %>% 
+	mutate(
+		shufman1994_absN = detect_in_window(
+			use_pattern = udsPattern,
+			window_width = 1L,
+			threshold = 1L
+		)
+	) %>% 
+	unnest(cols = "shufman1994_absN", names_sep = "_") %>% 
+	select(who, starts_with("shufman1994_absN")) %>% 
+	left_join(outcomes_df, ., by = "who")
+  
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, starts_with("shufman1994_absN"))
+```
+
+
+## Weiss et al., 2011 CTN-0030
+**Definition**: `r defns_char["Weiss et al., 2011 CTN-0030"]`, missing is positive.
+
+Note: this definition is looking for one of the following four abstinence patterns in last 4 weeks: `"----"`, `"+---"`, `"-+--"`, or `"--+-"`. This definition is just an insanely strict measure of study retention. The first part of the definition ("negative in the last week") already fails anyone who didn't stay in the study for the entire protocol period (because their last week UDS will automatically be `"o"`).
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+		)
+	) %>% 
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = udsPattern,
+			missing_is = "*"
+		)
+	) %>% 
+	mutate(
+		cleanLastWeek = detect_subpattern(
+			use_pattern = udsPattern,
+			subpattern = "-",
+			start = -1,
+			end = -1
+		)
+	) %>% 
+	mutate(
+		finalUseCount = count_matches(
+			use_pattern = udsPattern,
+			match_is = "+",
+			# 3 weeks leading up to the last week
+			start = -4L,
+			end = -2L
+		)
+	) %>% 
+	mutate(weissLingCTN0030_isAbs = cleanLastWeek & (finalUseCount <= 1)) %>% 
+	select(who, weissLingCTN0030_isAbs) %>% 
+	left_join(outcomes_df, ., by = "who")
+  
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, weissLingCTN0030_isAbs)
+```
 
 
 
