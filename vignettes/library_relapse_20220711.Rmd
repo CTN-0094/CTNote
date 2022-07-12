@@ -101,39 +101,105 @@ outcomes_df %>%
 
 # Relase to Substance Use Endpoints
 
-## Zaks, Fink, & Freedman, 1972
-**Definition**: `r defns_char["Zaks, Fink, & Freedman, 1972"]`; missing is ignored
-```{r, eval=FALSE}
+## CTN-0094 Endpoints
+```{r, include=FALSE}
+which0094_idx <- which(
+  names(defns_char) == "CTN-0094"
+)
+```
+
+Our [CTN-0094 research group](http://ctndisseminationlibrary.org/protocols/ctn0094.htm) has two relapse outcomes: `r defns_char[[which0094_idx[1]]]` and `r defns_char[[which0094_idx[2]]]`.
+
+### CTN-0094 Relapse
+**Definition**: `r defns_char[[which0094_idx[1]]]`; missing is positive
+```{r}
 outcomes_df <- 
 	outcomes_df %>%
   rowwise() %>% 
-  # Ignore missing
+  mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS
+		)
+	) %>%
 	mutate(
 		udsPattern = recode_missing_visits(
-			use_pattern = usePatternUDS,
-			missing_becomes = ""
-		)
-	) %>% 
-	# Count "+" UDS; 0 could be complete dropout or all negative
-	mutate(
-		zaks1972_use = count_matches(
 			use_pattern = udsPattern,
-			match_is = "+",
-			mixed_results_are = "*"
+			missing_is = "*"
 		)
 	) %>% 
-	ungroup() %>% 
-  # For each participant, the "abstinent" metric is the number of total weeks
-  #   of study participation - the number of positive weeks
-	mutate(zaks1972_abs = str_length(udsPattern) - zaks1972_use) %>% 
-	select(who, zaks1972_abs) %>% 
+  mutate(
+		ctn0094_relapse = detect_in_window(
+			use_pattern = udsPattern,
+			window_width = 4L,
+			threshold = 4L
+		)
+	) %>% 
+	unnest(cols = "ctn0094_relapse", names_sep = "_") %>% 
+	select(who, starts_with("ctn0094_relapse")) %>% 
 	left_join(outcomes_df, ., by = "who")
 
 outcomes_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, zaks1972_abs)
+  select(who, usePatternUDS, starts_with("ctn0094_relapse"))
 ```
 
+### CTN-0094 Dropout
+**Definition**: `r defns_char[[which0094_idx[2]]]`
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  # do NOT recode any missing visits
+  mutate(
+		ctn0094_dropout = detect_in_window(
+			use_pattern = usePatternUDS,
+			window_width = 4L,
+			threshold = 4L,
+			match_is = "o"
+		)
+	) %>% 
+	unnest(cols = "ctn0094_dropout", names_sep = "_") %>% 
+	select(who, starts_with("ctn0094_dropout")) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, starts_with("ctn0094_dropout"))
+```
+
+
+## Johnson, Jaffe, & Fudala, 1992
+**Definition**: `r defns_char["Johnson, Jaffe, & Fudala, 1992"]`; missing is positive
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+		)
+	) %>% 
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = udsPattern,
+			missing_is = "*"
+		)
+	) %>% 
+	mutate(
+		johnson1992_hasRel = detect_subpattern(
+			use_pattern = udsPattern,
+			subpattern = "++",
+			# Starting at 4 weeks of treatment
+			start = 4L
+		)
+	) %>% 
+	select(who, johnson1992_hasRel) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, johnson1992_hasRel)
+```
 
 
 *******************************************************************************
