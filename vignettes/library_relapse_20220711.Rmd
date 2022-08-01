@@ -270,6 +270,46 @@ outcomes_df %>%
 ```
 
 
+## Lee et al., 2018
+**Definition**: `r defns_char["Lee et al., 2018 CTN-0051"]`; missing is positive
+
+```{r}
+outcomes_df <- 
+	outcomes_df %>%
+  rowwise() %>% 
+  mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS
+		)
+	) %>% 
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = udsPattern,
+			missing_is = "*"
+		)
+	) %>% 
+	mutate(
+		udsPatternTrimmed = str_sub(udsPattern, start = 3L)
+	) %>% 
+	rowwise() %>% 
+	mutate(
+		lee2018_rel = detect_in_window(
+			use_pattern = udsPatternTrimmed,
+			window_width = 4L,
+			threshold = 4L
+		)
+	) %>% 
+	unnest(cols = "lee2018_rel", names_sep = "_") %>% 
+	mutate(lee2018_rel_time = lee2018_rel_time + 2) %>% 
+	select(who, starts_with("lee2018_rel")) %>% 
+	left_join(outcomes_df, ., by = "who")
+
+outcomes_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, starts_with("lee2018_rel"))
+```
+
+
 ## Schottenfeld et al., 2008
 **Definition**: `r defns_char["Schottenfeld et al., 2008"]`; missing is positive
 ```{r}
@@ -310,7 +350,7 @@ outcomes_df %>%
 # Comments
 
 ```{r, include=FALSE, eval=FALSE}
-write_csv(outcomes_df, file = "../inst/extdata/outcomes_relapse_20220711.csv")
+write_csv(outcomes_df, file = "../inst/extdata/outcomes_relapse_20220801.csv")
 ```
 
 

@@ -593,7 +593,7 @@ outcomes_df %>%
 # Comments
 
 ```{r, include=FALSE, eval=FALSE}
-write_csv(outcomes_df, file = "../inst/extdata/outcomes_abstinence_20220711.csv")
+# write_csv(outcomes_df, file = "../inst/extdata/outcomes_abstinence_20220711.csv")
 ```
 
 
