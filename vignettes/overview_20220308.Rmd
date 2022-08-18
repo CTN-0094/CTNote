@@ -6,6 +6,8 @@ output:
   rmarkdown::html_vignette:
     toc: true
     toc_depth: 2
+    fig_width: 8
+    fig_height: 8
 vignette: >
   %\VignetteIndexEntry{CTNote Overview}
   %\VignetteEngine{knitr::rmarkdown}
@@ -22,6 +24,7 @@ library(ctn0094DataExtra)
 library(CTNote)
 library(readxl)
 library(kableExtra)
+library(ape) # dendrogram options
 library(tidyverse)
 ```
 
@@ -162,7 +165,9 @@ The second limitation is one of parsimony. In order to ensure that use pattern s
 The third limitation is due to the cold and unfeeling logic of a computer. The computer cannot understand the many extenuating circumstances that pervade our human experience. Worth repeating is the old maxim of computing: "computers give you what you ask for, not what you want." Consider a concrete example: assume a participant was supposed to visit the clinic for a weekly urine test on Thursday, but they came on Wednesday instead due to a conflict at their work; their urine sample from Wednesday came back "clean". What would a nurse at the substance use clinic do in this case? Most people are reasonable; they would count the urine screen for that week as negative for opioids. What would a computer do? Without the direct input of a human to override the clinical trial protocol, a computer would count the negative urine on Wednesday but still mark the participant as a "failure to appear" / "missing urine screen" on Thursday. In many clinical trial protocols, missing urine screens are imputed as "positive" for the substance of interest, so now this participant's use pattern summary is marked `*` (mixed results) instead of `-` (negative results) for that week.
 
 
-### Computing Treatment Outcomes with `CTNote`
+
+## Computing Treatment Outcomes with `CTNote`
+
 We mentioned above that these use pattern summaries are "computable" (that a computer can parse them). The software package `CTNote::` for the R computing language is one such tool to enable computers to parse these use patterns. This software package contains the following groups of routines (also known as functions):
 
 - Handle missing UDS data with `recode_missing_visits()` and `impute_missing_visits()`
@@ -171,7 +176,11 @@ We mentioned above that these use pattern summaries are "computable" (that a com
 - Measure the longest periods of consecutive behavior with `measure_retention()` and `measure_abstinence_period()`
 - Count the substance use events with `count_matches()`
 
-By executing various combinations of these routines, we were able write algorithms to define each of the treatment outcome definitions in Table 1. For example, the Schottenfeld et al. (2008) treatment endpoint definition is "the length of the longest period of consecutive opioid abstinence", where missing clinic visits are imputed to represent a urine screen positive for the substance of interest. Therefore, the algorithm to calculate this definition for subject `r egWho_int` would be
+By executing various combinations of these routines, we were able write algorithms to define each of the treatment outcome definitions in Table 1. In our supplemental material, we include a "library" of algorithms to calculate each definition listed in Table 1. The input of each algorithm is a set of substance use pattern summaries for all clinical trial participants; the output of each algorithm is a calculated treatment endpoint for each participant included in the input.
+
+
+### Example Abstinence Outcome
+The Schottenfeld et al. (2008) treatment endpoint definition is "the length of the longest period of consecutive opioid abstinence", where missing clinic visits are imputed to represent a urine screen positive for the substance of interest. Therefore, the algorithm to calculate this definition for subject `r egWho_int` would be
 ```{r, echo=TRUE, eval=FALSE}
 # The participant's use pattern summary; the %>% symbol is read "and then"
 "++++---+--------------o-" %>% 
@@ -181,13 +190,48 @@ By executing various combinations of these routines, we were able write algorith
   measure_abstinence_period()
 ```
 
-In our supplemental material, we include a "library" of algorithms to calculate each definition listed in Table 1. The input of each algorithm is a set of substance use pattern summaries for all clinical trial participants; the output of each algorithm is a calculated treatment endpoint for each participant included in the input.
+
+### Example Use Reduction Outcome
+The Haight et al. (2019) treatment endpoint definition is the "percentage of negative UOS from week 5 to week 24"; because participants included in the CTN-0094 harmonized data set were not all followed for 24 weeks, we truncate this observation window to 15 weeks of study. Therefore, the code to calculate this definition for subject `r egWho_int` would be
+```{r, echo=TRUE, eval=FALSE}
+count_matches(
+  use_pattern = "++++---+--------------o-",
+  match_is = "-",
+  # Mixed results weeks count as half of a negative week
+  mixed_results_are = "*", mixed_weight = 0.5,
+  # The end-of-protocol for our trials is 15 weeks
+  start = 5, end = 15,
+  # Return the proportion instead of the count
+  proportion = TRUE
+)
+```
 
 
+### Example Relapse Outcome
+The Krupitsky et al. (2006) treatment endpoint has relapse defined as "3 consecutive positive UOS", where missing clinic visits are imputed to represent a urine screen positive for the substance of interest. Therefore, the algorithm to calculate this definition for subject `r egWho_int` would be
+```{r, echo=TRUE, eval=FALSE}
+"++++---+--------------o-" %>% 
+  recode_missing_visits(missing_becomes = "+") %>% 
+  # change all mixed-results visits to positive
+  recode_missing_visits(missing_is = "*", missing_becomes = "+") %>% 
+  # detect if the subject had 3 weeks of positive or missing UDS in a row
+  detect_subpattern(subpattern = "+++")
+```
 
-## Analyzing Treatment Outcomes from Use Patterns 
-
-Now that we have an opioid-specific use pattern for each participant in these three harmonized clinical trials, and we also have a suite of computer functions to calculate each treatment endpoint, we can answer further questions about measuring treatment success or failure. Note that by treatment failure, we mean that the treatment failed to help the participant, not that the participant themselves is a failure in treatment. There are `r nrow(tab1_df)` composite outcomes, but a few of these outcomes involve more than one component. For example, a "time to relapse" metric would involve both the length of time from induction to relapse and an indicator if a relapse was observed. While this type of data is structurally similar to survival data, we note that ([unlike standard survival analysis](https://doi.org/10.4103/0970-0218.66859)) the censoring indicator will rarely be independent of the time-to-event measure.
+If we were interested in relapse from a "time-to-event" or reliability perspective, the algorithm above changes only in the last line:
+```{r, echo=TRUE, eval=FALSE}
+"++++---+--------------o-" %>% 
+  recode_missing_visits(missing_becomes = "+") %>% 
+  recode_missing_visits(missing_is = "*", missing_becomes = "+") %>% 
+  # detect if the subject had 3 weeks of positive or missing UDS in a row, AND
+  #   measure the number of weeks until this pattern *starts*
+  detect_in_window(
+    # Look at all possible 3-week windows, and
+    window_width = 3L,
+    # check if any of them have all 3 positive UDS
+    threshold = 3L
+  )
+```
 
 
 
@@ -198,10 +242,36 @@ Now that we have an opioid-specific use pattern for each participant in these th
 
 # Results
 
-- Examples of Treatment Outcome Definitions
-- Clustering Treatment Outcomes
-    + Resampled Dendrogram (Figure 1)
-- Assessing Racial/Ethnic Sensitivity in Outcomes
+Now that we have an opioid-specific use pattern for each participant in these three harmonized clinical trials, and we also have a suite of computer functions to calculate each treatment endpoint, we can answer further questions about measuring treatment success or failure. Note that by treatment failure, we mean that the treatment failed to help the participant, not that the participant themselves is a failure in treatment. There are `r nrow(tab1_df)` composite outcomes, but a few of these outcomes involve more than one component. For example, a "time to relapse" metric would involve both the length of time from induction to relapse and an indicator if a relapse was observed. While this type of data is structurally similar to survival data, we note that ([unlike standard survival analysis](https://doi.org/10.4103/0970-0218.66859)) the censoring indicator will rarely be independent of the time-to-event measure.
+
+
+## Clustering Treatment Outcomes
+
+Resampled Dendrogram (Figure 1)
+
+```{r, outcome-clusters, echo=FALSE}
+# Cluster
+outcomeClustersBoot_mat <- readRDS(file = "outcome_clusters.rda")
+outcomes_hclust <- hclust(
+  as.dist(1 - outcomeClustersBoot_mat)
+)
+outcomes3Clust_int <- cutree(outcomes_hclust, 3)
+
+# Plot
+colors_char <- c("#db6d00", "#490092", "#009292")
+plot(
+  as.phylo(outcomes_hclust),
+  type = "f",
+  lab4ut = "axial",
+  cex = 0.7,
+  tip.color = colors_char[outcomes3Clust_int],
+  no.margin = TRUE
+)
+```
+
+
+
+## Assessing Racial/Ethnic Sensitivity in Outcomes
 
 
 *******************************************************************************

@@ -67,10 +67,9 @@ vignettes/*.pdf
 *.csv
 *.CSV
 *.Csv
-!inst/extdata/outcomes_reduction_20220701.csv
-!inst/extdata/outcomes_abstinence_20220711.csv
-!inst/extdata/outcomes_relapse_20220711.csv
-!inst/extdata/outcomes_relapse_20220801.csv
+!inst/extdata/outcomes_reduction_*.csv
+!inst/extdata/outcomes_abstinence_*.csv
+!inst/extdata/outcomes_relapse_*.csv
 
 # sas data
 *.sas7bdat
