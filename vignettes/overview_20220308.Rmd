@@ -242,16 +242,36 @@ If we were interested in relapse from a "time-to-event" or reliability perspecti
 
 # Results
 
+
+
 Now that we have an opioid-specific use pattern for each participant in these three harmonized clinical trials, and we also have a suite of computer functions to calculate each treatment endpoint, we can answer further questions about measuring treatment success or failure. Note that by treatment failure, we mean that the treatment failed to help the participant, not that the participant themselves is a failure in treatment. There are `r nrow(tab1_df)` composite outcomes, but a few of these outcomes involve more than one component. For example, a "time to relapse" metric would involve both the length of time from induction to relapse and an indicator if a relapse was observed. While this type of data is structurally similar to survival data, we note that ([unlike standard survival analysis](https://doi.org/10.4103/0970-0218.66859)) the censoring indicator will rarely be independent of the time-to-event measure.
+
 
 
 ## Clustering Treatment Outcomes
 
-Resampled Dendrogram (Figure 1)
+```{r, echo=FALSE}
+outcomeClustersBoot_mat <- readRDS(file = "outcome_clusters.rda")
+```
+
+
+### Hierarchical Clustering Process Details
+Given this library of MOUD treatment endpoints (`r nrow(tab1_df)` composite, including both "time" and "event" metrics; `r ncol(outcomeClustersBoot_mat)` distinct), we applied each endpoint to all 2492 participants who had been randomized to a treatment. This process enables us to empirically contrast endpoints via hierarchical clustering. Our process is as follows:
+
+1. We calculated all `r ncol(outcomeClustersBoot_mat)` distinct endpoints for each subject, resulting in a $2492 \times `r ncol(outcomeClustersBoot_mat)`$ table of outcome metric values.
+2. We scaled all "time" and "count" endpoints to be ratios of their maximum value. For example, if an endpoint measures the total number of negative UDS, then we divide this count for each participant by the maximum observed count across all participants.
+3. To reduce the influence of a single participant's use pattern on the clustering results, we calculate the Pearson correlation matrix (using pairwise complete observations) on a bootstrap sample of the rows in Step 1.
+4. We perform hierarchical clustering on the bootstrap correlation matrix from Step 3 using complete linkage, and cut the resulting tree into $k = 2, 3, \ldots, 15$ clusters. 
+5. For each number of clusters $k$, we generate a $`r ncol(outcomeClustersBoot_mat)` \times `r ncol(outcomeClustersBoot_mat)`$ network connection matrix. The $\{i,j\}$ values of this matrix are 1 if treatment endpoints $i$ and $j$ are in the same cluster, 0 otherwise.
+6. We repeat this process 10,000 times for each $k$, and sum these matrices. In the end, a value of $\{i,j\} = 10,000$ means that in every random bootstrap sample, the treatment endpoints $i$ and $j$ are in the same cluster. Similarly, a value of $\{i,j\} = 0$ means that the treatment endpoints $i$ and $j$ are never in the same cluster for any random bootstrap sample.
+7. We also performed *k*-means clustering for each number of clusters. We found that the optimal number of clusters was $k = 3$ (by observing an "elbow" in the total within-cluster Sum of Squares plot).
+
+
+### Hierarchical Clustering Results
+The bootstrap clustering results for $k = 3$ are shown in the accompanying figure.
 
 ```{r, outcome-clusters, echo=FALSE}
 # Cluster
-outcomeClustersBoot_mat <- readRDS(file = "outcome_clusters.rda")
 outcomes_hclust <- hclust(
   as.dist(1 - outcomeClustersBoot_mat)
 )
@@ -269,9 +289,53 @@ plot(
 )
 ```
 
+The teal cluster on the top right of the wheel, including Shufman et al. and Strain et al. endpoints all have the following trait in common: they ignore or remove missing UDS from their calculation. Notice that this teal cluster has 0 subsplits; in every single bootstrap sample, these metrics are all clustered together. We believe that these endpoints are far too lenient, because missing UDS in opoiod trials is commonly a negative prognostic indicator [CITE THE LEADING CTN-0094 PAPER HERE]. In contrast, the purple cluster on the bottom right of the wheel has the most variability and highest count of sub-clusters. These clusters all depend heavily on the UDS results from a single short interval. For example, the Lofwall et a. (2018) endpoint requires a negative UDS in week 12 (with missing UDS counted as positive), otherwise the treatment will be counted as a failure. This means that if a participant was present in the clinic with negative UDS for 11 weeks in a row, but missed the visit on week 12, the treatment would have been counted as a failure. Similarly, the Krupitsky et al. (2011) endpoint requires complete abstinence from study week 5 to study week 24, and missing UDS are imputed to be positive. The endpoints in this cluster are far too harsh to be meaningful in practice, which is why the clustering results from these endpoint have so much variability (the most number of subclusters).
+
+The larger orange cluster on the left side of the wheel is what we have termed the "Goldilocks" cluster: these outcomes are not too lenient by ignoring missing UDS, and they are not too harsh by measuring success or failure of an entire course of treatment based on a single week or pair of weeks. Of note, our *a priori* hypothesis that these endpoints would naturally cluster into "abstinence, relapse, and use reduction" did **not** hold true. Instead, our "Goldilocks" cluster contains abstinence, relapse, and use reduction endpoints. We believe that current and future MOUD clinical trials should use outcomes from this "Goldilocks" cluster, or--if researchers have the strong desire to create a set of bespoke outcomes--new outcomes should adhere to these considerations: do not ignore missing UDS, and do not make treatment failure too sensitive to a single week's UDS.
 
 
 ## Assessing Racial/Ethnic Sensitivity in Outcomes
+
+Another question that has arisen related to MOUD treatment endpoints is one of "fairness". Now a true discussion of fairness is far beyond the scope of our work, so we sought to answer a simpler question: when applied to the same set of participants, and controlling for clinically relevant covariates, are some of these outcomes more sensitive to race/ethnicity than others? This sensitivity alone does not necessarily mean that an endpoint is "unfair": it could be that a "sensitive" endpoint is better at detecting true differences in treatment for certain racial/ethnic subgroups. Such undue sesnsitivity to race/ethnicity could also mean that the endpoint in question is highlighting an "unfair" aspect of the design of the clinical trial itself. We leave thorough discussion such complex--but highly important--questions to future manuscripts.
+
+
+### Mathematical Challenges 
+One challenge is how to measure "sensitivity". Consider two statistical models using the same predictors:
+
+$$
+\textbf{y} = a_0 + a_1 \textbf{x}_1 + \ldots + a_p \textbf{x}_p + \textbf{e} \qquad (1) \\
+\textbf{z} = b_0 + b_1 \textbf{x}_1 + \ldots + b_p \textbf{x}_p + \boldsymbol{\epsilon} \qquad (2)
+$$
+Let $\textbf{x}_1$ measure a composite of race and ethnicity, $\textbf{y}$ represent outcome 1, and $\textbf{z}$ represent outcome 2.
+
+- With this setup, we can find a $p$-value to measure the statistical significance of race/ethnicity on outcomes 1 and 2 **independently**.
+- However, we can only compare (1) and (2) if the distributions of $\textbf{e}$ and $\boldsymbol{\epsilon}$ come from the same family (both Normal, both Binomial, etc.).
+- If the two outcomes share the same metric space, we could use this framework to state if outcome 1 is more sensitive to race/ethnicity than outcome 2 (or vice versa). 
+
+
+### Our Solution: Invert the Models
+In order to ensure that the distribution of the model residuals shares the same family (so we can compare $p$-values / regression coefficients), we **invert** the linear models above:
+
+$$
+\textbf{x}_1 = a_0 + \textbf{a}_1\textbf{Y} + \ldots + a_p \textbf{x}_p + \textbf{e} \qquad (1^*) \\
+\textbf{x}_1 = b_0 + \textbf{b}_1\textbf{Z} + \ldots + b_p \textbf{x}_p + \boldsymbol{\epsilon} \qquad (2^*)
+$$
+Notice the differences:
+
+- we are no longer using race/ethnicity to predict the trial outcomes, but we are *using the trial outcomes to predict race/ethnicity*
+- the distributions of $\textbf{e}$ and $\boldsymbol{\epsilon}$ are now both *Multinomial*
+- because survival outcomes (2-dimensional) are included, $\textbf{Y}$ and $\textbf{Z}$ are now *matrices* of predictor information and $\textbf{a}_1$ and $\textbf{b}_1$ are *vectors* of regression coefficients
+
+
+### Assessing Racial/Ethnic Information in Outcomes
+Now that we can build comparable multinomial regression models (with NHW as the reference group), we compare them as follows:
+
+1. Create a "null" model (no outcomes at all); fit $(1^*)$ without $\textbf{a}_1\textbf{Y}$. This includes covariates for age, sex, treatment medication, diagnoses of mental illness, use of other (non-opioid) illicit substances, clinical trial, and clinical trial site.
+2. Compare model $(1^*)$ to the null model using a Likelihood Ratio Test and the Akiake Information Criterion.
+3. Compare model $(1^*)$ to $(2^*)$ using the Akiake Information Criterion.
+
+Because we are fitting nearly 60 regression models, we adjust the model $p$-values using a false discovery rate (FDR) correction.
+
 
 
 *******************************************************************************
