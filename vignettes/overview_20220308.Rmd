@@ -1,6 +1,6 @@
 ---
 title: "Overview of the CTNote Library"
-author: "Gabriel Odom, Laura Brandt, Sean Luo, and Ray Balise"
+author: "Gabriel Odom, Laura Brandt, Ray Balise, and the CTN-0094 Team"
 date: "`r Sys.Date()`"
 output:
   rmarkdown::html_vignette:
@@ -13,6 +13,15 @@ vignette: >
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
+
+<!-- output: rmarkdown::word_document -->
+
+<!-- output: -->
+<!--   rmarkdown::html_vignette: -->
+<!--     toc: true -->
+<!--     toc_depth: 2 -->
+<!--     fig_width: 8 -->
+<!--     fig_height: 8 -->
 
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = FALSE)
@@ -51,29 +60,34 @@ tab1_df <- readxl::read_xlsx(pathToTable1_char)
 ```
 
 ```{r, show-table-one, results='asis'}
-tab1_df %>% 
-  select(-`Frequency of UOS`, -`Coded column name`, -DOI) %>% 
-  rename(
-    Group = `Outcome Group`,
-    Endpoint = `Primary Endpoint`,
-    Class = `Numeric Class`,
-    Definition = `Definition/Assessment of Outcome`,
-    `Missing is` = `Missing UOS coded as`
-  ) %>% 
-  mutate(
-    Group = case_when(
-      str_detect(Group, "Abstinence") ~ "Abstinence",
-      str_detect(Group, "Relapse") ~ "Relapse",
-      str_detect(Group, "Reduction") ~ "Reduction",
-    )
-  ) %>% 
-  kable("html") %>%
-  column_spec(1:4, width = "3cm") %>%
-  column_spec(5, width = "5cm") %>%
-  kable_styling("striped", font_size = 11) %>%
-  kable_minimal() %>% 
-  # All styling and spec calls have to come BEFORE this line.
-  scroll_box(width = "1000px", height = "500px") 
+if(!knitr::is_html_output()) {
+  "TABLE OF TREATMENT ENDPOINTS HERE; SEE .html VERSION"
+} else {
+
+  tab1_df %>% 
+    select(-`Frequency of UOS`, -`Coded column name`, -DOI) %>% 
+    rename(
+      Group = `Outcome Group`,
+      Endpoint = `Primary Endpoint`,
+      Class = `Numeric Class`,
+      Definition = `Definition/Assessment of Outcome`,
+      `Missing is` = `Missing UOS coded as`
+    ) %>% 
+    mutate(
+      Group = case_when(
+        str_detect(Group, "Abstinence") ~ "Abstinence",
+        str_detect(Group, "Relapse") ~ "Relapse",
+        str_detect(Group, "Reduction") ~ "Reduction",
+      )
+    ) %>% 
+    kable("html") %>%
+    column_spec(1:4, width = "3cm") %>%
+    column_spec(5, width = "5cm") %>%
+    kable_styling("striped", font_size = 11) %>%
+    kable_minimal() %>% 
+    # All styling and spec calls have to come BEFORE this line.
+    scroll_box(width = "1000px", height = "500px") 
+}
 ```
 
 Each row of Table 1 is an outcome used in a past clinical trial for MOUD. As preliminary work, our clinical team grouped these by clinical practice into three classes: *abstinence*, *relapse*, and substance use *reduction*. These classes were further split into subclasses based on their clinical interpretation. Of note, these metrics also differed in how they considered a scheduled but incomplete UDS (i.e. a "missing" UDS). We removed outcomes which could not be used to measure subject-specific outcomes (e.g. "proportion of subjects in treatment group with positive UDS in study week 3"); we removed outcomes which could not yield a univariate metric of subject success (e.g. "number of positive UDS per three-week window over time"); we split papers which assessed multiple outcomes (e.g. complete abstinence between weeks 5-12 AND total number of abstinent weeks), and we combined papers which used identical outcomes. At the end of our literature search, we have `r nrow(tab1_df)` outcomes from registered clinical trials to consider.
@@ -131,13 +145,21 @@ egWho_int <- 2089L
 
 We will first observe the recorded opioid use data via urine screen for subject `r egWho_int` after randomization.
 ```{r results='asis'}
-ctn0094data::all_drugs %>% 
+egTab_df <- 
+  ctn0094data::all_drugs %>% 
   filter(who == egWho_int) %>% 
   filter(source == "UDSAB") %>% 
   filter(when >= 0) %>% 
-  arrange(when) %>% 
-  kable() %>% 
-  scroll_box(width = "500px", height = "500px") 
+  arrange(when)
+
+if(!knitr::is_html_output()) {
+  "TABLE OF SUBSTANCE USE FOR EXAMPLE PARTICIPANT HERE; SEE .html VERSION "
+} else {
+  egTab_df %>% 
+    kable() %>% 
+    scroll_box(width = "500px", height = "500px")
+}
+
 ```
 
 While we observe that this participant used various substances throughout the clinical trial, it's difficult to make clinical judgement using the data in this form. On the one hand, this data can be clearly parsed by a computer, and it represents all of the opioid use for this subject. However, data in this form is not easy to directly interpret by a clinician.
@@ -260,11 +282,12 @@ Given this library of MOUD treatment endpoints (`r nrow(tab1_df)` composite, inc
 
 1. We calculated all `r ncol(outcomeClustersBoot_mat)` distinct endpoints for each subject, resulting in a $2492 \times `r ncol(outcomeClustersBoot_mat)`$ table of outcome metric values.
 2. We scaled all "time" and "count" endpoints to be ratios of their maximum value. For example, if an endpoint measures the total number of negative UDS, then we divide this count for each participant by the maximum observed count across all participants.
-3. To reduce the influence of a single participant's use pattern on the clustering results, we calculate the Pearson correlation matrix (using pairwise complete observations) on a bootstrap sample of the rows in Step 1.
-4. We perform hierarchical clustering on the bootstrap correlation matrix from Step 3 using complete linkage, and cut the resulting tree into $k = 2, 3, \ldots, 15$ clusters. 
-5. For each number of clusters $k$, we generate a $`r ncol(outcomeClustersBoot_mat)` \times `r ncol(outcomeClustersBoot_mat)`$ network connection matrix. The $\{i,j\}$ values of this matrix are 1 if treatment endpoints $i$ and $j$ are in the same cluster, 0 otherwise.
-6. We repeat this process 10,000 times for each $k$, and sum these matrices. In the end, a value of $\{i,j\} = 10,000$ means that in every random bootstrap sample, the treatment endpoints $i$ and $j$ are in the same cluster. Similarly, a value of $\{i,j\} = 0$ means that the treatment endpoints $i$ and $j$ are never in the same cluster for any random bootstrap sample.
-7. We also performed *k*-means clustering for each number of clusters. We found that the optimal number of clusters was $k = 3$ (by observing an "elbow" in the total within-cluster Sum of Squares plot).
+3. We re-framed all outcomes into a "larger is better" interpretation: $f(x) = \text{max}(x) - x$ for outcomes where a larger value would indicate a worse treatment outcome.
+4. To reduce the influence of a single participant's use pattern on the clustering results, we calculate the Pearson correlation matrix (using pairwise complete observations) on a bootstrap sample of the rows in Step 1.
+5. We perform hierarchical clustering on the bootstrap correlation matrix from Step 3 using complete linkage, and cut the resulting tree into $k = 2, 3, \ldots, 15$ clusters. 
+6. For each number of clusters $k$, we generate a $`r ncol(outcomeClustersBoot_mat)` \times `r ncol(outcomeClustersBoot_mat)`$ network connection matrix. The $\{i,j\}$ values of this matrix are 1 if treatment endpoints $i$ and $j$ are in the same cluster, 0 otherwise.
+7. We repeat this process 10,000 times for each $k$, and sum these matrices. In the end, a value of $\{i,j\} = 10,000$ means that in every random bootstrap sample, the treatment endpoints $i$ and $j$ are in the same cluster. Similarly, a value of $\{i,j\} = 0$ means that the treatment endpoints $i$ and $j$ are never in the same cluster for any random bootstrap sample.
+8. We also performed *k*-means clustering for each number of clusters. We found that the optimal number of clusters was $k = 3$ (by observing an "elbow" in the total within-cluster Sum of Squares plot).
 
 
 ### Hierarchical Clustering Results
@@ -306,35 +329,55 @@ $$
 \textbf{y} = a_0 + a_1 \textbf{x}_1 + \ldots + a_p \textbf{x}_p + \textbf{e} \qquad (1) \\
 \textbf{z} = b_0 + b_1 \textbf{x}_1 + \ldots + b_p \textbf{x}_p + \boldsymbol{\epsilon} \qquad (2)
 $$
-Let $\textbf{x}_1$ measure a composite of race and ethnicity, $\textbf{y}$ represent outcome 1, and $\textbf{z}$ represent outcome 2.
+Let $\textbf{x}_1$ measure a composite of race and ethnicity, $\textbf{x}_2, \ldots, \textbf{x}_p$ are the other relevant predictors and covariates, $\textbf{y}$ represent outcome 1, and $\textbf{z}$ represent outcome 2. With this setup, we can find a test statistic and $p$-value to measure the statistical significance of race/ethnicity on outcomes 1 and 2 **independently**. However, we can only compare models (1) and (2) if the distributions of $\textbf{e}$ and $\boldsymbol{\epsilon}$ come from the same family (both Normal, both Binomial, etc.). If the two outcomes share the same metric space, we could use this framework to state if outcome 1 is more sensitive to race/ethnicity than outcome 2 (or vice versa). 
 
-- With this setup, we can find a $p$-value to measure the statistical significance of race/ethnicity on outcomes 1 and 2 **independently**.
-- However, we can only compare (1) and (2) if the distributions of $\textbf{e}$ and $\boldsymbol{\epsilon}$ come from the same family (both Normal, both Binomial, etc.).
-- If the two outcomes share the same metric space, we could use this framework to state if outcome 1 is more sensitive to race/ethnicity than outcome 2 (or vice versa). 
-
-
-### Our Solution: Invert the Models
-In order to ensure that the distribution of the model residuals shares the same family (so we can compare $p$-values / regression coefficients), we **invert** the linear models above:
+However, our outcomes do **not** all share the same metric space. The error vectors could have univariate Bernoulli (success or failure), Poisson (number of negative UDS), Negative Binomial (number of positive UDS), Beta (ratio outcomes scaled between 0 and 1), or even multivariate (time to event and event indicator). Therefore, in order to ensure that the distribution of the model residuals shares the same family (so we can compare $p$-values / regression coefficients), we **invert** the linear models above:
 
 $$
 \textbf{x}_1 = a_0 + \textbf{a}_1\textbf{Y} + \ldots + a_p \textbf{x}_p + \textbf{e} \qquad (1^*) \\
 \textbf{x}_1 = b_0 + \textbf{b}_1\textbf{Z} + \ldots + b_p \textbf{x}_p + \boldsymbol{\epsilon} \qquad (2^*)
 $$
-Notice the differences:
-
-- we are no longer using race/ethnicity to predict the trial outcomes, but we are *using the trial outcomes to predict race/ethnicity*
-- the distributions of $\textbf{e}$ and $\boldsymbol{\epsilon}$ are now both *Multinomial*
-- because survival outcomes (2-dimensional) are included, $\textbf{Y}$ and $\textbf{Z}$ are now *matrices* of predictor information and $\textbf{a}_1$ and $\textbf{b}_1$ are *vectors* of regression coefficients
+Notice the differences. We are no longer using race/ethnicity to predict the trial outcomes, but we are *using the trial outcomes to predict race/ethnicity*. The distributions of $\textbf{e}$ and $\boldsymbol{\epsilon}$ are now both univariate *Multinomial* with composite race and ethnicity partitioned as Non-Hispanic White (NHW), Non-Hispanic Black (NHB), Hispanic, and Non-Hispanic Other (Other). Because time-to-event outcomes (survival; 2-dimensional) are included, $\textbf{Y}$ and $\textbf{Z}$ are now *matrices* of predictor information and $\textbf{a}_1$ and $\textbf{b}_1$ are *vectors* of regression coefficients.
 
 
 ### Assessing Racial/Ethnic Information in Outcomes
-Now that we can build comparable multinomial regression models (with NHW as the reference group), we compare them as follows:
+We fit equations $(1^*)$ and $(2^*)$ via feed-forward neural-network-based multinomial log-linear models (using the `multinom()` function from the [`nnet` package](https://CRAN.R-project.org/package=nnet) with defaults). Now that we can build comparable multinomial regression models (with NHW as the reference group), we compare them as follows:
 
-1. Create a "null" model (no outcomes at all); fit $(1^*)$ without $\textbf{a}_1\textbf{Y}$. This includes covariates for age, sex, treatment medication, diagnoses of mental illness, use of other (non-opioid) illicit substances, clinical trial, and clinical trial site.
+1. Create a "null" model (no outcomes at all); fit $(1^*)$ without $\textbf{a}_1\textbf{Y}$. This includes covariates for age, sex, study, treatment medication, and diagnoses of mental illness.
 2. Compare model $(1^*)$ to the null model using a Likelihood Ratio Test and the Akiake Information Criterion.
-3. Compare model $(1^*)$ to $(2^*)$ using the Akiake Information Criterion.
+3. Compare model $(1^*)$ to $(2^*)$ using the Likelihood Ratio Test.
 
-Because we are fitting nearly 60 regression models, we adjust the model $p$-values using a false discovery rate (FDR) correction.
+Because we are fitting `r nrow(tab1_df)` regression models, we adjust the model $p$-values from Step 3 using a false discovery rate (FDR) correction. The following table shows the results of these model comparisons against baseline (Non-Hispanic White) for each treatment endpoint, arranged by FDR. 
+
+```{r, show-race-table, results='asis'}
+tab2_df <- readRDS("./outcome_metric_biases.rda")
+
+if(!knitr::is_html_output()) {
+  "TABLE OF MODEL PERFORMANCE BY RACE/ETHNICITY HERE; SEE .html VERSION"
+} else {
+  tab2_df %>% 
+    select(name, race_ethnicity, beta, pVal, FDR) %>% 
+    arrange(FDR) %>% 
+    rename(
+      `Treatment Endpoint ID` = name,
+      `Race+Ethnicity` = race_ethnicity,
+      Beta = beta,
+      `p-Value` = pVal,
+      `Endpoint LR FDR` = FDR
+    ) %>% 
+    kable("html") %>%
+    column_spec(1:2, width = "3cm") %>%
+    column_spec(3:4, width = "2cm") %>%
+    # column_spec(5, width = "5cm") %>%
+    kable_styling("striped", font_size = 11) %>%
+    kable_minimal() %>% 
+    # All styling and spec calls have to come BEFORE this line.
+    scroll_box(width = "700px", height = "500px") 
+}
+
+```
+
+Recall that all outcomes were transformed so to range from 0 to 1 and have larger values indicate better treatment prognosis. Notice that the "beta" column (the effect) has nearly uniform negative signs: these negative $\beta$ values for these endpoints are saying "if you succeeded in this treatment, you are less likely to be a minority". [NOTE: these effects are disappear when we include the "site masked" variable. I think that site may be a proxy for race and ethnicity here. Help!]
 
 
 
@@ -343,3 +386,5 @@ Because we are fitting nearly 60 regression models, we adjust the model $p$-valu
 
 
 # Discussion
+
+We have a standard library of MOUD treatment outcomes. We have clustered these outcomes empirically, and we found an entire cluster only containing outcomes which ignored missing UDS--further giving credence to the theory that missing UDS are highly informative for opioid use treatment. We have also ascertained that participant race and ethnicity are informative predictors when measuring MOUD efficacy.

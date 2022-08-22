@@ -62,6 +62,7 @@ vignettes/*.pdf
 *.rda
 *.RDA
 *.Rda
+!vignettes/*.rda
 
 # csv data
 *.csv
