@@ -9,6 +9,7 @@ output:
     fig_width: 8
     fig_height: 8
 bibliography: CTNote_references.bib 
+csl: plos_one.csl
 vignette: >
   %\VignetteIndexEntry{CTNote: Quinary Words and Algorithms}
   %\VignetteEngine{knitr::rmarkdown}
