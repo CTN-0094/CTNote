@@ -26,9 +26,7 @@ License: GPL-3
 Encoding: UTF-8
 RoxygenNote: 7.2.1
 Depends:
-  R (>= 3.1.0),
-  ctn0094data,
-  ctn0094DataExtra
+  R (>= 3.1.0)
 Imports: 
   stringi,
   stringr
