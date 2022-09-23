@@ -25,6 +25,28 @@ library(kableExtra)
 library(tidyverse)
 ```
 
+```{r, helper-functions, include=FALSE}
+NamedTable <- function(categ_vec, ...) {
+  # Turn a 1-D Table into a Named Atomic Vector
+  # Arguments:
+  #   categ_vec - a categorical vector (a character, integer, or logical vector)
+  #   ... - additional arguments passed to the base::table() function
+  # Value: a named integer vector. The integers are the frequency counts of the
+  #   categories; the names are the categories.
+  # Examples:
+  #   a_categorical_vector <- sample(letters[1:5], size = 20, replace = TRUE)
+  #   NamedTable(a_categorical_vector)
+  
+  out_mat <- as.matrix( table(categ_vec, ...) )
+  out_vec <- out_mat
+  dim(out_vec) <- NULL
+  names(out_vec) <- rownames(out_mat)
+  out_vec
+  
+}
+```
+
+
 
 
 
@@ -98,7 +120,15 @@ Our scientific questions are as follows: (1) When applied to the same clinical t
 
 The [CTN-0094 Project](http://ctndisseminationlibrary.org/protocols/ctn0094.htm) research team harmonized data from 3 large-scale MOUD clinical trials: [CTN-0027](http://ctndisseminationlibrary.org/protocols/ctn0027.htm): "Starting reatment with Agonist Replacement Therapies (START)"; [CTN-0030](http://ctndisseminationlibrary.org/protocols/ctn0030.htm): "Prescription Opiate Abuse Treatment Study (POATS)"; and [CTN-0051](http://ctndisseminationlibrary.org/protocols/ctn0051.htm): "Extended-Release Naltrexone vs. Buprenorphine for Opioid Treatment (X:BOT)". These three are nationally representative, prospective clinical trials with over 3600 combined participants. These trials treated participants for 16-24 weeks, and collected rich baseline substance use data, demographics, and medical/psychiatric evaluations. 
 
-We have `r nrow(derived_weeklyOpioidPattern)` fully de-identified subjects with demographics and weekly UDS results for the months they were in treatment, 2492 of whom completed randomization to a treatment arm. This harmonized data will be released in the R packages `ctn0094data` and [`ctn0094DataExtra`](https://github.com/CTN-0094/ctn0094DataExtra). To simplify our analysis of endpoint sensitivity to race/ethnicity, we coded race and ethnicity conjointly as "Non-Hispanic White" ($n_W = 2484$), "Non-Hispanic Black" ($n_B = 347$), "Hispanic" ($n_H = 507$), and "Other" ($n_O = 222$). In order to summarize complex substance use patterns over the weeks of the multiple clinical trials, we standardized all dates to the day of trial consent, and we coded the urinalysis results for each day/week as a "word".
+```{r}
+raceCounts <- 
+  ctn0094DataExtra::derived_raceEthnicity %>% 
+  pull(race_ethnicity) %>% 
+  NamedTable() 
+```
+
+
+We have `r nrow(derived_weeklyOpioidPattern)` fully de-identified subjects with demographics and weekly UDS results for the months they were in treatment, 2492 of whom completed randomization to a treatment arm. This harmonized data will be released in the R packages `ctn0094data` and [`ctn0094DataExtra`](https://github.com/CTN-0094/ctn0094DataExtra). To simplify our analysis of endpoint sensitivity to race/ethnicity, we coded race and ethnicity conjointly as "Non-Hispanic White" $(n_W = `r raceCounts["Non-Hispanic White"]`)$, "Non-Hispanic Black" $(n_B = `r raceCounts["Non-Hispanic Black"]`)$, "Hispanic" $(n_H = `r raceCounts["Hispanic"]`)$, and "Other" $(n_O = `r raceCounts["Other"]`)$. In order to summarize complex substance use patterns over the weeks of the multiple clinical trials, we standardized all dates to the day of trial consent, and we coded the urinalysis results for each day/week as a "word".
 
 
 
