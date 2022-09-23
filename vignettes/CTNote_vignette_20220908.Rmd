@@ -1,0 +1,264 @@
+---
+title: "COOL TITLE HERE: An n-Ary Word Sufficient Statistic for Sequential Univariate Categorical Values"
+author: "Gabriel Odom, Laura Brandt, Ray Balise, Clinton Castro, and the CTN-0094 Team"
+date: "`r Sys.Date()`"
+output: 
+  rmarkdown::html_vignette:
+    toc: true
+    toc_depth: 2
+    fig_width: 8
+    fig_height: 8
+bibliography: CTNote_references.bib 
+csl: plos_one.csl
+vignette: >
+  %\VignetteIndexEntry{CTNote: Quinary Words and Algorithms}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+<!-- output: rmarkdown::word_document -->
+
+<!-- output: -->
+<!--   rmarkdown::html_vignette: -->
+<!--     toc: true -->
+<!--     toc_depth: 2 -->
+<!--     fig_width: 8 -->
+<!--     fig_height: 8 -->
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r, load-packages, include=FALSE}
+library(CTNote)
+library(readxl)
+library(kableExtra)
+library(tidyverse)
+```
+
+### Abstract
+
+
+
+# Introduction and Motivation
+
+
+## Background
+
+Over 750,000 Americans have died from a drug overdose [since 1990](https://www.hhs.gov/opioids/about-the-epidemic/opioid-crisis-statistics/index.html).[@us_hhs_opioid_2018] Even worse, after the onset of the COVID-19 pandemic, millions of Americans have self-reported [increases in their substance use](https://www.samhsa.gov/newsroom/press-announcements/202110260320) "a little more or much more",[@us_samhsa_samhsa_2021] and over 40 million Americans [needed treatment](https://zinniahealth.com/research/substance-use-disorder-treatment-by-state) for a substance use disorder (SUD) in 2020.[@liebhaber_over_2022] SUDs are treated with a [combination of pharmacological and psychological interventions](https://www.samhsa.gov/medication-assisted-treatment), known as medication assisted treatment.[@us_samhsa_medication-assisted_2022] When evaluating the efficacy of new medication-assisted treatments for SUDs, clinicians require trial participants to provide frequent urine samples, known as urine drug screenings (UDS), which are tested for the presence of substances of misuse. 
+
+For a single substance or group of substances, outcomes of these tests are uni-dimensional and categorical. Common UDS categories include "substance positive", "substance negative", "improper urine sample temperature", "missing urine", and others. Further, because these tests are given sequentially over the course of a clinical trial, the tests are correlated within subject and across study week. Because of these properties, single-value summaries of the UDS pattern (such as the proportion of "substance positive" results, or the maximum number of consecutive "substance negative" results) are not *sufficient statistics* (they do not contain all of the information about each trial participants' UDS pattern that was contained in the original UDS data).[@fisher_mathematical_1922]
+
+
+## Overview of this Paper
+
+In this paper, we extend the concept of a binary word to multiple categories. We show that this construct sufficiently collapses longitudinal records into a single, compact "word". Also, we give a few example algorithms to calculate some common single-value summaries from such a "word". Finally, we introduce a standard and code-based library of algorithms (contained in the `CTNote` package [@odom_ctnote_2022] for the R Computing Language [@r_core_team_r_2022]) for treatment outcome definitions useful to evaluate medication-based treatments for SUDs. 
+
+
+*******************************************************************************
+</br>
+
+
+
+# Methods
+
+
+## "Words" as Sufficient Statistics for Longitudinal Categorical Data
+
+We aim to create a sequence of letters and symbols that act as a sufficient statistic for a categorical random variable observed in a longitudinal manner. Our motivating example is a compact and sufficient representation of a subject's weekly UDS results. For laboratory tests which detect a substance of interest in the urine, this statistic is a compact representation of the full pattern of substance use for an individual participant. To be of use, this summary statistic must have the following properties:
+
+1. (*Machine-Readable*) It can be directly [parsed by a computer](https://opendatahandbook.org/glossary/en/terms/machine-readable/).[@open_data_handbook_machine_2022]
+2. (*Human-Readable/Parsimonious*) It can be easily interpreted by a human.
+3. (*Sufficient*) It represents all of the same information about the sequence of interest that would be present in the full data.
+
+
+## Binary and $n$-ary "Words"
+
+[Binary words](https://www.oxfordreference.com/view/10.1093/acref/9780199235940.001.0001/acref-9780199235940-e-293) are a compact representation of a sequence of logical or binary variables.[@clapham_binary_2009] For example, let the random variable $x$ indicate whether or not a clinical trial participant visited their clinic in each week over a four-week period, and assume that we observe the pattern: "visit", "visit", "no visit", "visit". If "1" represents a visit and "0" represents no recorded visit, then we can represent this clinic visit pattern as the binary word "1101". Similarly, we could represent these two categories symbolically as "V" for visit and "_" for no visit, so our binary word becomes "VV_V". Notice that for a short sequence like our 4-week example here, the original data itself is both machine readable and human readable. However, parsimony (human readability) begins to suffer as sequences grow longer.
+
+Extensions of this concept have been [famously applied to the human genome](https://www.ncbi.nlm.nih.gov/Class/MLACourse/Original8Hour/Genetics/basepair.html).[@geer_genetics_1999] The four nitrogen bases in DNA are abbreviated by their first letter: A for adenine, T for thymine, G for guanine, and C for cytosine. These four letters are collapsed by their position in the genome into a *quaternary* word (or a *quinary* word if U is included for uracil). For example, the "word" AAACCATTCACAATCAGACA expresses a sequence of 20 nucleic acid bases without loss of information about the bases (the "word" is *sufficient*). The "word" AAACCATTCACAATCAGACA is also much easier to understand by a human than the condensed structural formula or a skeletal-structural formula of these 20 compounds (the "word" is *human readable*). Furthermore, such a quaternary word can be parsed by a computer with ease (the "word" is *machine readable*).
+
+
+## Quinary UDS Pattern Legend
+
+We now build from the examples above. In order to compactly summarize a participant's pattern of substance use (for a particular class of substances) over time, we first define the following five-value legend:
+
+- **+**: positive for the substance(s) in a specified window of time (a day, week, month, etc.) by urine screen (or participant self report, if such data are of interest)
+- **–**: negative for the substance(s)
+- **o**: subject failed to provide a urine sample
+- <b>*</b>: inconclusive results or mixed results (e.g. subject provided more than one urine sample in the time interval and they did not agree)
+- <b>_</b>: no specimens required (weekends, holidays, pre-randomization period, alternating visit days/weeks)
+
+We note that the "+" and "-" symbols have been used in clinical shorthand for decades. Obviously this legend can be modified and extended to better reflect the complexities of individual clinical trials, but we believe that the structure (representing visits / short time intervals as single symbols) will still be beneficial as a quick "snapshot" of the patient's treatment results and adherence to trial protocol, and also as a computable summary of the subject's behavior during the follow-up period and post-trial analysis phase.
+
+
+## A Use Pattern Example
+```{r}
+egWho_int <- 2089L
+
+egUsePattern_char <- 
+  CTNote::outcomesCTN0094 %>% 
+  filter(who == egWho_int) %>% 
+  pull(usePatternUDS)
+```
+
+We will first observe the recorded opioid use data via urine screen for a subject after randomization.
+```{r results='asis'}
+egTab1_df <- 
+  CTNote::egOpioidsCTN0094 %>%
+  filter(who == egWho_int)
+kable(egTab1_df)
+```
+
+While we observe the study days that this participant used opioids throughout the clinical trial, it's difficult visualize the patient's treatment trajectory using the data in this form. On the one hand, after some preliminary data cleaning, this data can be parsed by a computer (*machine readability*). Additionally, this table represents all of the opioid use for this subject (*sufficiency*). However, data in this form is **not** easy to directly interpret by a clinician or researcher. Can we immediately derive clinical intuition about this patient? Does the treatment appear to be effective?
+
+<!-- `r egUsePattern_char` # I can't get the "--" to not be parsed as an en dash -->
+In contrast, observe the opioid use pattern summary for this same participant: 
+`++++---+--------------o-`. Using the basic pattern definition legend above, we can clearly see that this subject had a challenging first month (`++++`), improved in the second month (`---+`), and then remained abstinent from opioids for the remainder of the clinical trial (`--------------o-`). Participant substance use pattern data in this form *is* easy to interpret by a clinician. Moreover, this symbolic representation of substance use can be parsed and summarized by a computer. Finally, notice that this pattern represents the entire course of treatment for this subject without loss of any clinically relevant information about their opioid misuse.
+
+One last major strength is that using these opioid summary words allows for quick inspection of multiple patients' treatment trajectories all at once. Instead of checking multiple charts one-by-one to get a rough assessment of of the treatment efficacy, we can quickly see overall study arm patterns at a glance. The table below is an example of what these urine screen "words" would look like after 6 weeks of the study. This gives us a quick visual summary of which participants have responded well to the treatment so far (4, 13, 33, 163, and 242) and which participants have not (17, 210, 233, 1103, and 2089). Such quick clinical insights would be challenging to achieve from the raw data alone.
+```{r, message=FALSE}
+CTNote::egOpioidsCTN0094 %>% 
+  select(who) %>% 
+  distinct() %>% 
+  left_join(CTNote::outcomesCTN0094, by = "who") %>% 
+  select(who, usePatternUDS) %>% 
+  mutate(usePatternUDS = str_trunc(usePatternUDS, width = 6, ellipsis = "")) %>% 
+  as.data.frame() %>% 
+  print(row.names = FALSE)
+```
+
+
+
+*******************************************************************************
+</br>
+
+
+
+# Results
+
+We mentioned above that these use pattern summaries are "machine readable" (that a computer can parse them). The software package `CTNote::` is one such tool to enable computers to parse these use patterns.[@odom_ctnote_2022] This software package contains the following groups of routines (also known as functions):
+
+- Handle missing UDS data with `recode_missing_visits()` and `impute_missing_visits()`
+- Account for the study observation design or trial visit protocol with `collapse_lattice()` and `view_by_lattice()`
+- Detect a substance use pattern with `detect_subpattern()` and `detect_in_window()`
+- Measure the longest periods of consecutive behavior with `measure_retention()` and `measure_abstinence_period()`
+- Count the substance use events with `count_matches()`
+
+By executing various combinations of these routines, we were able write algorithms to define many common treatment outcome definitions used in SUD clinical trials. In our supplemental material, we include a "library" of algorithms to calculate each of these definitions. The input of each algorithm is a set of substance use pattern summaries (as a "word") for all clinical trial participants; the output of each algorithm is a calculated treatment endpoint for each participant included in the input.
+
+
+## Example: Abstinence Outcome
+
+One of the [Schottenfeld et al. (2008)](https://doi.org/10.1016/s0140-6736(08)60954-x) treatment endpoint definitions is "the maximum consecutive days abstinent" from opioids, where missing clinic visits are imputed to represent a urine screen positive for the substance of interest.[@schottenfeld_maintenance_2008] Therefore, the algorithm to calculate this definition for our example subject would be:
+```{r, echo=TRUE, eval=FALSE}
+# The participant's use pattern summary; the %>% symbol is read "and then"
+"++++---+--------------o-" %>% 
+  # change all missing visits to positive
+  recode_missing_visits(missing_becomes = "+") %>% 
+  # find the length of the longest abstinent period, in weeks
+  measure_abstinence_period()
+```
+
+
+## Example: Use Reduction Outcome
+
+The [Haight et al. (2019)](https://doi.org/10.1016/S0140-6736(18)32259-1) treatment endpoint definition is the "percentage of negative UOS [urine opioid screen] from week 5 to week 24".[@haight_efficacy_2019] Therefore, the code to calculate this definition for our example subject would be:
+```{r, echo=TRUE, eval=FALSE}
+count_matches(
+  use_pattern = "++++---+--------------o-",
+  match_is = "-",
+  # Mixed results weeks count as half of a negative week
+  mixed_results_are = "*", mixed_weight = 0.5,
+  start = 5, end = 24,
+  # Return the proportion instead of the count
+  proportion = TRUE
+)
+```
+
+
+## Example: Relapse Outcome
+
+The [Krupitsky et al. (2006)](https://doi.org/10.1016/j.jsat.2006.05.005) treatment endpoint has relapse defined as "3 consecutive positive UOS", where missing clinic visits are imputed to represent a urine screen positive for the substance of interest.[@krupitsky_naltrexone_2006] Therefore, the algorithm to calculate this definition for our example subject would be:
+```{r, echo=TRUE, eval=FALSE}
+"++++---+--------------o-" %>% 
+  recode_missing_visits(missing_becomes = "+") %>% 
+  # change all mixed-results visits to positive
+  recode_missing_visits(missing_is = "*", missing_becomes = "+") %>% 
+  # detect if the subject had 3 weeks of positive or missing UDS in a row
+  detect_subpattern(subpattern = "+++")
+```
+
+If we were interested in relapse from a "time-to-event" or reliability perspective,[@kleinbaum_introduction_2012] the algorithm above changes only in the last line:
+```{r, echo=TRUE, eval=FALSE}
+"++++---+--------------o-" %>% 
+  recode_missing_visits(missing_becomes = "+") %>% 
+  recode_missing_visits(missing_is = "*", missing_becomes = "+") %>% 
+  # detect if the subject had 3 weeks of positive or missing UDS in a row, AND
+  #   measure the number of weeks until this pattern *starts*
+  detect_in_window(
+    # Look at all possible 3-week windows, and
+    window_width = 3L,
+    # check if any of them have all 3 positive UDS
+    threshold = 3L
+  )
+```
+
+
+*******************************************************************************
+</br>
+
+
+
+# Discussion
+
+
+## Use Pattern "Word" Strengths
+
+We believe this `CTNote` package and outcomes library will be useful to all future substance use disorder clinical trials in the National Institute of Drug Abuse (NIDA)'s [Clinical Trials Network](https://doi.org/10.1186/s13722-021-00238-6) (CTN) and in other substance use disorder research.[@tai_nida_2021] While developing this construct, our work adheres to the [Open Knowledge](https://doi.org/10.1371/journal.pbio.1001195) philosophy of science,[@molloy_open_2011] so the code for the CTNote package and all related algorithms are open-source.
+
+**HELP!!** I need some help writing this part of the discussion. I think this quinary word structure is an awesome way to represent urine test results over time, but I don't know how to sell a clinician or their statistician on this.
+
+
+## Accounting for Multivariate Categorical Variables
+
+These use pattern summaries are substance or substance group specific (*univariate*, statistically speaking). From this opioid use pattern summary word, we can see that our example trial participant quickly reduced their opioid use. However, if we inspect their complete urine screening record, we would see an increase in use of some other substances. For example, this participant does *not* decrease their cocaine use over the same time interval. The **opioid** use pattern summary can not display information about concurrent **cocaine** use. This is one of our current areas of research: expanding the support of substance use pattern "words" to include poly-substance use in a meaningful way (including the ability to preserve cross-substance correlations).
+
+<!-- ```{r results='asis'} -->
+<!-- egTab2_df <-  -->
+<!--   ctn0094data::all_drugs %>%  -->
+<!--   filter(who == egWho_int) %>%  -->
+<!--   filter(source == "UDSAB") %>%  -->
+<!--   filter(when >= 0) %>%  -->
+<!--   filter(what %in% c("Opioid", "Cocaine")) %>%  -->
+<!--   arrange(when) -->
+<!-- kable(egTab2_df) -->
+<!-- ``` -->
+
+
+## The Complexity-Parsimony Tradeoff
+
+We now discuss some of the technical components surrounding parsimony. In order to ensure that use pattern summaries work regardless of a computer's locale or operating system, we limit the symbols in the "word" to proper symbols from the [American Standard Code for Information Interchange](https://www.ascii-code.com/) (ASCII) list,[@injosoft_ab_extended_2022] which has been a computing standard [for decades](http://edition.cnn.com/TECH/computing/9907/06/1963.idg/).[@brandel_1963_1999] Technically speaking, there are 128 [7-bit ASCII](https://www.ibm.com/docs/en/aix/7.1?topic=support-ascii-characters) symbols, but only 96 are visible (printable) characters.[@ibm_ascii_2022] Put simply, these 96 characters are all the symbols that a traditional North American computer keyboard can make. Therefore, we could define a substance use pattern "word" with any combination of these 96 printable symbols. 
+
+However, such a visual summary with 96 possible values would be incredibly challenging to interpret, consequently failing to meet the parsimony requirement (that our summary be easily read by a clinician). In the interest of simplicity, we chose the five symbols mentioned above (`+`, `-`, `o`, `*`, and `_`). We recognize that different clinical trial designs may necessitate the introduction of additional symbols to this use pattern summary, but we strongly recommend (due to human [memory constraints](https://doi.org/10.1037/h0043158)) that such lists be kept to seven symbols or fewer.[@miller_magical_1956] As an example, we discussed the benefit of adding special symbols for a "missing but excused" clinic visit (or for "urine sample of improper temperature"), but we ultimately did not because such instances were rare in our data.
+
+
+## The Inflexibility of Computers
+
+When discussing how algorithms make decisions about human behavior, we should never fail to account for the cold and unfeeling logic of a computer. Worth repeating is the old maxim of computing: "computers give you what you ask for, not what you want." The computer cannot understand the many extenuating circumstances that pervade our human experience. Consider a concrete example: assume a participant was supposed to visit the clinic for a weekly urine test on Thursday, but they came on Wednesday instead due to a conflict at their work; their urine sample from Wednesday came back "clean". What would a nurse at the substance use clinic do in this case? Most people are reasonable; they would count the urine screen for that week as negative for illicit substances. What would a computer do? Without the direct input of a human to override the clinical trial protocol, a computer would 1) count the negative urine on Wednesday, and 2) mark the participant as a "failure to appear" / "missing urine screen" on Thursday. Then, because, missing urine screens are imputed as "positive" for the substance of interest in many clinical trial protocols, the computer would 3) write this participant's urine screen as positive for the Thursday, and then 4) mark the use pattern summary as `*` (mixed results) instead of `-` (negative results) for that week. While automation is incredibly powerful when done correctly, we must make every effort to ensure that our code "first does no harm".
+
+
+
+*******************************************************************************
+</br>
+
+
+
+# Conclusion
+We have presented a use case of the quinary word structure to summarize clinical trial participants' opioid screening information. Additionally, we gave some code examples of how to use these quinary word summaries in analysis practice, all using the open-source R package `CTNote::`. Finally, we gave some comments on the strengths and limitations of this approach, and some discussion of applying this data summarization technique in practice.
+
+**NEEDS MORE LOVE HERE**
+
+
+
+# References

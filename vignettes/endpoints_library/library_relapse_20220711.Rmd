@@ -85,12 +85,12 @@ udsOutcomes_df <-
   select(who, usePatternUDS)
 
 # Make a copy
-outcomes_df <- udsOutcomes_df
+outcomesRel_df <- udsOutcomes_df
 
 
 ###  Examples  ###
 examplePeople_int <- c(1, 163, 210, 242, 4, 17, 13, 1103, 233, 2089)
-outcomes_df %>% 
+outcomesRel_df %>% 
   filter(who %in% examplePeople_int)
 ```
 
@@ -113,8 +113,8 @@ Our [CTN-0094 research group](http://ctndisseminationlibrary.org/protocols/ctn00
 ### CTN-0094 Relapse
 **Definition**: `r defns_char[[which0094_idx[1]]]`; missing is positive
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRel_df <- 
+	outcomesRel_df %>%
   rowwise() %>% 
   mutate(
 		udsPattern = recode_missing_visits(
@@ -136,9 +136,9 @@ outcomes_df <-
 	) %>% 
 	unnest(cols = "ctn0094_relapse", names_sep = "_") %>% 
 	select(who, starts_with("ctn0094_relapse")) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRel_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRel_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, starts_with("ctn0094_relapse"))
 ```
@@ -146,8 +146,8 @@ outcomes_df %>%
 ### CTN-0094 Dropout
 **Definition**: `r defns_char[[which0094_idx[2]]]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRel_df <- 
+	outcomesRel_df %>%
   rowwise() %>% 
   # do NOT recode any missing visits
   mutate(
@@ -160,9 +160,9 @@ outcomes_df <-
 	) %>% 
 	unnest(cols = "ctn0094_dropout", names_sep = "_") %>% 
 	select(who, starts_with("ctn0094_dropout")) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRel_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRel_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, starts_with("ctn0094_dropout"))
 ```
@@ -171,8 +171,8 @@ outcomes_df %>%
 ## Johnson, Jaffe, & Fudala, 1992
 **Definition**: `r defns_char["Johnson, Jaffe, & Fudala, 1992"]`; missing is positive
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRel_df <- 
+	outcomesRel_df %>%
   rowwise() %>% 
   mutate(
 		udsPattern = recode_missing_visits(
@@ -194,9 +194,9 @@ outcomes_df <-
 		)
 	) %>% 
 	select(who, johnson1992_hasRel) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRel_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRel_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, johnson1992_hasRel)
 ```
@@ -205,8 +205,8 @@ outcomes_df %>%
 ## Krupitsky et al., 2004/2006
 **Definition**: `r defns_char["Krupitsky et al., 2004"]`; missing is positive (their papers do not explicitly state what to do with missing UDS, but their previous protocols treated missing as positive).
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRel_df <- 
+	outcomesRel_df %>%
   rowwise() %>% 
   mutate(
 		udsPattern = recode_missing_visits(
@@ -226,9 +226,9 @@ outcomes_df <-
 		)
 	) %>% 
 	select(who, krupitsky2004_hasRel) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRel_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRel_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, krupitsky2004_hasRel)
 ```
@@ -239,8 +239,8 @@ outcomes_df %>%
 
 We interpret their outcome as "two or more positive weekly UDS in a 4-week window".
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRel_df <- 
+	outcomesRel_df %>%
   rowwise() %>% 
   mutate(
 		udsPattern = recode_missing_visits(
@@ -262,9 +262,9 @@ outcomes_df <-
 	) %>% 
 	unnest(cols = "lee2016_rel", names_sep = "_") %>% 
 	select(who, starts_with("lee2016_rel")) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRel_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRel_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, starts_with("lee2016_rel"))
 ```
@@ -274,8 +274,8 @@ outcomes_df %>%
 **Definition**: `r defns_char["Lee et al., 2018 CTN-0051"]`; missing is positive
 
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRel_df <- 
+	outcomesRel_df %>%
   rowwise() %>% 
   mutate(
 		udsPattern = recode_missing_visits(
@@ -302,9 +302,9 @@ outcomes_df <-
 	unnest(cols = "lee2018_rel", names_sep = "_") %>% 
 	mutate(lee2018_rel_time = lee2018_rel_time + 2) %>% 
 	select(who, starts_with("lee2018_rel")) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRel_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRel_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, starts_with("lee2018_rel"))
 ```
@@ -313,8 +313,8 @@ outcomes_df %>%
 ## Schottenfeld et al., 2008
 **Definition**: `r defns_char["Schottenfeld et al., 2008"]`; missing is positive
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRel_df <- 
+	outcomesRel_df %>%
   rowwise() %>% 
   mutate(
 		udsPattern = recode_missing_visits(
@@ -336,9 +336,9 @@ outcomes_df <-
 	) %>% 
 	unnest(cols = "schottenfeld2008_rel", names_sep = "_") %>% 
 	select(who, starts_with("schottenfeld2008_rel")) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRel_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRel_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, starts_with("schottenfeld2008_rel"))
 ```
@@ -350,7 +350,10 @@ outcomes_df %>%
 # Comments
 
 ```{r, include=FALSE, eval=FALSE}
-write_csv(outcomes_df, file = "../inst/extdata/outcomes_relapse_20220801.csv")
+write_csv(
+  outcomesRel_df,
+  file = "../inst/extdata/outcomes_relapse_20220818.csv"
+)
 ```
 
 

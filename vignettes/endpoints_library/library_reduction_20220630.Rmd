@@ -85,12 +85,12 @@ udsOutcomes_df <-
   select(who, usePatternUDS)
 
 # Make a copy
-outcomes_df <- udsOutcomes_df
+outcomesRed_df <- udsOutcomes_df
 
 
 ###  Examples  ###
 examplePeople_int <- c(1, 163, 210, 242, 4, 17, 13, 1103, 233, 2089)
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int)
 ```
 
@@ -105,8 +105,8 @@ outcomes_df %>%
 ## Comer et al., 2006
 **Definition**: `r defns_char["Comer et al., 2006"]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
 	mutate(
 		comer2006_red = count_matches(
@@ -120,9 +120,9 @@ outcomes_df <-
 		)
 	) %>%
 	select(who, comer2006_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, comer2006_red)
 ```
@@ -133,8 +133,8 @@ outcomes_df %>%
 
 From [their paper](https://pubmed.ncbi.nlm.nih.gov/9200635/), we read "Where urinalysis data were missing for an entire week (5 of 1836 data points; 0.3%) the average of that patient's results from the 2 weeks surrounding the missing week was substituted for the missing value." Also, because some of our trials only retained subjects for 15-16 weeks, we changed the cutoff to 15 weeks in order to apply this definition to our data.
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Check for 15 weeks of participation
   mutate(
@@ -167,9 +167,9 @@ outcomes_df <-
 		)
 	) %>% 
 	select(who, eissenberg1997_isAbs) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, eissenberg1997_isAbs)
 ```
@@ -178,8 +178,8 @@ outcomes_df %>%
 ## Fiellin et al., 2006
 **Definition**: `r defns_char["Fiellin et al., 2006"]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
 		fiellin2006_red = count_matches(
@@ -191,9 +191,9 @@ outcomes_df <-
 		)
 	) %>%
 	select(who, fiellin2006_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, fiellin2006_red)
 ```
@@ -202,8 +202,8 @@ outcomes_df %>%
 ## Fudala et al., 2003
 **Definition**: `r defns_char["Fudala et al., 2003"]`; they exclude missing values.
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Drop weeks with missing UDS
   mutate(
@@ -222,9 +222,9 @@ outcomes_df <-
 		)
 	) %>% 
 	select(who, fudala2003_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, fudala2003_red)
 ```
@@ -233,8 +233,8 @@ outcomes_df %>%
 ## Haight et al., 2019
 **Definition**: `r defns_char["Haight et al., 2019"]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
 		haight2019_red = count_matches(
@@ -248,9 +248,9 @@ outcomes_df <-
 		)
 	) %>%
 	select(who, haight2019_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, haight2019_red)
 ```
@@ -259,8 +259,8 @@ outcomes_df %>%
 ## Jaffe et al., 1972
 **Definition**: `r defns_char["Jaffe et al., 1972"]`; and missing values were imputed to the mode for each participant.
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Mark if participants completed 8 weeks of treatment; remove those who do not
   #   (but we will add them back in at the end)
@@ -286,12 +286,12 @@ outcomes_df <-
 		)
 	) %>% 
 	select(who, jaffe1972_red) %>% 
-	left_join(outcomes_df, ., by = "who") %>% 
+	left_join(outcomesRed_df, ., by = "who") %>% 
 	# Lots of NAs from the participants who did not make it to week 8; replace
 	#   these NAs with 0
 	replace_na(list(jaffe1972_red = 0))
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, jaffe1972_red)
 ```
@@ -300,8 +300,8 @@ outcomes_df %>%
 ## Johnson et al., 1992
 **Definitions**: `r defns_char["Johnson et al., 1992"]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
 		johnson1992_red = count_matches(
@@ -313,9 +313,9 @@ outcomes_df <-
 		)
 	) %>% 
 	select(who, johnson1992_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, johnson1992_red)
 ```
@@ -326,8 +326,8 @@ outcomes_df %>%
 
 Note: there are multiple definitions of treatment failure in this paper; we provide an algorithm for the definition which results in a single value for each participant.
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Exclude missing visits
   mutate(
@@ -349,9 +349,9 @@ outcomes_df <-
 	) %>% 
 	mutate(kosten1993B_red = kosten1993B_prop >= 0.7) %>% 
 	select(who, kosten1993B_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, kosten1993B_red)
 ```
@@ -369,8 +369,8 @@ There are two definitions from [this paper](https://pubmed.ncbi.nlm.nih.gov/9684
 ### Ling et al., 1998 (A)
 **Definition**: `r defns_char[whichLing_idx[1]]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Exclude missing UDS
   mutate(
@@ -390,9 +390,9 @@ outcomes_df <-
 		)
 	) %>% 
 	select(who, ling1998A_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, ling1998A_red)
 ```
@@ -400,8 +400,8 @@ outcomes_df %>%
 ### Ling et al., 1998 (C)
 **Definition**: `r defns_char[whichLing_idx[2]]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
 		ling1998C_red = count_matches(
@@ -413,9 +413,9 @@ outcomes_df <-
 		)
 	) %>% 
 	select(who, ling1998C_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, ling1998C_red)
 ```
@@ -424,8 +424,8 @@ outcomes_df %>%
 ## Ling et al., 2010
 **Definition**: `r defns_char["Ling et al., 2010"]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
 		ling2010_red = count_matches(
@@ -439,9 +439,9 @@ outcomes_df <-
 		)
 	) %>% 
 	select(who, ling2010_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, ling2010_red)
 ```
@@ -454,8 +454,8 @@ outcomes_df %>%
 ### Original
 The definition in [this paper](https://doi.org/10.1001/archpsyc.1976.01770060043007) is quite complex, but very well thought out. It is one of our favorite MOUD treatment endpoints.
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Rule 1: mark induction failures
   # The Ling et al. protocol lasted 40 weeks while requiring 7 weeks of data for
@@ -488,9 +488,9 @@ outcomes_df <-
 		ling1976o22_abs = 120 - ling1976o22_use
 	) %>%
 	select(who, ling1976o22_abs) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, ling1976o22_abs)
 ```
@@ -498,8 +498,8 @@ outcomes_df %>%
 ### A Variant
 We also include a variant of this definition which includes a greater penalty for missing values and a smooth function to increase weights of positive UDS.
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
 	mutate(
 		inductFail = measure_retention(usePatternUDS) <= 3
@@ -526,9 +526,9 @@ outcomes_df <-
 		ling1976o100_abs = 120 - ling1976o100_use
 	) %>%
 	select(who, ling1976o100_abs) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, ling1976o100_abs)
 ```
@@ -551,8 +551,8 @@ lofwallLattice_char
 
 
 ###  Calculate the Endpoint  ###
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Mark all missing UDS as positive
 	mutate(
@@ -587,9 +587,9 @@ outcomes_df <-
 		)
 	) %>%
 	select(who, lofwall2018_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, lofwall2018_red)
 ```
@@ -607,8 +607,8 @@ There are also two definitions from [this paper](https://pubmed.ncbi.nlm.nih.gov
 ### Mattick et al., 2003 (A)
 **Definition**: `r defns_char[whichMattick_idx[1]]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Find out how long the participant stayed in the study
   mutate(lastWeek_idx = measure_retention(use_pattern = usePatternUDS)) %>% 
@@ -624,9 +624,9 @@ outcomes_df <-
 		)
 	) %>%
 	select(who, mattick2003A_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, mattick2003A_red)
 ```
@@ -635,8 +635,8 @@ outcomes_df %>%
 ### Mattick et al., 2003 (B)
 **Definition**: `r defns_char[whichMattick_idx[2]]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
 		mattick2003B_red = count_matches(
@@ -650,9 +650,9 @@ outcomes_df <-
 		)
 	) %>%
 	select(who, mattick2003B_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, mattick2003B_red)
 ```
@@ -670,8 +670,8 @@ There are also two definitions from [this paper](https://doi.org/10.1016/S0376-8
 ### Pani et al., 2000 (A)
 **Definition**: `r defns_char[whichPani_idx[1]]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Remove weeks where participant failed to provide UDS
   mutate(
@@ -690,9 +690,9 @@ outcomes_df <-
 		)
 	) %>% 
 	select(who, pani2000A_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, pani2000A_red)
 ```
@@ -701,8 +701,8 @@ outcomes_df %>%
 ### Pani et al., 2000 (B)
 **Definition**: `r defns_char[whichPani_idx[2]]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
 		pani2000B_red = count_matches(
@@ -714,9 +714,9 @@ outcomes_df <-
 		)
 	) %>% 
 	select(who, pani2000B_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, pani2000B_red)
 ```
@@ -725,8 +725,8 @@ outcomes_df %>%
 ## Petitjean et al. 2001
 **Definition**: `r defns_char["Petitjean et al., 2001"]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
 		udsPattern = recode_missing_visits(usePatternUDS)
@@ -743,9 +743,9 @@ outcomes_df <-
 		petitjean2001_abs = 1 - petitjean2001_use
 	) %>% 
 	select(who, petitjean2001_abs) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, petitjean2001_abs)
 ```
@@ -754,8 +754,8 @@ outcomes_df %>%
 ## Preston, Umbricht, & Epstein, 2000
 **Definition**: `r defns_char["Preston, Umbricht, & Epstein, 2000"]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
 		preston2000_red = count_matches(
@@ -769,9 +769,9 @@ outcomes_df <-
 		)
 	) %>% 
 	select(who, preston2000_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, preston2000_red)
 ```
@@ -780,8 +780,8 @@ outcomes_df %>%
 ## Schottenfeld et al., 2005
 **Definition**: `r defns_char["Schottenfeld et al., 2005"]`; exclude missing UDS
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Exclude missing
   mutate(
@@ -801,9 +801,9 @@ outcomes_df <-
 		)
 	) %>% 
 	select(who, schottenfeld2005_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, schottenfeld2005_red)
 ```
@@ -814,8 +814,8 @@ outcomes_df %>%
 
 This definition is a cohort-level definition, not an individual definition. The individual endpoint would be "was this participant abstinent from the substance of interest at the 120-day follow-up? (17 weeks from randomization). Our participants do not uniformly have 17 weeks of data, so we will assess them at week 15 instead.
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
   	schwartz2006_abs = count_matches(
@@ -830,9 +830,9 @@ outcomes_df <-
 		schwartz2006_isAbs = schwartz2006_abs == 1
 	) %>% 
 	select(who, schwartz2006_isAbs) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, schwartz2006_isAbs)
 ```
@@ -841,8 +841,8 @@ outcomes_df %>%
 ## Shufman et al., 1994
 **Definition**: `r defns_char["Shufman et al., 1994"]`; missing is ignored
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Count "+" UDS; 0 could be complete dropout or all negative
 	mutate(
@@ -855,9 +855,9 @@ outcomes_df <-
 	) %>% 
 	mutate(shufman1994_absP = 1 - shufman1994_useP) %>% 
 	select(who, shufman1994_absP) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, schwartz2006_isAbs)
 ```
@@ -868,8 +868,8 @@ outcomes_df %>%
 
 The paper is [here](https://pubmed.ncbi.nlm.nih.gov/18205978/).
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Ignore missing UDS
 	mutate(
@@ -891,9 +891,9 @@ outcomes_df <-
 	mutate(soyka2008_abs = 1 - soyka2008_use) %>% 
 	ungroup() %>% 
 	select(who, soyka2008_abs) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, soyka2008_abs)
 ```
@@ -904,8 +904,8 @@ outcomes_df %>%
 
 Paper [here](https://doi.org/10.7326/0003-4819-119-1-199307010-00004)
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Count "+" UDS; 0 could be complete dropout or all negative
 	mutate(
@@ -919,9 +919,9 @@ outcomes_df <-
 	) %>% 
 	mutate(strain1993_abs = 1 - strain1993_use) %>% 
 	select(who, strain1993_abs) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, strain1993_abs)
 ```
@@ -932,8 +932,8 @@ outcomes_df %>%
 
 Paper [here](https://doi.org/10.1176/ajp.151.7.1025)
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
 	# Ignore missing
 	mutate(
@@ -953,9 +953,9 @@ outcomes_df <-
 	) %>% 
 	mutate(strain1994_abs = 1 - strain1994_use) %>% 
 	select(who, strain1994_abs) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, strain1994_abs)
 ``` 
@@ -966,8 +966,8 @@ outcomes_df %>%
 
 Because the "two-weeks blocks" definition results in more than one value per participant, we do not provide it in our library. This definition is now identical to that of Strain, Stitzer, Liebson, & Bigelow (1994).
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
 	# Ignore missing
 	mutate(
@@ -987,9 +987,9 @@ outcomes_df <-
 	) %>% 
 	mutate(strain1996_abs = 1 - strain1996_use) %>% 
 	select(who, strain1996_abs) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, strain1996_abs)
 ```
@@ -1000,8 +1000,8 @@ outcomes_df %>%
 
 [This paper](https://doi.org/10.1001/jama.281.11.1000) gave no commentary on *how* the missing values would be processed, only that the statistical software SAS was capable of handling missing values. SAS, by default, [excludes missing values](https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.5/proc/n026epq8bpz1f9n10oeb7zen7s1e.htm) from analyses. Therefore, this definition will also be identical to that of Strain, Stitzer, Liebson, & Bigelow (1994).
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
 	# Ignore missing
 	mutate(
@@ -1021,9 +1021,9 @@ outcomes_df <-
 	) %>% 
 	mutate(strain1999_abs = 1 - strain1999_use) %>% 
 	select(who, strain1999_abs) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, strain1999_abs)
 ```
@@ -1034,8 +1034,8 @@ outcomes_df %>%
 
 Our protocols do not uniformly contain 26 weeks of data, so we apply this definition as "the last 12 weeks of the protocol."
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
 		cleanProp = count_matches(
@@ -1052,9 +1052,9 @@ outcomes_df <-
 	mutate(strang2010_hasRed = cleanProp >= 0.5) %>% 
 	ungroup() %>% 
 	select(who, strang2010_hasRed) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, strang2010_hasRed)
 ```
@@ -1065,8 +1065,8 @@ outcomes_df %>%
 
 Paper [here](https://pubmed.ncbi.nlm.nih.gov/30702059/)
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
 		strang2019_red = count_matches(
@@ -1080,9 +1080,9 @@ outcomes_df <-
 		)
 	) %>%
 	select(who, strang2019_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, strang2019_red)
 ```
@@ -1093,8 +1093,8 @@ outcomes_df %>%
 
 Note that this definition as written is a group outcome, not a participant outcome. Therefore, we calculate this for each subject as the "rate of negative UOS for the time that the patient remained in the study."
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # How long was each subject retained?
   mutate(lastWeek_idx = measure_retention(use_pattern = usePatternUDS)) %>% 
@@ -1109,9 +1109,9 @@ outcomes_df <-
 		)
 	) %>%
 	select(who, tanum2017_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, tanum2017_red)
 ```
@@ -1120,8 +1120,8 @@ outcomes_df %>%
 ## Wolstein et al., 2009
 **Definition**: `r defns_char["Wolstein et al., 2009"]`
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Because we are measuring outcomes only while "participating", remove missing
 	#   weeks from the use pattern
@@ -1141,9 +1141,9 @@ outcomes_df <-
 		)
 	) %>%
 	select(who, wolstein2009_red) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, wolstein2009_red)
 ```
@@ -1160,8 +1160,8 @@ woodyLattice_char
 
 
 ###  Calculate the Endpoint  ###
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Only observe scheduled UDS
   mutate(
@@ -1193,9 +1193,9 @@ outcomes_df <-
 	) %>% 
 	mutate(woody2008_abs = 1 - woody2008_use) %>% 
 	select(who, woody2008_abs) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, woody2008_abs)
 ```
@@ -1204,8 +1204,8 @@ outcomes_df %>%
 ## Zaks, Fink, & Freedman, 1972
 **Definition**: `r defns_char["Zaks, Fink, & Freedman, 1972"]`; missing is ignored
 ```{r}
-outcomes_df <- 
-	outcomes_df %>%
+outcomesRed_df <- 
+	outcomesRed_df %>%
   rowwise() %>% 
   # Ignore missing
 	mutate(
@@ -1227,9 +1227,9 @@ outcomes_df <-
   #   of study participation - the number of positive weeks
 	mutate(zaks1972_abs = str_length(udsPattern) - zaks1972_use) %>% 
 	select(who, zaks1972_abs) %>% 
-	left_join(outcomes_df, ., by = "who")
+	left_join(outcomesRed_df, ., by = "who")
 
-outcomes_df %>% 
+outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
   select(who, usePatternUDS, zaks1972_abs)
 ```
@@ -1242,7 +1242,10 @@ outcomes_df %>%
 # Comments
 
 ```{r, include=FALSE, eval=FALSE}
-write_csv(outcomes_df, file = "../inst/extdata/outcomes_reduction_20220701.csv")
+# write_csv(
+#   outcomesRed_df,
+#   file = "../inst/extdata/outcomes_reduction_20220818.csv"
+# )
 ```
 
 
