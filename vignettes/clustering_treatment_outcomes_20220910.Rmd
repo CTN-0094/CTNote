@@ -12,7 +12,7 @@ bibliography:
   - CTNote_references.bib 
   - Brandt_Opioids.bib
 nocite: '@*'
-csl: plos_one.csl
+csl: addiction_vancouver.csl
 vignette: >
   %\VignetteIndexEntry{CTNote Overview}
   %\VignetteEngine{knitr::rmarkdown}
@@ -33,8 +33,6 @@ knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r, load-packages, include=FALSE}
-library(ctn0094data)
-library(ctn0094DataExtra)
 library(CTNote)
 library(readxl)
 library(kableExtra)
@@ -42,6 +40,7 @@ library(ape) # dendrogram options
 library(tidyverse)
 ```
 
+### Abstract
 
 
 
@@ -93,7 +92,7 @@ if(!knitr::is_html_output()) {
 }
 ```
 
-Each row of Table 1 is an outcome used in a past clinical trial for MOUD. As preliminary work, our clinical team grouped these by clinical practice into three short-term outcome classes: *abstinence*, *relapse*, and substance use *reduction*.[DO WE NEED CITATIONS FOR THESE "CLASSES"?] Of note, these metrics also differed in how they considered a scheduled but incomplete UDS (i.e. a "missing" UDS). We removed outcomes which could not be used to measure subject-specific outcomes (e.g. "proportion of subjects in treatment group with positive UDS during study week 3"); we removed outcomes which could not yield a univariate metric of subject success (e.g. "number of positive UDS per three-week window over time"); we split papers which assessed multiple outcomes (e.g. complete abstinence between weeks 5-12 AND total number of abstinent weeks); and we combined papers which used identical outcomes. At the end of our literature search, we have `r nrow(tab1_df)` outcomes from registered clinical trials to consider.
+Each row of Table 1 is an outcome used in a past clinical trial for MOUD. As preliminary work, our clinical team grouped these by clinical practice into three short-term outcome classes: *abstinence*, *relapse*, and substance use *reduction*.[@us_fda_opioid_2020] Of note, these metrics also differed in how they considered a scheduled but incomplete UDS (i.e. a "missing" UDS). We removed outcomes which could not be used to measure subject-specific outcomes (e.g. "proportion of subjects in treatment group with positive UDS during study week 3"); we removed outcomes which could not yield a univariate metric of subject success (e.g. "number of positive UDS per three-week window over time"); we split papers which assessed multiple outcomes (e.g. complete abstinence between weeks 5-12 AND total number of abstinent weeks); and we combined papers which used identical outcomes. At the end of our literature search, we have `r nrow(tab1_df)` outcomes from registered clinical trials to consider.
 
 
 
@@ -124,35 +123,35 @@ The [CTN-0094 Project](http://ctndisseminationlibrary.org/protocols/ctn0094.htm)
 
 These three are nationally representative, prospective clinical trials with over 3600 combined participants. These trials treated participants for 16-24 weeks, and collected rich baseline substance use data, demographics, and medical/psychiatric evaluations. 
 
-We have `r nrow(derived_weeklyOpioidPattern)` fully de-identified subjects with demographics and weekly UDS results for the months they were in treatment, 2492 of whom completed randomization to a treatment arm. This harmonized data will be released in the R packages `ctn0094data` and [`ctn0094DataExtra`](https://github.com/CTN-0094/ctn0094DataExtra). In order to summarize complex substance use patterns over the weeks of the multiple clinical trials, we standardized all dates to the day of trial consent, and we coded the urinalysis results for each study day/week as a quinary "word".[@odom_ctnote_2022]
+We have 3560 fully de-identified subjects with demographics and weekly UDS results for the months they were in treatment, 2492 of whom completed randomization to a treatment arm. This harmonized data will be released in the R packages `ctn0094data` and [`ctn0094DataExtra`](https://github.com/CTN-0094/ctn0094DataExtra). In order to summarize complex substance use patterns over the weeks of the multiple clinical trials, we standardized all dates to the day of trial consent, and we coded the urinalysis results for each study day/week as a quinary "word".[@odom_ctnote_2022]
 
 
 
 ## Computing Treatment Outcomes with `CTNote`
 
+```{r, echo=FALSE}
+outcomeClustersBoot_mat <- readRDS(file = "outcome_clusters.rda")
+```
+
 The software package `CTNote::` for the R computing language contains algorithms which translate urine screen results of substance use patterns into clinical trial outcomes and endpoints of interest.[@odom_ctnote_2022] By executing various combinations of these algorithms, we were able to define in computer code each of the treatment outcome definitions in Table 1. Additionally, the supplemental material of the `CTNote::` package includes a "library" of algorithms to calculate each definition listed in Table 1.
 
-The input of each algorithm is a set of substance use pattern summaries as a quinary word for all clinical trial participants; the output of each algorithm is a calculated treatment endpoint for each participant included in the input. Now that we have an opioid-specific use pattern for each participant in these three harmonized clinical trials, and we also have a suite of computer functions to calculate each treatment endpoint, we can "cross" them to calculate each endpoint for each trial participant. There are `r nrow(tab1_df)` composite outcomes, but a few of these outcomes involve more than one component. For example, a "time to relapse" metric would involve both the length of time from induction to relapse and an indicator if a relapse was observed. While this type of data is structurally similar to survival data [@kleinbaum_introduction_2012], we note that (unlike standard survival analysis) the censoring indicator will rarely be independent of the time-to-event measure.
+The input of each algorithm is a set of substance use pattern summaries as a quinary word for all clinical trial participants; the output of each algorithm is a calculated treatment endpoint for each participant included in the input. Now that we have an opioid-specific use pattern for each participant in these three harmonized clinical trials, and we also have a suite of computer functions to calculate each treatment endpoint, we can "cross" these two sets to calculate each endpoint for each trial participant. Each of these treatment endpoints are proxy measures for an unobserved outcome of interest (such as quality of life 5 years after treatment), but they all measure participant-specific treatment success or failure in one way or another. Note that by "treatment failure", we mean that the treatment failed to help the participant, not that the participant themselves is a failure in treatment. These clinical trials evaluated the efficiacy of treatments, not the adherence of participants to behavioral norms.
 
-[TO DO: continue editing here] answer further questions about measuring treatment success or failure. Note that by treatment failure, we mean that the treatment failed to help the participant, not that the participant themselves is a failure in treatment. 
+There are `r nrow(tab1_df)` composite outcomes, but a few of these outcomes involve more than one component. For example, a "time to relapse" metric would involve both the length of time from induction to the first observed relapse and an indicator if a relapse was observed. While this type of data is structurally similar to survival data [@kleinbaum_introduction_2012], we note that (unlike standard survival analysis) the censoring indicator will rarely be independent of the time-to-event measure. Counting both both "time" and "event" metrics independently, we have `r ncol(outcomeClustersBoot_mat)` distinct endpoints.
 
 
 
 ## Hierarchical Clustering Process Details
 
-```{r, echo=FALSE}
-outcomeClustersBoot_mat <- readRDS(file = "outcome_clusters.rda")
-```
-
-Given this library of MOUD treatment endpoints (`r nrow(tab1_df)` composite, including both "time" and "event" metrics; `r ncol(outcomeClustersBoot_mat)` distinct), we applied each endpoint to all 2492 participants who had been randomized to a treatment. This process enables us to empirically contrast endpoints via hierarchical clustering. Our process is as follows:
+We applied each of the of `r ncol(outcomeClustersBoot_mat)` distinct MOUD treatment endpoints in our library to all 2492 participants who had been randomized to a treatment. This process enables us to empirically contrast endpoints via hierarchical clustering. Our process is as follows:
 
 1. We calculated all `r ncol(outcomeClustersBoot_mat)` distinct endpoints for each subject, resulting in a $2492 \times `r ncol(outcomeClustersBoot_mat)`$ table of outcome metric values.
 2. We scaled all "time" and "count" endpoints to be ratios of their maximum value. For example, if an endpoint measures the total number of negative UDS, then we divide this count for each participant by the maximum observed count across all participants.
-3. We re-framed all outcomes into a "larger is better" interpretation: $f(x) = \text{max}(x) - x$ for outcomes where a larger value would indicate a worse treatment outcome.
-4. To reduce the influence of a single participant's use pattern on the clustering results, we calculate the Pearson correlation matrix (using pairwise complete observations) on a bootstrap sample[@efron_introduction_1994] of the rows in Step 1.
+3. We re-contextualized all outcomes into a "larger value is better" interpretation. That is, for outcomes where a larger numeric value would indicate a worse treatment outcome, we transformed the outcome via $f(x) = \text{max}(x) - x$.
+4. To reduce the influence of a single participant's use pattern on the clustering results, we calculate the Pearson correlation matrix (using pairwise complete observations) on a bootstrap sample[@efron_introduction_1994] of the data rows defined in Step 1.
 5. We perform hierarchical clustering[@bridges_hierarchical_1966] on the bootstrap correlation matrix from Step 3 using complete linkage, and cut the resulting tree into $k = 2, 3, \ldots, 15$ clusters. 
 6. For each number of clusters $k$, we generate a $`r ncol(outcomeClustersBoot_mat)` \times `r ncol(outcomeClustersBoot_mat)`$ network connection matrix. The $\{i,j\}$ values of this matrix are 1 if treatment endpoints $i$ and $j$ are in the same cluster, 0 otherwise.
-7. We repeat this process 10,000 times for each $k$, and sum these matrices. In the end, a value of $\{i,j\} = 10,000$ means that in every random bootstrap sample, the treatment endpoints $i$ and $j$ are in the same cluster. Similarly, a value of $\{i,j\} = 0$ means that the treatment endpoints $i$ and $j$ are never in the same cluster for any random bootstrap sample.
+7. We repeat Steps 4-6 10,000 times for each $k$, and sum these matrices. In the end, a value of $\{i,j\} = 10,000$ means that in every random bootstrap sample, the treatment endpoints $i$ and $j$ are in the same cluster. Similarly, a value of $\{i,j\} = 0$ means that the treatment endpoints $i$ and $j$ are never in the same cluster for any random bootstrap sample.
 8. We also performed *k*-means clustering[@macqueen_methods_1966] for each number of clusters. We found that the optimal number of clusters was $k = 3$ (by observing an "elbow" in the total within-cluster Sum of Squares plot).
 
 
@@ -185,7 +184,21 @@ plot(
 )
 ```
 
-The teal cluster on the top right of the wheel, including Shufman et al. [@shufman_efficacy_1994] and Strain et al. [@strain_dose-response_1993; @strain_comparison_1994; @strain_buprenorphine_1996; @strain_moderate-_1999] endpoints all have the following trait in common: they ignore or remove missing UDS from their calculation. Notice that this teal cluster has 0 subsplits; in every single bootstrap sample, these metrics are all clustered together. We believe that these endpoints are far too lenient, because missing UDS in opoiod trials is commonly a negative prognostic indicator [CITE THE LEADING CTN-0094 PAPER HERE]. In contrast, the purple cluster on the bottom right of the wheel has the most variability and highest count of sub-clusters. These clusters all depend heavily on the UDS results from a single short interval. For example, the Lofwall et a. (2018) [@lofwall_weekly_2018] endpoint requires a negative UDS in week 12 (with missing UDS counted as positive), otherwise the treatment will be counted as a failure. This means that if a participant was present in the clinic with negative UDS for 11 weeks in a row, but missed the visit on week 12, the treatment would have been counted as a failure. Similarly, the Krupitsky et al. (2011) [@krupitsky_injectable_2011] endpoint requires complete abstinence from study week 5 to study week 24, and missing UDS are imputed to be positive. The endpoints in this cluster are far too harsh to be meaningful in practice, which is why the clustering results from these endpoint have so much variability (the most number of subclusters).
+
+
+## Endpoints Cluster 1
+
+The teal cluster on the top right of the wheel, including Shufman et al. [@shufman_efficacy_1994] and Strain et al. [@strain_dose-response_1993; @strain_comparison_1994; @strain_buprenorphine_1996; @strain_moderate-_1999] endpoints all have the following trait in common: they ignore or remove missing UDS from their calculation. Notice that this teal cluster has 0 subsplits; in every single bootstrap sample, these metrics are all clustered together. We believe that these endpoints are far too lenient, because missing UDS in opoiod trials is commonly a negative prognostic indicator [CITE THE LEADING CTN-0094 PAPER HERE].
+
+
+
+## Endpoints Cluster 2
+
+In contrast, the purple cluster on the bottom right of the wheel has the most variability and highest count of sub-clusters. These clusters all depend heavily on the UDS results from a single short interval. For example, the Lofwall et a. (2018) [@lofwall_weekly_2018] endpoint requires a negative UDS in week 12 (with missing UDS counted as positive), otherwise the treatment will be counted as a failure. This means that if a participant was present in the clinic with negative UDS for 11 weeks in a row, but missed the visit on week 12, the treatment would have been counted as a failure. Similarly, the Krupitsky et al. (2011) [@krupitsky_injectable_2011] endpoint requires complete abstinence from study week 5 to study week 24, and missing UDS are imputed to be positive. The endpoints in this cluster are far too harsh to be meaningful in practice, which is why the clustering results from these endpoint have so much variability (the most number of subclusters).
+
+
+
+## Endpoints Cluster 3
 
 The larger orange cluster on the left side of the wheel is what we have termed the "Goldilocks" cluster: these outcomes are not too lenient by ignoring missing UDS, and they are not too harsh by measuring success or failure of an entire course of treatment based on a single week or pair of weeks. Of note, our *a priori* hypothesis that these endpoints would naturally cluster into "abstinence, relapse, and use reduction" did **not** hold true. Instead, our "Goldilocks" cluster contains abstinence, relapse, and use reduction endpoints. We believe that current and future MOUD clinical trials should use outcomes from this "Goldilocks" cluster, or--if researchers have the strong desire to create a set of bespoke outcomes--new outcomes should adhere to these considerations: do not ignore missing UDS, and do not make treatment failure too sensitive to a single week's UDS.
 
@@ -199,6 +212,8 @@ The larger orange cluster on the left side of the wheel is what we have termed t
 # Discussion
 
 We have clustered these outcomes empirically, and we found an entire cluster only containing outcomes which ignored missing UDS--further giving credence to the theory that missing UDS are highly informative for opioid use treatment.
+
+**NEEDS MORE LOVE HERE**
 
 
 
