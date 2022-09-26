@@ -9,10 +9,10 @@ output:
     fig_width: 8
     fig_height: 8
 bibliography:
-  - CTNote_references.bib 
-  - Brandt_Opioids.bib
+  - refs/CTNote_references.bib 
+  - refs/Brandt_Opioids.bib
 nocite: '@*'
-csl: addiction_vancouver.csl
+csl: refs/addiction_vancouver.csl
 vignette: >
   %\VignetteIndexEntry{CTNote Overview}
   %\VignetteEngine{knitr::rmarkdown}

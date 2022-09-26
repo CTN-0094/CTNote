@@ -7,6 +7,7 @@ output:
     toc: true
     toc_depth: 2
     code_folding: hide
+bibliography: ../refs/Brandt_Opioids.bib
 vignette: >
   %\VignetteIndexEntry{CTNote Library Abstinence}
   %\VignetteEngine{knitr::rmarkdown}
@@ -18,8 +19,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r, load-packages, include=FALSE}
-library(ctn0094data)
-library(ctn0094DataExtra)
 library(CTNote)
 library(readxl)
 library(kableExtra)
@@ -74,14 +73,20 @@ tabTidy1_df  %>%
   scroll_box(width = "1000px", height = "500px") 
 ```
 
-We will use the table of participant opioid use patterns from the `ctn0094DataExtra::` package to calculate these endpoints. Importantly, if you wish to apply these algorithms to calculate endpoints for your data, the participants' substance use patterns must be stored in the "substance use pattern word" format shown here. We also show a subset of the data to visualize a variety of different real substance use patterns.
+We will use the table of participant opioid use patterns from the `ctn0094DataExtra` package to calculate these endpoints (we have a copy of the endpoints in the dataset `outcomesCTN0094`). Importantly, if you wish to apply these algorithms to calculate endpoints for your data, the participants' substance use patterns must be stored in the "substance use pattern word" format shown here. We also show a subset of the data to visualize a variety of different real substance use patterns.
+
+We first define the following five-value legend:
+
+- **+**: positive for the substance(s) in a specified window of time (a day, week, month, etc.) by urine screen (or participant self report, if such data are of interest)
+- **–**: negative for the substance(s)
+- **o**: subject failed to provide a urine sample
+- <b>*</b>: inconclusive results or mixed results (e.g. subject provided more than one urine sample in the time interval and they did not agree)
+- <b>_</b>: no specimens required (weekends, holidays, pre-randomization period, alternating visit days/weeks)
+
 ```{r}
 ###  Full Data  ###
 udsOutcomes_df <- 
-	ctn0094DataExtra::derived_weeklyOpioidPattern %>% 
-	group_by(who) %>% 
-	mutate(usePatternUDS = paste0(Phase_1, Phase_2, collapse = "")) %>% 
-	ungroup() %>% 
+	CTNote::outcomesCTN0094 %>% 
   select(who, usePatternUDS)
 
 # Make a copy
@@ -94,6 +99,8 @@ outcomesAbs_df %>%
   filter(who %in% examplePeople_int)
 ```
 
+For example, participant 1 has a use pattern `ooooooooooooooo` (all missing UDS), which means that they dropped out of the study. In contrast, participant 233 has a use pattern `*+++++++++++o++++++++++o` (nearly all positive UDS): they did not drop out of the study, but the treatment was completely ineffective for them. Participant 2089 started the study in a rough patch, but greatly improved in treatment over time (`++++---+--------------o-`).
+
 
 
 *******************************************************************************
@@ -101,7 +108,7 @@ outcomesAbs_df %>%
 
 # Abstinence from Substance Use Endpoints
 
-## Fiellin et al., 2006
+## @fiellin_counseling_2006
 **Definition**: `r defns_char["Fiellin et al., 2006"]`; missing is positive
 ```{r}
 outcomesAbs_df <- 
@@ -136,7 +143,7 @@ outcomesAbs_df %>%
 ```
 
 
-## Kosten et al., 1993
+## @kosten_buprenorphine_1993
 **Definition**: `r defns_char["Kosten et al., 1993"]`
 ```{r}
 outcomesAbs_df <- 
@@ -157,7 +164,7 @@ outcomesAbs_df %>%
 ```
 
 
-## Krupitsky et al., 2011 (A) and (B)
+## @krupitsky_injectable_2011 (A) and (B)
 ```{r, include=FALSE}
 whichKrupitsky_idx <- which(
   names(defns_char) == "Krupitsky et al., 2011"
@@ -239,7 +246,7 @@ outcomesAbs_df %>%
 ```
 
 
-## Ling et al., 1998
+## @ling_buprenorphine_1998
 **Definition**: `r defns_char["Ling et al., 1998"]`; urine was screened 3 times per week
 ```{r}
 outcomesAbs_df <- 
@@ -262,7 +269,7 @@ outcomesAbs_df %>%
 ```
 
 
-## Lofwall et al., 2018
+## @lofwall_weekly_2018
 **Definition**: `r defns_char["Lofwall et al., 2018"]`
 
 [In their paper](https://doi.org/10.1001/jamainternmed.2018.1052), abstinence was defined as 2 of 3 negative UDS for weeks 9, 10, and 11; negative UDS in week 12; and 5 or 6 UDS negative during weeks 13-24 (with alternating week visits, yielding 6 visits in this Phase II period). Because we have 15 weeks of data guaranteed, we scale this window and lattice. Their definition of abstinence is quite complex. Because we only have 15 weeks of data for most subjects, we shift their 12-week Phase I endpoint to week 7, and treat weeks 8-15 as Phase II. Also, we calculate these as proportions and not counts; this is so that these rules can be applied to windows of other sizes. The proportions would be the same---only the window of observation would change.
@@ -345,7 +352,7 @@ outcomesAbs_df %>%
 ```
 
 
-## Mokri, Chawarski, Taherinakhost, & Schottenfeld, 2016
+## @mokri_medical_2016
 **Definition**: `r defns_char["Mokri, Chawarski, Taherinakhost, & Schottenfeld, 2016"]`; missing is positive
 ```{r}
 outcomesAbs_df <- 
@@ -395,7 +402,7 @@ outcomesAbs_df %>%
 ```
 
 
-## Schottenfeld et al., 2005
+## @schottenfeld_methadone_2005
 **Definition**: `r defns_char["Schottenfeld et al., 2005"]`, missing is ignored
 ```{r}
 outcomesAbs_df <- 
@@ -431,7 +438,7 @@ outcomesAbs_df %>%
 ```
 
 
-## Schottenfeld et al., 2008 (A) and (B)
+## @schottenfeld_maintenance_2008 (A) and (B)
 
 There are two definitions from [this paper](https://doi.org/10.1016/S0140-6736(08)60954-X) which we include in the reduction section our library: `r defns_char["Schottenfeld et al., 2008"]` and `r defns_char["Schottenfeld, Chawarski, & Mazlan, 2008"]`. 
 
@@ -501,7 +508,7 @@ outcomesAbs_df %>%
 ```
 
 
-## Shufman et al., 1994
+## @shufman_efficacy_1994
 **Definition**: `r defns_char["Shufman et al., 1994"]`, missing is ignored (but treated as negative in order to count the weeks properly)
 ```{r}
 outcomesAbs_df <- 
@@ -539,7 +546,7 @@ outcomesAbs_df %>%
 ```
 
 
-## Weiss et al., 2011 CTN-0030
+## @weiss_adjunctive_2011 [CTN-0030]
 **Definition**: `r defns_char["Weiss et al., 2011 CTN-0030"]`, missing is positive.
 
 Note: this definition is looking for one of the following four abstinence patterns in last 4 weeks: `"----"`, `"+---"`, `"-+--"`, or `"--+-"`. This definition is just an insanely strict measure of study retention. The first part of the definition ("negative in the last week") already fails anyone who didn't stay in the study for the entire protocol period (because their last week UDS will automatically be `"o"`).
@@ -590,7 +597,6 @@ outcomesAbs_df %>%
 *******************************************************************************
 </br>
 
-# Comments
 
 ```{r, include=FALSE, eval=FALSE}
 # write_csv(
@@ -600,4 +606,5 @@ outcomesAbs_df %>%
 ```
 
 
+# References
 

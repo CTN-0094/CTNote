@@ -7,6 +7,7 @@ output:
     toc: true
     toc_depth: 2
     code_folding: hide
+bibliography: ../refs/Brandt_Opioids.bib
 vignette: >
   %\VignetteIndexEntry{CTNote Library Relapse}
   %\VignetteEngine{knitr::rmarkdown}
@@ -18,8 +19,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r, load-packages, include=FALSE}
-library(ctn0094data)
-library(ctn0094DataExtra)
 library(CTNote)
 library(readxl)
 library(kableExtra)
@@ -74,14 +73,20 @@ tabTidy1_df  %>%
   scroll_box(width = "1000px", height = "500px") 
 ```
 
-We will use the table of participant opioid use patterns from the `ctn0094DataExtra::` package to calculate these endpoints. Importantly, if you wish to apply these algorithms to calculate endpoints for your data, the participants' substance use patterns must be stored in the "substance use pattern word" format shown here. We also show a subset of the data to visualize a variety of different real substance use patterns.
+We will use the table of participant opioid use patterns from the `ctn0094DataExtra` package to calculate these endpoints (we have a copy of the endpoints in the dataset `outcomesCTN0094`). Importantly, if you wish to apply these algorithms to calculate endpoints for your data, the participants' substance use patterns must be stored in the "substance use pattern word" format shown here. We also show a subset of the data to visualize a variety of different real substance use patterns.
+
+We first define the following five-value legend:
+
+- **+**: positive for the substance(s) in a specified window of time (a day, week, month, etc.) by urine screen (or participant self report, if such data are of interest)
+- **–**: negative for the substance(s)
+- **o**: subject failed to provide a urine sample
+- <b>*</b>: inconclusive results or mixed results (e.g. subject provided more than one urine sample in the time interval and they did not agree)
+- <b>_</b>: no specimens required (weekends, holidays, pre-randomization period, alternating visit days/weeks)
+
 ```{r}
 ###  Full Data  ###
 udsOutcomes_df <- 
-	ctn0094DataExtra::derived_weeklyOpioidPattern %>% 
-	group_by(who) %>% 
-	mutate(usePatternUDS = paste0(Phase_1, Phase_2, collapse = "")) %>% 
-	ungroup() %>% 
+	CTNote::outcomesCTN0094 %>% 
   select(who, usePatternUDS)
 
 # Make a copy
@@ -94,12 +99,14 @@ outcomesRel_df %>%
   filter(who %in% examplePeople_int)
 ```
 
+For example, participant 1 has a use pattern `ooooooooooooooo` (all missing UDS), which means that they dropped out of the study. In contrast, participant 233 has a use pattern `*+++++++++++o++++++++++o` (nearly all positive UDS): they did not drop out of the study, but the treatment was completely ineffective for them. Participant 2089 started the study in a rough patch, but greatly improved in treatment over time (`++++---+--------------o-`).
+
 
 
 *******************************************************************************
 </br>
 
-# Relase to Substance Use Endpoints
+# "Relapse to Substance Use" Endpoints
 
 ## CTN-0094 Endpoints
 ```{r, include=FALSE}
@@ -168,7 +175,7 @@ outcomesRel_df %>%
 ```
 
 
-## Johnson, Jaffe, & Fudala, 1992
+## @johnson_controlled_1992
 **Definition**: `r defns_char["Johnson, Jaffe, & Fudala, 1992"]`; missing is positive
 ```{r}
 outcomesRel_df <- 
@@ -202,7 +209,7 @@ outcomesRel_df %>%
 ```
 
 
-## Krupitsky et al., 2004/2006
+## @krupitsky_naltrexone_2004 and @krupitsky_naltrexone_2006
 **Definition**: `r defns_char["Krupitsky et al., 2004"]`; missing is positive (their papers do not explicitly state what to do with missing UDS, but their previous protocols treated missing as positive).
 ```{r}
 outcomesRel_df <- 
@@ -234,7 +241,7 @@ outcomesRel_df %>%
 ```
 
 
-## Lee et al., 2016
+## @lee_extended-release_2016
 **Definition**: `r defns_char["Lee et al., 2016"]`; missing is positive
 
 We interpret their outcome as "two or more positive weekly UDS in a 4-week window".
@@ -270,7 +277,7 @@ outcomesRel_df %>%
 ```
 
 
-## Lee et al., 2018
+## @lee_comparative_2018
 **Definition**: `r defns_char["Lee et al., 2018 CTN-0051"]`; missing is positive
 
 ```{r}
@@ -310,7 +317,7 @@ outcomesRel_df %>%
 ```
 
 
-## Schottenfeld et al., 2008
+## @schottenfeld_maintenance_2008
 **Definition**: `r defns_char["Schottenfeld et al., 2008"]`; missing is positive
 ```{r}
 outcomesRel_df <- 
@@ -347,14 +354,16 @@ outcomesRel_df %>%
 *******************************************************************************
 </br>
 
-# Comments
 
 ```{r, include=FALSE, eval=FALSE}
-write_csv(
-  outcomesRel_df,
-  file = "../inst/extdata/outcomes_relapse_20220818.csv"
-)
+# write_csv(
+#   outcomesRel_df,
+#   file = "../inst/extdata/outcomes_relapse_20220818.csv"
+# )
 ```
+
+
+# References
 
 
 

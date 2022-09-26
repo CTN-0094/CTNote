@@ -7,6 +7,7 @@ output:
     toc: true
     toc_depth: 2
     code_folding: hide
+bibliography: ../refs/Brandt_Opioids.bib
 vignette: >
   %\VignetteIndexEntry{CTNote Library Reduction}
   %\VignetteEngine{knitr::rmarkdown}
@@ -18,8 +19,6 @@ knitr::opts_chunk$set(echo = TRUE)
 ```
 
 ```{r, load-packages, include=FALSE}
-library(ctn0094data)
-library(ctn0094DataExtra)
 library(CTNote)
 library(readxl)
 library(kableExtra)
@@ -74,14 +73,20 @@ tabTidy1_df  %>%
   scroll_box(width = "1000px", height = "500px") 
 ```
 
-We will use the table of participant opioid use patterns from the `ctn0094DataExtra::` package to calculate these endpoints. Importantly, if you wish to apply these algorithms to calculate endpoints for your data, the participants' substance use patterns must be stored in the "substance use pattern word" format shown here. We also show a subset of the data to visualize a variety of different real substance use patterns.
+We will use the table of participant opioid use patterns from the `ctn0094DataExtra` package to calculate these endpoints (we have a copy of the endpoints in the dataset `outcomesCTN0094`). Importantly, if you wish to apply these algorithms to calculate endpoints for your data, the participants' substance use patterns must be stored in the "substance use pattern word" format shown here. We also show a subset of the data to visualize a variety of different real substance use patterns.
+
+We first define the following five-value legend:
+
+- **+**: positive for the substance(s) in a specified window of time (a day, week, month, etc.) by urine screen (or participant self report, if such data are of interest)
+- **–**: negative for the substance(s)
+- **o**: subject failed to provide a urine sample
+- <b>*</b>: inconclusive results or mixed results (e.g. subject provided more than one urine sample in the time interval and they did not agree)
+- <b>_</b>: no specimens required (weekends, holidays, pre-randomization period, alternating visit days/weeks)
+
 ```{r}
 ###  Full Data  ###
 udsOutcomes_df <- 
-	ctn0094DataExtra::derived_weeklyOpioidPattern %>% 
-	group_by(who) %>% 
-	mutate(usePatternUDS = paste0(Phase_1, Phase_2, collapse = "")) %>% 
-	ungroup() %>% 
+	CTNote::outcomesCTN0094 %>% 
   select(who, usePatternUDS)
 
 # Make a copy
@@ -94,6 +99,8 @@ outcomesRed_df %>%
   filter(who %in% examplePeople_int)
 ```
 
+For example, participant 1 has a use pattern `ooooooooooooooo` (all missing UDS), which means that they dropped out of the study. In contrast, participant 233 has a use pattern `*+++++++++++o++++++++++o` (nearly all positive UDS): they did not drop out of the study, but the treatment was completely ineffective for them. Participant 2089 started the study in a rough patch, but greatly improved in treatment over time (`++++---+--------------o-`).
+
 
 
 *******************************************************************************
@@ -102,7 +109,7 @@ outcomesRed_df %>%
 # Substance Use Reduction Endpoints
 
 
-## Comer et al., 2006
+## @comer_injectable_2006
 **Definition**: `r defns_char["Comer et al., 2006"]`
 ```{r}
 outcomesRed_df <- 
@@ -128,7 +135,7 @@ outcomesRed_df %>%
 ```
 
 
-## Eissenberg et al., 1997
+## @eissenberg_dose-related_1997
 **Definition**: `r defns_char["Eissenberg et al., 1997"]`
 
 From [their paper](https://pubmed.ncbi.nlm.nih.gov/9200635/), we read "Where urinalysis data were missing for an entire week (5 of 1836 data points; 0.3%) the average of that patient's results from the 2 weeks surrounding the missing week was substituted for the missing value." Also, because some of our trials only retained subjects for 15-16 weeks, we changed the cutoff to 15 weeks in order to apply this definition to our data.
@@ -175,7 +182,7 @@ outcomesRed_df %>%
 ```
 
 
-## Fiellin et al., 2006
+## @fiellin_counseling_2006
 **Definition**: `r defns_char["Fiellin et al., 2006"]`
 ```{r}
 outcomesRed_df <- 
@@ -199,7 +206,7 @@ outcomesRed_df %>%
 ```
 
 
-## Fudala et al., 2003
+## @fudala_office-based_2003
 **Definition**: `r defns_char["Fudala et al., 2003"]`; they exclude missing values.
 ```{r}
 outcomesRed_df <- 
@@ -230,7 +237,7 @@ outcomesRed_df %>%
 ```
 
 
-## Haight et al., 2019
+## @haight_efficacy_2019
 **Definition**: `r defns_char["Haight et al., 2019"]`
 ```{r}
 outcomesRed_df <- 
@@ -256,7 +263,7 @@ outcomesRed_df %>%
 ```
 
 
-## Jaffe et al., 1972
+## @jaffe_methadyl_1972
 **Definition**: `r defns_char["Jaffe et al., 1972"]`; and missing values were imputed to the mode for each participant.
 ```{r}
 outcomesRed_df <- 
@@ -297,7 +304,7 @@ outcomesRed_df %>%
 ```
 
 
-## Johnson et al., 1992
+## @johnson_controlled_1992
 **Definitions**: `r defns_char["Johnson et al., 1992"]`
 ```{r}
 outcomesRed_df <- 
@@ -321,7 +328,7 @@ outcomesRed_df %>%
 ```
 
 
-## Kosten et al., 1993
+## @kosten_buprenorphine_1993
 **Definition**: `r defns_char['Kosten et al., 1993']`; missing UDS are excluded
 
 Note: there are multiple definitions of treatment failure in this paper; we provide an algorithm for the definition which results in a single value for each participant.
@@ -357,7 +364,7 @@ outcomesRed_df %>%
 ```
 
 
-## Ling et al., 1998 (A) and (C)
+## @ling_buprenorphine_1998 (A) and (C)
 ```{r, include=FALSE}
 whichLing_idx <- which(
   names(defns_char) == "Ling et al., 1998"
@@ -421,7 +428,7 @@ outcomesRed_df %>%
 ```
 
 
-## Ling et al., 2010
+## @ling_buprenorphine_2010
 **Definition**: `r defns_char["Ling et al., 2010"]`
 ```{r}
 outcomesRed_df <- 
@@ -448,11 +455,11 @@ outcomesRed_df %>%
 
 
 
-## Ling, Charuvastra, Kaim, & Klett, 1976
+## @ling_methadyl_1976
 **Definition**: `r defns_char["Ling, Charuvastra, Kaim, & Klett, 1976"]`
 
 ### Original
-The definition in [this paper](https://doi.org/10.1001/archpsyc.1976.01770060043007) is quite complex, but very well thought out. It is one of our favorite MOUD treatment endpoints.
+The definition in [this paper](https://doi.org/10.1001/archpsyc.1976.01770060043007) is quite complex, but very well thought out. It is one of our favorite MOUD treatment endpoints because of its flexibility.
 ```{r}
 outcomesRed_df <- 
 	outcomesRed_df %>%
@@ -534,7 +541,7 @@ outcomesRed_df %>%
 ```
 
 
-## Lofwall et al., 2018
+## @lofwall_weekly_2018
 **Definition**: `r defns_char["Lofwall et al., 2018"]`; but urine screens are collected each week for the first 12 weeks, then every other week for weeks 13-24. 
 We project this onto a 15-16 week protocol by requiring UDS each week for the first 7 weeks, then every other week for the next 8. Then, we impute the skipped weeks to be whatever the value of the UDS was from the last visit.
 ```{r}
@@ -595,7 +602,7 @@ outcomesRed_df %>%
 ```
 
 
-## Mattick et al., 2003 (A) and (B)
+## @mattick_buprenorphine_2003 (A) and (B)
 ```{r, include=FALSE}
 whichMattick_idx <- which(
   names(defns_char) == "Mattick et al., 2003"
@@ -658,7 +665,7 @@ outcomesRed_df %>%
 ```
 
 
-## Pani, Maremmani, Pirastu, Tagliamonte, & Gessa, 2000 (A) and (B)
+## @pani_buprenorphine_2000 (A) and (B)
 ```{r, include=FALSE}
 whichPani_idx <- which(
   names(defns_char) == "Pani, Maremmani, Pirastu, Tagliamonte, & Gessa, 2000"
@@ -722,7 +729,7 @@ outcomesRed_df %>%
 ```
 
 
-## Petitjean et al. 2001
+## @petitjean_double-blind_2001
 **Definition**: `r defns_char["Petitjean et al., 2001"]`
 ```{r}
 outcomesRed_df <- 
@@ -751,7 +758,7 @@ outcomesRed_df %>%
 ```
 
 
-## Preston, Umbricht, & Epstein, 2000
+## @preston_methadone_2000
 **Definition**: `r defns_char["Preston, Umbricht, & Epstein, 2000"]`
 ```{r}
 outcomesRed_df <- 
@@ -777,7 +784,7 @@ outcomesRed_df %>%
 ```
 
 
-## Schottenfeld et al., 2005
+## @schottenfeld_methadone_2005
 **Definition**: `r defns_char["Schottenfeld et al., 2005"]`; exclude missing UDS
 ```{r}
 outcomesRed_df <- 
@@ -809,7 +816,7 @@ outcomesRed_df %>%
 ```
 
 
-## Schwartz et al., 2006
+## @schwartz_randomized_2006
 **Definition**: `r defns_char["Schwartz et al., 2006"]`
 
 This definition is a cohort-level definition, not an individual definition. The individual endpoint would be "was this participant abstinent from the substance of interest at the 120-day follow-up? (17 weeks from randomization). Our participants do not uniformly have 17 weeks of data, so we will assess them at week 15 instead.
@@ -838,7 +845,7 @@ outcomesRed_df %>%
 ```
 
 
-## Shufman et al., 1994
+## @shufman_efficacy_1994
 **Definition**: `r defns_char["Shufman et al., 1994"]`; missing is ignored
 ```{r}
 outcomesRed_df <- 
@@ -863,7 +870,7 @@ outcomesRed_df %>%
 ```
 
 
-## Soyka, Zingg, Koller, & Kuefner, 2008
+## @soyka_retention_2008
 **Definition**: `r defns_char["Soyka, Zingg, Koller, & Kuefner, 2008"]`; missing is ignored
 
 The paper is [here](https://pubmed.ncbi.nlm.nih.gov/18205978/).
@@ -899,7 +906,7 @@ outcomesRed_df %>%
 ```
 
 
-## Strain, Stitzer, Liebson, & Bigelow, 1993
+## @strain_dose-response_1993
 **Definition**: `r defns_char["Strain, Stitzer, Liebson, & Bigelow, 1993"]`; missing is not defined
 
 Paper [here](https://doi.org/10.7326/0003-4819-119-1-199307010-00004)
@@ -927,7 +934,7 @@ outcomesRed_df %>%
 ```
 
 
-## Strain, Stitzer, Liebson, & Bigelow, 1994
+## @strain_comparison_1994
 **Definition**: `r defns_char["Strain, Stitzer, Liebson, & Bigelow, 1994"]`; missing is ignored
 
 Paper [here](https://doi.org/10.1176/ajp.151.7.1025)
@@ -961,7 +968,7 @@ outcomesRed_df %>%
 ``` 
 
 
-## Strain, Stitzer, Liebson, & Bigelow, 1996
+## @strain_buprenorphine_1996
 **Definition**: `r defns_char["Strain, Stitzer, Liebson, & Bigelow, 1996"]`; missing is ignored
 
 Because the "two-weeks blocks" definition results in more than one value per participant, we do not provide it in our library. This definition is now identical to that of Strain, Stitzer, Liebson, & Bigelow (1994).
@@ -995,7 +1002,7 @@ outcomesRed_df %>%
 ```
 
 
-## Strain, Bigelow, Liebson, & Stitzer, 1999
+## @strain_moderate-_1999
 **Definition**: `r defns_char["Strain, Bigelow, Liebson, & Stitzer, 1999"]`
 
 [This paper](https://doi.org/10.1001/jama.281.11.1000) gave no commentary on *how* the missing values would be processed, only that the statistical software SAS was capable of handling missing values. SAS, by default, [excludes missing values](https://documentation.sas.com/doc/en/pgmsascdc/9.4_3.5/proc/n026epq8bpz1f9n10oeb7zen7s1e.htm) from analyses. Therefore, this definition will also be identical to that of Strain, Stitzer, Liebson, & Bigelow (1994).
@@ -1029,7 +1036,7 @@ outcomesRed_df %>%
 ```
 
 
-## Strang et al., 2010
+## @strang_supervised_2010
 **Definitions**: `r defns_char["Strang et al., 2010"]`
 
 Our protocols do not uniformly contain 26 weeks of data, so we apply this definition as "the last 12 weeks of the protocol."
@@ -1060,7 +1067,7 @@ outcomesRed_df %>%
 ```
 
 
-## Strang et al., 2019
+## @strang_extended-release_2019
 **Definition**: `r defns_char["Strang et al., 2019"]`
 
 Paper [here](https://pubmed.ncbi.nlm.nih.gov/30702059/)
@@ -1088,7 +1095,7 @@ outcomesRed_df %>%
 ```
 
 
-## Tanum et al., 2017
+## @tanum_effectiveness_2017
 **Definition**: `r defns_char["Tanum et al., 2017"]`
 
 Note that this definition as written is a group outcome, not a participant outcome. Therefore, we calculate this for each subject as the "rate of negative UOS for the time that the patient remained in the study."
@@ -1117,7 +1124,7 @@ outcomesRed_df %>%
 ```
 
 
-## Wolstein et al., 2009
+## @wolstein_randomized_2009
 **Definition**: `r defns_char["Wolstein et al., 2009"]`
 ```{r}
 outcomesRed_df <- 
@@ -1149,7 +1156,7 @@ outcomesRed_df %>%
 ```
 
 
-## Woody et al., 2008
+## @woody_extended_2008
 **Definition**: `r defns_char["Woody et al., 2008"]`
 
 [This paper](https://doi.org/10.1001/jama.2008.574) contains rather exotic methods for missing value imputation, but the authors remark that setting "missing is positive" did not change their final results. We may include their imputation method in future versions of this code library.
@@ -1201,7 +1208,7 @@ outcomesRed_df %>%
 ```
 
 
-## Zaks, Fink, & Freedman, 1972
+## @zaks_levomethadyl_1972
 **Definition**: `r defns_char["Zaks, Fink, & Freedman, 1972"]`; missing is ignored
 ```{r}
 outcomesRed_df <- 
@@ -1239,7 +1246,6 @@ outcomesRed_df %>%
 *******************************************************************************
 </br>
 
-# Comments
 
 ```{r, include=FALSE, eval=FALSE}
 # write_csv(
@@ -1248,5 +1254,7 @@ outcomesRed_df %>%
 # )
 ```
 
+
+# References
 
 
