@@ -3,6 +3,7 @@ title: CTNote
 ---
 
 <!-- badges: start -->
+[![R-CMD-check](https://github.com/CTN-0094/CTNote/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/CTN-0094/CTNote/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 # Introduction to CTNote: The CTN Outcomes, Treatments, and Endpoints Library
