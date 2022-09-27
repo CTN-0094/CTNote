@@ -43,3 +43,4 @@ VignetteBuilder: knitr
 LazyData: true
 Roxygen: list(markdown = TRUE)
 Config/testthat/edition: 3
+URL: https://ctn-0094.github.io/CTNote/
