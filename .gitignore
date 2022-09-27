@@ -62,7 +62,7 @@ vignettes/*.pdf
 *.rda
 *.RDA
 *.Rda
-!vignettes/*.rda
+!vignettes/data/*.rda
 !data/outcomesCTN0094.rda
 !data/egOpioidsCTN0094.rda
 

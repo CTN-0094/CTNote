@@ -1,5 +1,0 @@
-*.html
-*.R
-
-# Exception to include Gabriel's progress spreadsheet:
-!OpioidUse_UDS_Variables_20210422.xlsx

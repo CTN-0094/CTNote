@@ -130,7 +130,7 @@ We have 3560 fully de-identified subjects with demographics and weekly UDS resul
 ## Computing Treatment Outcomes with `CTNote`
 
 ```{r, echo=FALSE}
-outcomeClustersBoot_mat <- readRDS(file = "outcome_clusters.rda")
+outcomeClustersBoot_mat <- readRDS(file = "data/outcome_clusters.rda")
 ```
 
 The software package `CTNote::` for the R computing language contains algorithms which translate urine screen results of substance use patterns into clinical trial outcomes and endpoints of interest.[@odom_ctnote_2022] By executing various combinations of these algorithms, we were able to define in computer code each of the treatment outcome definitions in Table 1. Additionally, the supplemental material of the `CTNote::` package includes a "library" of algorithms to calculate each definition listed in Table 1.
