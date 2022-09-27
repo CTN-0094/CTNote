@@ -32,11 +32,11 @@
     <a href="#main" class="visually-hidden-focusable">Skip to contents</a>
     
 
-    <nav class="navbar fixed-top navbar-light navbar-expand-lg bg-light"><div class="container">
+    <nav class="navbar fixed-top navbar-dark navbar-expand-lg bg-primary"><div class="container">
     
     <a class="navbar-brand me-2" href="index.html">CTNote</a>
 
-    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9015</small>
+    <small class="nav-text text-muted me-auto" data-bs-toggle="tooltip" data-bs-placement="bottom" title="">0.0.0.9016</small>
 
     
     <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbar" aria-controls="navbar" aria-expanded="false" aria-label="Toggle navigation">
@@ -45,18 +45,16 @@
 
     <div id="navbar" class="collapse navbar-collapse ms-3">
       <ul class="navbar-nav me-auto">
-<li class="nav-item">
-  <a class="nav-link" href="reference/index.html">Reference</a>
-</li>
 <li class="nav-item dropdown">
   <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown" role="button" aria-expanded="false" aria-haspopup="true" id="dropdown-articles">Articles</a>
   <div class="dropdown-menu" aria-labelledby="dropdown-articles">
-    <a class="dropdown-item" href="articles/CTNote_vignette_20220926.html">An n-Ary Word Sufficient Statistic for Repeated Univariate Categorical Values: Applications to Standardized Urine Drug Screen Data</a>
-    <a class="dropdown-item" href="articles/clustering_treatment_outcomes_20220910.html">Empirically Contrasting Substance Use Disorder Treatment Outcome Definitions</a>
     <a class="dropdown-item" href="articles/library_abstinence_20220711.html">CTNote Library: Abstinence Outcomes</a>
     <a class="dropdown-item" href="articles/library_reduction_20220630.html">CTNote Library: Reduction Outcomes</a>
     <a class="dropdown-item" href="articles/library_relapse_20220711.html">CTNote Library: Relapse Outcomes</a>
   </div>
+</li>
+<li class="nav-item">
+  <a class="nav-link" href="reference/index.html">Reference</a>
 </li>
       </ul>
 <form class="form-inline my-2 my-lg-0" role="search">
@@ -71,23 +69,53 @@
 </nav><div class="container template-home">
 <div class="row">
   <main id="main" class="col-md-9"><div class="section level1">
-<div class="page-header"><h1 id="ctnote-ctn-outcomes-treatments-and-endpoints">CTNote: CTN Outcomes, Treatments and Endpoints<a class="anchor" aria-label="anchor" href="#ctnote-ctn-outcomes-treatments-and-endpoints"></a>
+<div class="page-header"><h1 id="introduction-to-ctnote-the-ctn-outcomes-treatments-and-endpoints-library">Introduction to CTNote: The CTN Outcomes, Treatments, and Endpoints Library<a class="anchor" aria-label="anchor" href="#introduction-to-ctnote-the-ctn-outcomes-treatments-and-endpoints-library"></a>
 </h1></div>
-<!-- badges: start --><!-- badges: end --><p>The goal of CTNote is to …do stuff (layla’s commit)</p>
+<p>The package <code>CTNote</code> exists as a comprehensive implementation of <em>outcomes</em>, <em>treatments</em>, and <em>endpoints</em> used in clincial trials to evaluate the efficacy of medication-assisted treatment of substance use disorders (SUDs). The functions in this package are programmatic building blocks with which to construct algorithms which calculate single-value summaries of clinical trial participants’ substance use patterns. We assume that these substance use patterns are symbolized as a “word” (see below). The vignettes for this package include a standard and code-based library of algorithms for treatment outcome definitions useful to evaluate medication-based treatments for SUDs.</p>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install the released version of CTNote from <a href="https://CRAN.R-project.org" class="external-link">CRAN</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"CTNote"</span><span class="op">)</span></span></code></pre></div>
+<hr>
+<p></p>
+</div>
+<div class="section level2">
+<h2 id="use-pattern-words">Use Pattern “Words”<a class="anchor" aria-label="anchor" href="#use-pattern-words"></a>
+</h2>
+<p>If you wish to apply the functions in this package to create algorithms to calculate endpoints for your data, the participants’ substance use patterns must be stored in the “substance use pattern word” format shown below.</p>
+<p>We define the following five-value legend:</p>
+<ul>
+<li>
+<strong>+</strong>: positive for the substance(s) in a specified window of time (a day, week, month, etc.) by urine screen (or participant self report, if such data are of interest)</li>
+<li>
+<strong>–</strong>: negative for the substance(s)</li>
+<li>
+<strong>o</strong>: subject failed to provide a urine sample</li>
+<li>
+<b>*</b>: inconclusive results or mixed results (e.g. subject provided more than one urine sample in the time interval and they did not agree)</li>
+<li>
+<b>_</b>: no specimens required (weekends, holidays, pre-randomization period, alternating visit days/weeks)</li>
+</ul>
+<p>For example, a participant who attended the clinic for three consecutive weeks on Mondays, Wednesdays, and Fridays, and was abstinent from the substance of interest on all days but the first two, would have their substance use pattern recorded as (assuming the week starts on Sunday):</p>
+<pre><code><span><span class="st">"_+_+_-__-_-_-__-_-_-_"</span></span></code></pre>
+<p>As another example, consider a clinical trial with urine samples submitted weekly over a 12 week protocol. If a trial participant submitted positive urine samples for the first 3 weeks, but then did not return to the clinic for the remainder of the trial (they were lost to follow-up), then their substance use pattern would be recorded in a “word” as:</p>
+<pre><code><span><span class="st">"+++ooooooooo"</span></span></code></pre>
+<hr>
+<p></p>
 </div>
 <div class="section level2">
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
-<p>This is a basic example which shows you how to solve a common problem:</p>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<p>This is a basic example which shows how to measure a participant’s duration in the study:</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ctn-0094.github.io/CTNote/">CTNote</a></span><span class="op">)</span></span>
-<span><span class="co">## basic example code</span></span></code></pre></div>
+<span></span>
+<span><span class="va">usePattern_char</span> <span class="op">&lt;-</span> <span class="st">"__++++*o-------+--+-o-o-o+o+oooooo"</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/measure_retention.html">measure_retention</a></span><span class="op">(</span><span class="va">usePattern_char</span><span class="op">)</span></span></code></pre></div>
+<p>This function will count the number of visits (weeks in this case) until the last non-missing symbol is observed—in this case, 28 weeks, including the first two weeks before the randomization period (shown as <code>__</code>).</p>
 </div>
 </div>
   </main><aside class="col-md-3"><div class="license">
@@ -98,6 +126,32 @@
 </ul>
 </div>
 
+<div class="table-of-contents">
+<h2 data-toc-skip>Table of contents</h2>
+<ul class="list-unstyled">
+<li><nav id="toc"></nav></li>
+</ul>
+</div>
+
+<div class="developers">
+<h2 data-toc-skip>Developers</h2>
+<ul class="list-unstyled">
+<li>
+<a href="https://gabriel.quarto.pub/home/" class="external-link">Gabriel Odom</a> <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-1341-4555" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>
+<a href="https://www.ccny.cuny.edu/profiles/laura-brandt" class="external-link">Laura Brandt</a> <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-7551-221X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li>
+<a href="https://github.com/RaymondBalise" class="external-link">Raymond Balise</a> <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-9856-5901" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
+<li><a href="authors.html">More about authors...</a></li>
+</ul>
+</div>
+
+<div class="funding">
+<h2 data-toc-skip>Funding</h2>
+<ul class="list-unstyled">
+<li><p>NIMHD FIU-RCMI Pilot AWD000000009108; NIDA UG1DA013035-17</p></li>
+</ul>
+</div>
 
 <div class="citation">
 <h2 data-toc-skip>Citation</h2>
@@ -106,24 +160,13 @@
 </ul>
 </div>
 
-<div class="developers">
-<h2 data-toc-skip>Developers</h2>
-<ul class="list-unstyled">
-<li>Gabriel Odom <br><small class="roles"> Author, maintainer </small> <a href="https://orcid.org/0000-0003-1341-4555" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Laura Brandt <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0001-7551-221X" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-<li>Raymond Balise <br><small class="roles"> Author </small> <a href="https://orcid.org/0000-0002-9856-5901" target="orcid.widget" aria-label="ORCID" class="external-link"><span class="fab fa-orcid orcid" aria-hidden="true"></span></a> </li>
-</ul>
-</div>
-
-
-
   </aside>
 </div>
 
 
     <footer><div class="pkgdown-footer-left">
   <p></p>
-<p>Developed by Gabriel Odom, Laura Brandt, Raymond Balise.</p>
+<p>Developed by <a href="https://gabriel.quarto.pub/home/" class="external-link">Gabriel Odom</a>, <a href="https://www.ccny.cuny.edu/profiles/laura-brandt" class="external-link">Laura Brandt</a>, <a href="https://github.com/RaymondBalise" class="external-link">Raymond Balise</a>.</p>
 </div>
 
 <div class="pkgdown-footer-right">
