@@ -9,7 +9,7 @@ output:
     code_folding: hide
 bibliography: refs/Brandt_Opioids.bib
 vignette: >
-  %\VignetteIndexEntry{CTNote Library Reduction}
+  %\VignetteIndexEntry{CTNote Library: Reduction Outcomes}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
