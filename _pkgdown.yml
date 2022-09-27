@@ -16,6 +16,16 @@ navbar:
   structure:
     left:  [articles, reference]
     right: [search, github]
+  components:
+    articles:
+      text: Endpoints Library
+      menu:
+      - text: Abstinence Outcomes
+        href: articles/library_abstinence_20220711.html
+      - text: Use Reduction Outcomes
+        href: articles/library_reduction_20220630.html
+      - text: Relapse Outcomes
+        href: articles/library_relapse_20220711.html
 
 home:
   sidebar:
@@ -24,4 +34,4 @@ home:
       custom:
         title: Funding
         text: NIMHD FIU-RCMI Pilot AWD000000009108; NIDA UG1DA013035-17
-        
+      
