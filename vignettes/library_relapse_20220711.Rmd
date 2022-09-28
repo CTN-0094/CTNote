@@ -355,6 +355,16 @@ outcomesRel_df %>%
 </br>
 
 
+
+# Computing Environment
+
+Here is the information concerning the system configuration, packages, and their versions used in this computation:
+
+```{r}
+sessionInfo()
+```
+
+
 ```{r, include=FALSE, eval=FALSE}
 # write_csv(
 #   outcomesRel_df,
