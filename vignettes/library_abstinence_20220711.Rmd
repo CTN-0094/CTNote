@@ -7,7 +7,7 @@ output:
     toc: true
     toc_depth: 2
     code_folding: hide
-bibliography: refs/Brandt_Opioids.bib
+bibliography: bib/Brandt_Opioids.bib
 vignette: >
   %\VignetteIndexEntry{CTNote Library: Abstinence Outcomes}
   %\VignetteEngine{knitr::rmarkdown}
