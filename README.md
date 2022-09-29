@@ -8,7 +8,7 @@ title: CTNote
 
 # Introduction to CTNote: The CTN Outcomes, Treatments, and Endpoints Library
 
-The package `CTNote` exists as a comprehensive implementation of *outcomes*, *treatments*, and *endpoints* used in clincial trials to evaluate the efficacy of medication-assisted treatment of substance use disorders (SUDs). The functions in this package are programmatic building blocks with which to construct algorithms which calculate single-value summaries of clinical trial participants' substance use patterns. We assume that these substance use patterns are symbolized as a "word" (see below). The vignettes for this package include a standard and code-based library of algorithms for treatment outcome definitions useful to evaluate medication-based treatments for SUDs.
+The package `CTNote` exists as a comprehensive implementation of *outcomes*, *treatments*, and *endpoints* used in clinical trials to evaluate the efficacy of medication-assisted treatment of substance use disorders (SUDs). The functions in this package are programmatic building blocks with which to construct algorithms which calculate single-value summaries of clinical trial participants' substance use patterns. We assume that these substance use patterns are symbolized as a "word" (see below). The vignettes for this package include a standard and code-based library of algorithms for treatment outcome definitions useful to evaluate medication-based treatments for SUDs.
 
 ## Installation
 

@@ -6,7 +6,7 @@ Description: The CTN-0094 Research Team herein provide a coded collection of
   daily or weekly patient urine screenings. Note that we abbreviate urine drug
   screen as "UDS" and urine opioid screen as "UOS". For the example data sets
   (based on clinical trials data harmonized in CTN-0094), UDS and UOS are
-  largely interchangable.
+  largely interchangeable.
 Version: 0.1.0
 Authors@R:
   c(

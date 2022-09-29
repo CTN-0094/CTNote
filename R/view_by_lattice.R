@@ -36,7 +36,7 @@
 #'   which time the protocol could be that the subject was only required to
 #'   visit the clinic monthly (so long as the supplied UDS was negative).
 #'   
-#'   Many lattice patterns can be easilty constructed by using the function
+#'   Many lattice patterns can be easily constructed by using the function
 #'   \code{\link{collapse_lattice}}. For example, to repeat the
 #'   "Monday-Wednesday-Friday" visit pattern noted above 4 times, you can use
 #'   \code{collapse_lattice("o_o_o__", 4)} to create a vector of weekly visit

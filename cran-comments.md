@@ -6,7 +6,8 @@
 
 - The Description field should not start with the package name, 'This package' or similar.
 - Found the following URLs which should use `\doi` (with the DOI name only):
-    + File 'weight_positive_visits.Rd':
+    + File 'weight_positive_visits.Rd'
+- Fixed miscellaneous spelling errors
 
 
 

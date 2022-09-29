@@ -37,7 +37,7 @@ but will remain unchanged in the returned use pattern string.}
 \item{tiebreaker}{In the event of ties between two modes, should positive or
 negative UDS be the mode? Defaults to positive (\code{"+"}).}
 
-\item{k}{The number of neaest visits to use in kNV imputation. This defaults
+\item{k}{The number of nearest visits to use in kNV imputation. This defaults
 to 1; we recommend that this parameter stays at 1 unless the use patterns
 in your data have extraordinarily few missing values.}
 
