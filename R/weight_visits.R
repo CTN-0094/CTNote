@@ -36,9 +36,9 @@
 #'   values for the use pattern
 #'   
 #' @details This function exists to code the treatment outcome defined in Ling
-#'   et al. (1976): \url{https://doi.org/10.1001/archpsyc.1976.01770060043007}.
-#'   This definition requires other CTNote:: functions as well, but this
-#'   function was written specifically for that definition.
+#'   et al. (1976): \doi{10.1001/archpsyc.1976.01770060043007}. This definition
+#'   requires other CTNote:: functions as well, but this function was written
+#'   specifically for that definition.
 #'   
 #'   The \code{weights_num} argument is the static "penalty" for positive and
 #'   missing UDS values; this will not change over the protocol weeks. These
