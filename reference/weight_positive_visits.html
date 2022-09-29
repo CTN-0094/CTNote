@@ -32,7 +32,13 @@
       </ul><form class="form-inline my-2 my-lg-0" role="search">
         <input type="search" class="form-control me-sm-2" aria-label="Toggle navigation" name="search-input" data-search-index="../search.json" id="search-input" placeholder="Search for" autocomplete="off"></form>
 
-      <ul class="navbar-nav"></ul></div>
+      <ul class="navbar-nav"><li class="nav-item">
+  <a class="external-link nav-link" href="https://github.com/CTN-0094/CTNote/" aria-label="github">
+    <span class="fab fa fab fa-github fa-lg"></span>
+     
+  </a>
+</li>
+      </ul></div>
 
     
   </div>
@@ -40,7 +46,7 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>Weight Visits in a Subject Use Pattern</h1>
-      
+      <small class="dont-index">Source: <a href="https://github.com/CTN-0094/CTNote/blob/HEAD/R/weight_visits.R" class="external-link"><code>R/weight_visits.R</code></a></small>
       <div class="d-none name"><code>weight_positive_visits.Rd</code></div>
     </div>
 
@@ -119,9 +125,10 @@ values for the use pattern</p>
     <div class="section level2">
     <h2 id="details">Details<a class="anchor" aria-label="anchor" href="#details"></a></h2>
     <p>This function exists to code the treatment outcome defined in Ling
-et al. (1976): <a href="https://doi.org/10.1001/archpsyc.1976.01770060043007" class="external-link">https://doi.org/10.1001/archpsyc.1976.01770060043007</a>.
-This definition requires other CTNote:: functions as well, but this
-function was written specifically for that definition.</p>
+et al. (1976): <a href="https://doi.org/10.1001/archpsyc.1976.01770060043007" class="external-link">doi:10.1001/archpsyc.1976.01770060043007</a>
+. This definition
+requires other CTNote:: functions as well, but this function was written
+specifically for that definition.</p>
 <p>The <code>weights_num</code> argument is the static "penalty" for positive and
 missing UDS values; this will not change over the protocol weeks. These
 values are then multiplied by the penalty vectors (<code>posPenalty_num</code>
