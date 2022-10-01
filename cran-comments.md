@@ -1,3 +1,16 @@
+## Resubmission 3 (v 0.1.0)
+
+**R CMD check results**: 0 ERRORs, 0 WARNINGs, and 0 NOTEs.
+
+**Comments**: V.W. marked the following problem:
+
+- Please always explain all acronyms in the description text. e.g.: CTN
+
+**Response**: we updated the Description field of the DESCRIPTION file to define all acronyms before use. The paper with our method is still in the editing phase. We expect to submit it to PLoS One within the next month.
+
+
+
+
 ## Resubmission 2 (v 0.1.0)
 
 **R CMD check results**: 0 ERRORs, 0 WARNINGs, and 0 NOTEs.

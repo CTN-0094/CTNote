@@ -1,12 +1,15 @@
 Package: CTNote
 Title: CTN Outcomes, Treatments, and Endpoints
-Description: The CTN-0094 Research Team herein provide a coded collection of
-  substance use disorder clinical trial outcomes. These coded outcome functions
-  are used to compare and cluster different clinical outcome functions based on
-  daily or weekly patient urine screenings. Note that we abbreviate urine drug
-  screen as "UDS" and urine opioid screen as "UOS". For the example data sets
-  (based on clinical trials data harmonized in CTN-0094), UDS and UOS are
-  largely interchangeable.
+Description: The Clinical Trials Network (CTN) of the U.S. National Institute
+  of Drug Abuse sponsored the CTN-0094 research team to harmonize data sets
+  from three nationally-representative clinical trials for opioid use disorder
+  (OUD). The CTN-0094 team herein provides a coded collection of trial outcomes
+  and endpoints used in various OUD clinical trials over the past 50 years.
+  These coded outcome functions are used to contrast and cluster different
+  clinical outcome functions based on daily or weekly patient urine screenings.
+  Note that we abbreviate urine drug screen as "UDS" and urine opioid screen as
+  "UOS". For the example data sets (based on clinical trials data harmonized by
+  the CTN-0094 research team), UDS and UOS are largely interchangeable.
 Version: 0.1.0
 Authors@R:
   c(
