@@ -47,5 +47,5 @@ First submission of the CTNote package.
 
 **R CMD check results**: 0 ERRORs, 0 WARNINGs, and 0 NOTEs.
 
-**Comments**: We use GitHub Actions for continuous integration. This package builds cleanly on ubuntu R devel, R release, and R old release; this also builds on windows and macOS R release.
+**Comments**: We use GitHub Actions for continuous integration. This package builds cleanly on ubuntu R devel, R release, and R old release; this also builds cleanly on windows and macOS R release.
 
