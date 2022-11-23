@@ -1,4 +1,4 @@
-who,usePatternUDS,ctn0094_relapse_time,ctn0094_relapse_event,ctn0094_dropout_time,ctn0094_dropout_event,johnson1992_hasRel,krupitsky2004_hasRel,lee2016_rel_time,lee2016_rel_event,lee2018_rel_time,lee2018_rel_event,schottenfeld2008_rel_time,schottenfeld2008_rel_event
+who,usePatternUDS,RsT_ctnNinetyFour_2023,RsE_ctnNinetyFour_2023,DrT_ctnNinetyFour_2023,DrE_ctnNinetyFour_2023,Rs_johnson_1992,Rs_krupitsky_2004,RsT_lee_2016,RsE_lee_2016,RsT_ctnFiftyOne_2018,RsE_ctnFiftyOne_2018,RsT_schottenfeld_2008,RsE_schottenfeld_2008
 1,ooooooooooooooo,1,1,1,1,TRUE,TRUE,3,1,3,1,1,1
 2,*---oo-o-o-o+oo,12,1,12,0,TRUE,TRUE,5,1,12,1,12,1
 3,o-ooo-ooooooooooooooooo,7,1,7,1,TRUE,TRUE,3,1,7,1,3,1

@@ -31,7 +31,7 @@ library(tidyverse)
 This document contains the algorithms necessary to code all the outcomes which measure "abstinence from substance use" or "relapse to substance use". We only include outcomes which result in a single value per subject. These outcomes are:
 ```{r, import-table-one, include=FALSE}
 pathToTable1_char <- system.file(
-  "suppl_docs", "definitions_20220405.xlsx", package = "CTNote", mustWork = TRUE
+  "suppl_docs", "definitions_20221123.xlsx", package = "CTNote", mustWork = TRUE
 )
 tab1_df <- readxl::read_xlsx(pathToTable1_char) 
 ```
@@ -143,11 +143,15 @@ outcomesRel_df <-
 	) %>% 
 	unnest(cols = "ctn0094_relapse", names_sep = "_") %>% 
 	select(who, starts_with("ctn0094_relapse")) %>% 
+  rename(
+    RsT_ctnNinetyFour_2023 = ctn0094_relapse_time,
+    RsE_ctnNinetyFour_2023 = ctn0094_relapse_event
+  ) %>% 
 	left_join(outcomesRel_df, ., by = "who")
 
 outcomesRel_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, starts_with("ctn0094_relapse"))
+  select(who, usePatternUDS, RsT_ctnNinetyFour_2023, RsE_ctnNinetyFour_2023)
 ```
 
 ### CTN-0094 Dropout
@@ -167,11 +171,15 @@ outcomesRel_df <-
 	) %>% 
 	unnest(cols = "ctn0094_dropout", names_sep = "_") %>% 
 	select(who, starts_with("ctn0094_dropout")) %>% 
+  rename(
+    DrT_ctnNinetyFour_2023 = ctn0094_dropout_time,
+    DrE_ctnNinetyFour_2023 = ctn0094_dropout_event
+  ) %>% 
 	left_join(outcomesRel_df, ., by = "who")
 
 outcomesRel_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, starts_with("ctn0094_dropout"))
+  select(who, usePatternUDS, DrT_ctnNinetyFour_2023, DrE_ctnNinetyFour_2023)
 ```
 
 
@@ -193,19 +201,19 @@ outcomesRel_df <-
 		)
 	) %>% 
 	mutate(
-		johnson1992_hasRel = detect_subpattern(
+		Rs_johnson_1992 = detect_subpattern(
 			use_pattern = udsPattern,
 			subpattern = "++",
 			# Starting at 4 weeks of treatment
 			start = 4L
 		)
 	) %>% 
-	select(who, johnson1992_hasRel) %>% 
+	select(who, Rs_johnson_1992) %>% 
 	left_join(outcomesRel_df, ., by = "who")
 
 outcomesRel_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, johnson1992_hasRel)
+  select(who, usePatternUDS, Rs_johnson_1992)
 ```
 
 
@@ -227,17 +235,17 @@ outcomesRel_df <-
 		)
 	) %>% 
 	mutate(
-		krupitsky2004_hasRel = detect_subpattern(
+		Rs_krupitsky_2004 = detect_subpattern(
 			use_pattern = udsPattern,
 			subpattern = "+++"
 		)
 	) %>% 
-	select(who, krupitsky2004_hasRel) %>% 
+	select(who, Rs_krupitsky_2004) %>% 
 	left_join(outcomesRel_df, ., by = "who")
 
 outcomesRel_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, krupitsky2004_hasRel)
+  select(who, usePatternUDS, Rs_krupitsky_2004)
 ```
 
 
@@ -269,15 +277,19 @@ outcomesRel_df <-
 	) %>% 
 	unnest(cols = "lee2016_rel", names_sep = "_") %>% 
 	select(who, starts_with("lee2016_rel")) %>% 
+  rename(
+    RsT_lee_2016 = lee2016_rel_time,
+    RsE_lee_2016 = lee2016_rel_event
+  ) %>% 
 	left_join(outcomesRel_df, ., by = "who")
 
 outcomesRel_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, starts_with("lee2016_rel"))
+  select(who, usePatternUDS, contains("lee_2016"))
 ```
 
 
-## @lee_comparative_2018
+## @lee_comparative_2018 [CTN-0051]
 **Definition**: `r defns_char["Lee et al., 2018 CTN-0051"]`; missing is positive
 
 ```{r}
@@ -309,11 +321,15 @@ outcomesRel_df <-
 	unnest(cols = "lee2018_rel", names_sep = "_") %>% 
 	mutate(lee2018_rel_time = lee2018_rel_time + 2) %>% 
 	select(who, starts_with("lee2018_rel")) %>% 
+  rename(
+    RsT_ctnFiftyOne_2018 = lee2018_rel_time,
+    RsE_ctnFiftyOne_2018 = lee2018_rel_event
+  ) %>% 
 	left_join(outcomesRel_df, ., by = "who")
 
 outcomesRel_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, starts_with("lee2018_rel"))
+  select(who, usePatternUDS, contains("ctnFiftyOne_2018"))
 ```
 
 
@@ -343,11 +359,15 @@ outcomesRel_df <-
 	) %>% 
 	unnest(cols = "schottenfeld2008_rel", names_sep = "_") %>% 
 	select(who, starts_with("schottenfeld2008_rel")) %>% 
+  rename(
+    RsT_schottenfeld_2008 = schottenfeld2008_rel_time,
+    RsE_schottenfeld_2008 = schottenfeld2008_rel_event
+  ) %>% 
 	left_join(outcomesRel_df, ., by = "who")
 
 outcomesRel_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, starts_with("schottenfeld2008_rel"))
+  select(who, usePatternUDS, contains("schottenfeld_2008"))
 ```
 
 
@@ -368,7 +388,7 @@ sessionInfo()
 ```{r, include=FALSE, eval=FALSE}
 # write_csv(
 #   outcomesRel_df,
-#   file = "../inst/extdata/outcomes_relapse_20220818.csv"
+#   file = "../inst/extdata/outcomes_relapse_20221123.csv"
 # )
 ```
 

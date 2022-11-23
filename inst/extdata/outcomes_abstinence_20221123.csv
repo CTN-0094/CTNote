@@ -1,4 +1,4 @@
-who,usePatternUDS,fiellin2006_abs,kosten1993_isAbs,krupitsky2011A_isAbs,krupitsky2011B_abs,ling1998_isAbs,lofwall2018_isAbs,mokri2016_abs_time,mokri2016_abs_event,schottenfeld2005_abs,schottenfeld2008A_abs_time,schottenfeld2008A_abs_event,schottenfeld2008B_abs,shufman1994_absN_time,shufman1994_absN_event,weissLingCTN0030_isAbs
+who,usePatternUDS,Ab_fiellin_2006,Ab_kosten_1993,Ab_krupitskyA_2011,Ab_krupitskyB_2011,Ab_ling_1998,Ab_lofwall_2018,AbT_mokri_2016,AbE_mokri_2016,Ab_schottenfeld_2005,AbT_schottenfeldA_2008,AbE_schottenfeldA_2008,Ab_schottenfeldB_2008,AbT_shufman_1994,AbE_shufman_1994,Ab_ctnThirty_2011
 1,ooooooooooooooo,0,FALSE,FALSE,0,FALSE,FALSE,1,1,0,1,1,0,15,0,FALSE
 2,*---oo-o-o-o+oo,6,TRUE,FALSE,3,FALSE,FALSE,1,1,6,1,1,3,1,1,FALSE
 3,o-ooo-ooooooooooooooooo,2,FALSE,FALSE,1,FALSE,FALSE,1,1,2,1,1,1,23,0,FALSE

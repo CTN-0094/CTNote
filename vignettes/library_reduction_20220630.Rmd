@@ -31,7 +31,7 @@ library(tidyverse)
 This document contains the algorithms necessary to code all the outcomes which measure "substance use reduction". We only include outcomes which result in a single value per subject. These outcomes are:
 ```{r, import-table-one, include=FALSE}
 pathToTable1_char <- system.file(
-  "suppl_docs", "definitions_20220405.xlsx", package = "CTNote", mustWork = TRUE
+  "suppl_docs", "definitions_20221123.xlsx", package = "CTNote", mustWork = TRUE
 )
 tab1_df <- readxl::read_xlsx(pathToTable1_char) 
 ```
@@ -116,7 +116,7 @@ outcomesRed_df <-
 	outcomesRed_df %>%
   rowwise() %>% 
 	mutate(
-		comer2006_red = count_matches(
+		Rd_comer_2006 = count_matches(
 			use_pattern = usePatternUDS,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -126,12 +126,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>%
-	select(who, comer2006_red) %>% 
+	select(who, Rd_comer_2006) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, comer2006_red)
+  select(who, usePatternUDS, Rd_comer_2006)
 ```
 
 
@@ -168,17 +168,17 @@ outcomesRed_df <-
 	# non-participation penalty: if the participant didn't stay in the study the
   #   whole time, then the treatment was a failure
 	mutate(
-		eissenberg1997_isAbs = case_when(
+		Ab_eissenberg_1997 = case_when(
 			completedProtocol  ~ consecNeg,
 			!completedProtocol ~ FALSE
 		)
 	) %>% 
-	select(who, eissenberg1997_isAbs) %>% 
+	select(who, Ab_eissenberg_1997) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, eissenberg1997_isAbs)
+  select(who, usePatternUDS, Ab_eissenberg_1997)
 ```
 
 
@@ -189,7 +189,7 @@ outcomesRed_df <-
 	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
-		fiellin2006_red = count_matches(
+		Rd_fiellin_2006 = count_matches(
 			use_pattern = usePatternUDS,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -197,12 +197,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>%
-	select(who, fiellin2006_red) %>% 
+	select(who, Rd_fiellin_2006) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, fiellin2006_red)
+  select(who, usePatternUDS, Rd_fiellin_2006)
 ```
 
 
@@ -220,7 +220,7 @@ outcomesRed_df <-
 		)
 	) %>%
 	mutate(
-		fudala2003_red = count_matches(
+		Rd_fudala_2003 = count_matches(
 			use_pattern = usePatternPresent,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -228,12 +228,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	select(who, fudala2003_red) %>% 
+	select(who, Rd_fudala_2003) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, fudala2003_red)
+  select(who, usePatternUDS, Rd_fudala_2003)
 ```
 
 
@@ -244,7 +244,7 @@ outcomesRed_df <-
 	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
-		haight2019_red = count_matches(
+		Rd_haight_2019 = count_matches(
 			use_pattern = usePatternUDS,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -254,12 +254,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>%
-	select(who, haight2019_red) %>% 
+	select(who, Rd_haight_2019) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, haight2019_red)
+  select(who, usePatternUDS, Rd_haight_2019)
 ```
 
 
@@ -284,7 +284,7 @@ outcomesRed_df <-
 		)
 	) %>% 
 	mutate(
-		jaffe1972_red = count_matches(
+		Rd_jaffe_1972 = count_matches(
 			usePatternImputed,
 			match_is = "-",
 			mixed_results_are = "*",
@@ -292,15 +292,15 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	select(who, jaffe1972_red) %>% 
+	select(who, Rd_jaffe_1972) %>% 
 	left_join(outcomesRed_df, ., by = "who") %>% 
 	# Lots of NAs from the participants who did not make it to week 8; replace
 	#   these NAs with 0
-	replace_na(list(jaffe1972_red = 0))
+	replace_na(list(Rd_jaffe_1972 = 0))
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, jaffe1972_red)
+  select(who, usePatternUDS, Rd_jaffe_1972)
 ```
 
 
@@ -311,7 +311,7 @@ outcomesRed_df <-
 	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
-		johnson1992_red = count_matches(
+		Rd_johnson_1992 = count_matches(
 			use_pattern = usePatternUDS,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -319,12 +319,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	select(who, johnson1992_red) %>% 
+	select(who, Rd_johnson_1992) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, johnson1992_red)
+  select(who, usePatternUDS, Rd_johnson_1992)
 ```
 
 
@@ -354,13 +354,13 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(kosten1993B_red = kosten1993B_prop >= 0.7) %>% 
-	select(who, kosten1993B_red) %>% 
+	mutate(Rd_kostenB_1993 = kosten1993B_prop >= 0.7) %>% 
+	select(who, Rd_kostenB_1993) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, kosten1993B_red)
+  select(who, usePatternUDS, Rd_kostenB_1993)
 ```
 
 
@@ -387,7 +387,7 @@ outcomesRed_df <-
 		)
 	) %>%
 	mutate(
-		ling1998A_red = count_matches(
+		Rd_lingA_1998 = count_matches(
 			use_pattern = usePatternPresent,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -396,12 +396,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	select(who, ling1998A_red) %>% 
+	select(who, Rd_lingA_1998) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, ling1998A_red)
+  select(who, usePatternUDS, Rd_lingA_1998)
 ```
 
 ### Ling et al., 1998 (C)
@@ -411,7 +411,7 @@ outcomesRed_df <-
 	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
-		ling1998C_red = count_matches(
+		Rd_lingC_1998 = count_matches(
 			use_pattern = usePatternUDS,
 			match_is = "-",
 			end = 15,
@@ -419,12 +419,12 @@ outcomesRed_df <-
 			mixed_weight = 0.5
 		)
 	) %>% 
-	select(who, ling1998C_red) %>% 
+	select(who, Rd_lingC_1998) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, ling1998C_red)
+  select(who, usePatternUDS, Rd_lingC_1998)
 ```
 
 
@@ -435,7 +435,7 @@ outcomesRed_df <-
 	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
-		ling2010_red = count_matches(
+		Rd_ling_2010 = count_matches(
 			use_pattern = usePatternUDS,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -445,12 +445,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	select(who, ling2010_red) %>% 
+	select(who, Rd_ling_2010) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, ling2010_red)
+  select(who, usePatternUDS, Rd_ling_2010)
 ```
 
 
@@ -492,14 +492,14 @@ outcomesRed_df <-
 			inductFail  ~ 120,
 			!inductFail ~ ling1976o22_use
 		),
-		ling1976o22_abs = 120 - ling1976o22_use
+		Ab_lingA_1976 = 120 - ling1976o22_use
 	) %>%
-	select(who, ling1976o22_abs) %>% 
+	select(who, Ab_lingA_1976) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, ling1976o22_abs)
+  select(who, usePatternUDS, Ab_lingA_1976)
 ```
 
 ### A Variant
@@ -530,14 +530,14 @@ outcomesRed_df <-
 			inductFail  ~ 120,
 			!inductFail ~ ling1976o100_use
 		),
-		ling1976o100_abs = 120 - ling1976o100_use
+		Ab_lingB_1976 = 120 - ling1976o100_use
 	) %>%
-	select(who, ling1976o100_abs) %>% 
+	select(who, Ab_lingB_1976) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, ling1976o100_abs)
+  select(who, usePatternUDS, Ab_lingB_1976)
 ```
 
 
@@ -584,7 +584,7 @@ outcomesRed_df <-
 		)
 	) %>% 
 	mutate(
-		lofwall2018_red = count_matches(
+		Rd_lofwall_2018 = count_matches(
 			use_pattern = udsLatticeLOCF,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -593,12 +593,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>%
-	select(who, lofwall2018_red) %>% 
+	select(who, Rd_lofwall_2018) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, lofwall2018_red)
+  select(who, usePatternUDS, Rd_lofwall_2018)
 ```
 
 
@@ -620,7 +620,7 @@ outcomesRed_df <-
   # Find out how long the participant stayed in the study
   mutate(lastWeek_idx = measure_retention(use_pattern = usePatternUDS)) %>% 
 	mutate(
-		mattick2003A_red = count_matches(
+		Rd_mattickA_2003 = count_matches(
 			use_pattern = usePatternUDS,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -630,12 +630,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>%
-	select(who, mattick2003A_red) %>% 
+	select(who, Rd_mattickA_2003) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, mattick2003A_red)
+  select(who, usePatternUDS, Rd_mattickA_2003)
 ```
 
 
@@ -646,7 +646,7 @@ outcomesRed_df <-
 	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
-		mattick2003B_red = count_matches(
+		Rd_mattickB_2003 = count_matches(
 			use_pattern = usePatternUDS,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -656,12 +656,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>%
-	select(who, mattick2003B_red) %>% 
+	select(who, Rd_mattickB_2003) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, mattick2003B_red)
+  select(who, usePatternUDS, Rd_mattickB_2003)
 ```
 
 
@@ -688,7 +688,7 @@ outcomesRed_df <-
 		)
 	) %>%
 	mutate(
-		pani2000A_red = count_matches(
+		Rd_paniA_2000 = count_matches(
 			use_pattern = usePatternPresent,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -696,12 +696,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	select(who, pani2000A_red) %>% 
+	select(who, Rd_paniA_2000) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, pani2000A_red)
+  select(who, usePatternUDS, Rd_paniA_2000)
 ```
 
 
@@ -712,7 +712,7 @@ outcomesRed_df <-
 	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
-		pani2000B_red = count_matches(
+		Rd_paniB_2000 = count_matches(
 			use_pattern = usePatternUDS,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -720,12 +720,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	select(who, pani2000B_red) %>% 
+	select(who, Rd_paniB_2000) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, pani2000B_red)
+  select(who, usePatternUDS, Rd_paniB_2000)
 ```
 
 
@@ -747,14 +747,14 @@ outcomesRed_df <-
 		)
 	) %>% 
 	mutate(
-		petitjean2001_abs = 1 - petitjean2001_use
+		Ab_petitjean_2001 = 1 - petitjean2001_use
 	) %>% 
-	select(who, petitjean2001_abs) %>% 
+	select(who, Ab_petitjean_2001) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, petitjean2001_abs)
+  select(who, usePatternUDS, Ab_petitjean_2001)
 ```
 
 
@@ -765,7 +765,7 @@ outcomesRed_df <-
 	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
-		preston2000_red = count_matches(
+		Rd_preston_2000 = count_matches(
 			use_pattern = usePatternUDS,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -775,12 +775,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	select(who, preston2000_red) %>% 
+	select(who, Rd_preston_2000) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, preston2000_red)
+  select(who, usePatternUDS, Rd_preston_2000)
 ```
 
 
@@ -799,7 +799,7 @@ outcomesRed_df <-
 	) %>%
   # Count negative
 	mutate(
-		schottenfeld2005_red = count_matches(
+		Rd_schottenfeld_2005 = count_matches(
 			use_pattern = usePatternPresent,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -807,12 +807,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	select(who, schottenfeld2005_red) %>% 
+	select(who, Rd_schottenfeld_2005) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, schottenfeld2005_red)
+  select(who, usePatternUDS, Rd_schottenfeld_2005)
 ```
 
 
@@ -834,14 +834,14 @@ outcomesRed_df <-
   ) %>% 
 	ungroup() %>% 
 	mutate(
-		schwartz2006_isAbs = schwartz2006_abs == 1
+		Ab_schwartz_2006 = schwartz2006_abs == 1
 	) %>% 
-	select(who, schwartz2006_isAbs) %>% 
+	select(who, Ab_schwartz_2006) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, schwartz2006_isAbs)
+  select(who, usePatternUDS, Ab_schwartz_2006)
 ```
 
 
@@ -860,13 +860,13 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(shufman1994_absP = 1 - shufman1994_useP) %>% 
-	select(who, shufman1994_absP) %>% 
+	mutate(Ab_shufman_1994 = 1 - shufman1994_useP) %>% 
+	select(who, Ab_shufman_1994) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, schwartz2006_isAbs)
+  select(who, usePatternUDS, Ab_shufman_1994)
 ```
 
 
@@ -895,14 +895,14 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(soyka2008_abs = 1 - soyka2008_use) %>% 
+	mutate(Ab_soyka_2008 = 1 - soyka2008_use) %>% 
 	ungroup() %>% 
-	select(who, soyka2008_abs) %>% 
+	select(who, Ab_soyka_2008) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, soyka2008_abs)
+  select(who, usePatternUDS, Ab_soyka_2008)
 ```
 
 
@@ -921,16 +921,17 @@ outcomesRed_df <-
 			match_is = "+",
 			# The stable dosing period began in week 6
 			start = 6, end = 15,
-			mixed_results_are = "*"
+			mixed_results_are = "*",
+			proportion = TRUE
 		)
 	) %>% 
-	mutate(strain1993_abs = 1 - strain1993_use) %>% 
-	select(who, strain1993_abs) %>% 
+	mutate(Ab_strain_1993 = 1 - strain1993_use) %>% 
+	select(who, Ab_strain_1993) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, strain1993_abs)
+  select(who, usePatternUDS, Ab_strain_1993)
 ```
 
 
@@ -958,13 +959,13 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(strain1994_abs = 1 - strain1994_use) %>% 
-	select(who, strain1994_abs) %>% 
+	mutate(Ab_strain_1994 = 1 - strain1994_use) %>% 
+	select(who, Ab_strain_1994) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, strain1994_abs)
+  select(who, usePatternUDS, Ab_strain_1994)
 ``` 
 
 
@@ -992,13 +993,13 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(strain1996_abs = 1 - strain1996_use) %>% 
-	select(who, strain1996_abs) %>% 
+	mutate(Ab_strain_1996 = 1 - strain1996_use) %>% 
+	select(who, Ab_strain_1996) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, strain1996_abs)
+  select(who, usePatternUDS, Ab_strain_1996)
 ```
 
 
@@ -1026,13 +1027,13 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(strain1999_abs = 1 - strain1999_use) %>% 
-	select(who, strain1999_abs) %>% 
+	mutate(Ab_strain_1999 = 1 - strain1999_use) %>% 
+	select(who, Ab_strain_1999) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, strain1999_abs)
+  select(who, usePatternUDS, Ab_strain_1999)
 ```
 
 
@@ -1056,14 +1057,14 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(strang2010_hasRed = cleanProp >= 0.5) %>% 
+	mutate(Rd_strang_2010 = cleanProp >= 0.5) %>% 
 	ungroup() %>% 
-	select(who, strang2010_hasRed) %>% 
+	select(who, Rd_strang_2010) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, strang2010_hasRed)
+  select(who, usePatternUDS, Rd_strang_2010)
 ```
 
 
@@ -1076,7 +1077,7 @@ outcomesRed_df <-
 	outcomesRed_df %>%
   rowwise() %>% 
   mutate(
-		strang2019_red = count_matches(
+		Rd_strang_2019 = count_matches(
 			use_pattern = usePatternUDS,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -1086,12 +1087,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>%
-	select(who, strang2019_red) %>% 
+	select(who, Rd_strang_2019) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, strang2019_red)
+  select(who, usePatternUDS, Rd_strang_2019)
 ```
 
 
@@ -1106,7 +1107,7 @@ outcomesRed_df <-
   # How long was each subject retained?
   mutate(lastWeek_idx = measure_retention(use_pattern = usePatternUDS)) %>% 
 	mutate(
-		tanum2017_red = count_matches(
+		Rd_tanum_2017 = count_matches(
 			use_pattern = usePatternUDS,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -1115,12 +1116,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>%
-	select(who, tanum2017_red) %>% 
+	select(who, Rd_tanum_2017) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, tanum2017_red)
+  select(who, usePatternUDS, Rd_tanum_2017)
 ```
 
 
@@ -1139,7 +1140,7 @@ outcomesRed_df <-
 		)
 	) %>%   
 	mutate(
-		wolstein2009_red = count_matches(
+		Rd_wolstein_2009 = count_matches(
 			use_pattern = usePatternPresent,
 			match_is = "-",
 			# Mixed results weeks count as half of a negative week
@@ -1147,12 +1148,12 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>%
-	select(who, wolstein2009_red) %>% 
+	select(who, Rd_wolstein_2009) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, wolstein2009_red)
+  select(who, usePatternUDS, Rd_wolstein_2009)
 ```
 
 
@@ -1198,13 +1199,13 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(woody2008_abs = 1 - woody2008_use) %>% 
-	select(who, woody2008_abs) %>% 
+	mutate(Ab_woody_2008 = 1 - woody2008_use) %>% 
+	select(who, Ab_woody_2008) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, woody2008_abs)
+  select(who, usePatternUDS, Ab_woody_2008)
 ```
 
 
@@ -1229,16 +1230,16 @@ outcomesRed_df <-
 			mixed_results_are = "*"
 		)
 	) %>% 
-	ungroup() %>% 
   # For each participant, the "abstinent" metric is the number of total weeks
   #   of study participation - the number of positive weeks
-	mutate(zaks1972_abs = str_length(udsPattern) - zaks1972_use) %>% 
-	select(who, zaks1972_abs) %>% 
+	mutate(Ab_zaks_1972 = str_length(udsPattern) - zaks1972_use) %>% 
+	ungroup() %>% 
+	select(who, Ab_zaks_1972) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, zaks1972_abs)
+  select(who, usePatternUDS, Ab_zaks_1972)
 ```
 
 
@@ -1260,7 +1261,7 @@ sessionInfo()
 ```{r, include=FALSE, eval=FALSE}
 # write_csv(
 #   outcomesRed_df,
-#   file = "../inst/extdata/outcomes_reduction_20220818.csv"
+#   file = "../inst/extdata/outcomes_reduction_20221123.csv"
 # )
 ```
 

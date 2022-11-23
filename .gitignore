@@ -52,8 +52,7 @@ vignettes/*.pdf
 # Exclude Excel
 *.xlsx
 *.xls
-!inst/suppl_docs/definitions_20220210.xlsx
-!inst/suppl_docs/definitions_20220405.xlsx
+!inst/suppl_docs/definitions_20221123.xlsx
 
 # R data
 *.rds
