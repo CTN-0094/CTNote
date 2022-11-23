@@ -71,9 +71,10 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>CTNote Library: Abstinence Outcomes</h1>
-                        <h4 data-toc-skip class="author">Gabriel Odom, Laura Brandt, Sean Luo, and Ray Balise</h4>
+                        <h4 data-toc-skip class="author">Gabriel Odom,
+Laura Brandt, Sean Luo, and Ray Balise</h4>
             
-            <h4 data-toc-skip class="date">2022-10-12</h4>
+            <h4 data-toc-skip class="date">2022-11-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CTN-0094/CTNote/blob/HEAD/vignettes/library_abstinence_20220711.Rmd" class="external-link"><code>vignettes/library_abstinence_20220711.Rmd</code></a></small>
       <div class="d-none name"><code>library_abstinence_20220711.Rmd</code></div>
@@ -84,7 +85,10 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>This document contains the algorithms necessary to code all the outcomes which measure “abstinence from substance use” or “relapse to substance use”. We only include outcomes which result in a single value per subject. These outcomes are:</p>
+<p>This document contains the algorithms necessary to code all the
+outcomes which measure “abstinence from substance use” or “relapse to
+substance use”. We only include outcomes which result in a single value
+per subject. These outcomes are:</p>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:1000px; ">
 <table class="table table table-striped lightable-minimal" style='font-size: 11px; margin-left: auto; margin-right: auto; font-family: "Trebuchet MS", verdana, sans-serif; margin-left: auto; margin-right: auto;'>
 <thead><tr>
@@ -222,7 +226,8 @@ logical
 Lofwall et al., 2018
 </td>
 <td style="text-align:left;width: 5cm; ">
-No evidence of opioid use based on UOS (NOTE: minimal evidence of opioid use from UOS, not none)
+No evidence of opioid use based on UOS (NOTE: minimal evidence of opioid
+use from UOS, not none)
 </td>
 <td style="text-align:left;">
 Positive
@@ -342,7 +347,8 @@ logical
 Weiss et al., 2011 CTN-0030
 </td>
 <td style="text-align:left;width: 5cm; ">
-Negative UOS during the last week AND for at least 2 of the previous 3 weeks of the third month of BUP/NX treatment
+Negative UOS during the last week AND for at least 2 of the previous 3
+weeks of the third month of BUP/NX treatment
 </td>
 <td style="text-align:left;">
 Positive
@@ -351,19 +357,31 @@ Positive
 </tbody>
 </table>
 </div>
-<p>We will use the table of participant opioid use patterns from the <code>ctn0094DataExtra</code> package to calculate these endpoints (we have a copy of the endpoints in the dataset <code>outcomesCTN0094</code>). Importantly, if you wish to apply these algorithms to calculate endpoints for your data, the participants’ substance use patterns must be stored in the “substance use pattern word” format shown here. We also show a subset of the data to visualize a variety of different real substance use patterns.</p>
+<p>We will use the table of participant opioid use patterns from the
+<code>ctn0094DataExtra</code> package to calculate these endpoints (we
+have a copy of the endpoints in the dataset
+<code>outcomesCTN0094</code>). Importantly, if you wish to apply these
+algorithms to calculate endpoints for your data, the participants’
+substance use patterns must be stored in the “substance use pattern
+word” format shown here. We also show a subset of the data to visualize
+a variety of different real substance use patterns.</p>
 <p>We first define the following five-value legend:</p>
 <ul>
 <li>
-<strong>+</strong>: positive for the substance(s) in a specified window of time (a day, week, month, etc.) by urine screen (or participant self report, if such data are of interest)</li>
+<strong>+</strong>: positive for the substance(s) in a specified
+window of time (a day, week, month, etc.) by urine screen (or
+participant self report, if such data are of interest)</li>
 <li>
 <strong>–</strong>: negative for the substance(s)</li>
 <li>
 <strong>o</strong>: subject failed to provide a urine sample</li>
 <li>
-<b>*</b>: inconclusive results or mixed results (e.g. subject provided more than one urine sample in the time interval and they did not agree)</li>
+<b>*</b>: inconclusive results or mixed results (e.g. subject
+provided more than one urine sample in the time interval and they did
+not agree)</li>
 <li>
-<b>_</b>: no specimens required (weekends, holidays, pre-randomization period, alternating visit days/weeks)</li>
+<b>_</b>: no specimens required (weekends, holidays,
+pre-randomization period, alternating visit days/weeks)</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">###  Full Data  ###</span></span>
@@ -392,7 +410,14 @@ Positive
 <span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------            </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-</span></span></code></pre>
-<p>For example, participant 1 has a use pattern <code>ooooooooooooooo</code> (all missing UDS), which means that they dropped out of the study. In contrast, participant 233 has a use pattern <code>*+++++++++++o++++++++++o</code> (nearly all positive UDS): they did not drop out of the study, but the treatment was completely ineffective for them. Participant 2089 started the study in a rough patch, but greatly improved in treatment over time (<code>++++---+--------------o-</code>).</p>
+<p>For example, participant 1 has a use pattern
+<code>ooooooooooooooo</code> (all missing UDS), which means that they
+dropped out of the study. In contrast, participant 233 has a use pattern
+<code>*+++++++++++o++++++++++o</code> (nearly all positive UDS): they
+did not drop out of the study, but the treatment was completely
+ineffective for them. Participant 2089 started the study in a rough
+patch, but greatly improved in treatment over time
+(<code>++++---+--------------o-</code>).</p>
 <hr>
 <p></p>
 </div>
@@ -403,7 +428,8 @@ Positive
 <h3 id="fiellin_counseling_2006">
 <span class="citation">Fiellin et al. (2006)</span><a class="anchor" aria-label="anchor" href="#fiellin_counseling_2006"></a>
 </h3>
-<p><strong>Definition</strong>: Weeks of confirmed opioid abstinence; missing is positive</p>
+<p><strong>Definition</strong>: Weeks of confirmed opioid abstinence;
+missing is positive</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesAbs_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span></span>
@@ -423,19 +449,19 @@ Positive
 <span>  <span class="co"># We did not code this definition with an "end", so participants with longer</span></span>
 <span>  <span class="co">#   stays in treatment could have higher scores</span></span>
 <span>    <span class="fu">mutate</span><span class="op">(</span></span>
-<span>        fiellin2006_abs <span class="op">=</span> <span class="fu"><a href="../reference/count_matches.html">count_matches</a></span><span class="op">(</span></span>
+<span>        Ab_fiellin_2006 <span class="op">=</span> <span class="fu"><a href="../reference/count_matches.html">count_matches</a></span><span class="op">(</span></span>
 <span>            use_pattern <span class="op">=</span> <span class="va">udsPattern</span>,</span>
 <span>            match_is <span class="op">=</span> <span class="st">"-"</span></span>
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">fiellin2006_abs</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">Ab_fiellin_2006</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesAbs_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">fiellin2006_abs</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">Ab_fiellin_2006</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 3</span></span></span>
-<span><span class="co">##      who usePatternUDS                       fiellin2006_abs</span></span>
+<span><span class="co">##      who usePatternUDS                       Ab_fiellin_2006</span></span>
 <span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                   0</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                         21</span></span>
@@ -452,47 +478,57 @@ Positive
 <h3 id="kosten_buprenorphine_1993">
 <span class="citation">Kosten et al. (1993)</span><a class="anchor" aria-label="anchor" href="#kosten_buprenorphine_1993"></a>
 </h3>
-<p><strong>Definition</strong>: attaining at least 3 weeks of consecutive negative UOS</p>
+<p><strong>Definition</strong>: attaining at least 3 weeks of
+consecutive negative UOS</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesAbs_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">rowwise</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu">mutate</span><span class="op">(</span></span>
-<span>        kosten1993_isAbs <span class="op">=</span> <span class="fu"><a href="../reference/detect_subpattern.html">detect_subpattern</a></span><span class="op">(</span></span>
+<span>        Ab_kosten_1993 <span class="op">=</span> <span class="fu"><a href="../reference/detect_subpattern.html">detect_subpattern</a></span><span class="op">(</span></span>
 <span>            <span class="va">usePatternUDS</span>,</span>
 <span>            subpattern <span class="op">=</span> <span class="st">"---"</span> </span>
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">kosten1993_isAbs</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">Ab_kosten_1993</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesAbs_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">kosten1993_isAbs</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">Ab_kosten_1993</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 3</span></span></span>
-<span><span class="co">##      who usePatternUDS                       kosten1993_isAbs</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>           </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                     FALSE           </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o            TRUE            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo            TRUE            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-             FALSE           </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------            TRUE            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------            TRUE            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o            FALSE           </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------             TRUE            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o TRUE            </span></span>
+<span><span class="co">##      who usePatternUDS                       Ab_kosten_1993</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>         </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                     FALSE         </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o            TRUE          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo            TRUE          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-             FALSE         </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------            TRUE          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------            TRUE          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o            FALSE         </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------             TRUE          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o TRUE          </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-            TRUE</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="krupitsky_injectable_2011-a-and-b">
-<span class="citation">Krupitsky et al. (2011)</span> (A) and (B)<a class="anchor" aria-label="anchor" href="#krupitsky_injectable_2011-a-and-b"></a>
+<span class="citation">Krupitsky et al. (2011)</span> (A) and
+(B)<a class="anchor" aria-label="anchor" href="#krupitsky_injectable_2011-a-and-b"></a>
 </h3>
-<p>There are two definitions from <a href="https://doi.org/DOI:10.1016/S0140-6736(11)60358-9" class="external-link">this paper</a> which we include in the reduction section our library: Confirmed opioid abstinence during weeks 5‐24 based on UOS and Weeks of confirmed opioid abstinence.</p>
+<p>There are two definitions from <a href="https://doi.org/DOI:10.1016/S0140-6736(11)60358-9" class="external-link">this paper</a>
+which we include in the reduction section our library: Confirmed opioid
+abstinence during weeks 5‐24 based on UOS and Weeks of confirmed opioid
+abstinence.</p>
 <div class="section level4">
 <h4 id="krupitsky-et-al--2011-a">Krupitsky et al., 2011 (A)<a class="anchor" aria-label="anchor" href="#krupitsky-et-al--2011-a"></a>
 </h4>
-<p><strong>Definition</strong>: Confirmed opioid abstinence during weeks 5‐24 based on UOS</p>
-<p>A comment on our algorithm: we do not know how long each protocol is exactly, so a pattern match approach (while intuitive at first) would not work. We will instead recode the use pattern as “negative” or “non-negative”, and then check that the proportion of non-negative UDS is 0%.</p>
+<p><strong>Definition</strong>: Confirmed opioid abstinence during weeks
+5‐24 based on UOS</p>
+<p>A comment on our algorithm: we do not know how long each protocol is
+exactly, so a pattern match approach (while intuitive at first) would
+not work. We will instead recode the use pattern as “negative” or
+“non-negative”, and then check that the proportion of non-negative UDS
+is 0%.</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesAbs_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span></span>
@@ -518,25 +554,25 @@ Positive
 <span>            proportion <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>    <span class="fu">mutate</span><span class="op">(</span>krupitsky2011A_isAbs <span class="op">=</span> <span class="va">useProp</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">krupitsky2011A_isAbs</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">mutate</span><span class="op">(</span>Ab_krupitskyA_2011 <span class="op">=</span> <span class="va">useProp</span> <span class="op">==</span> <span class="fl">0</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">Ab_krupitskyA_2011</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesAbs_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">krupitsky2011A_isAbs</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">Ab_krupitskyA_2011</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 3</span></span></span>
-<span><span class="co">##      who usePatternUDS                       krupitsky2011A_isAbs</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>               </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                     FALSE               </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o            TRUE                </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo            FALSE               </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-             FALSE               </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------            FALSE               </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------            FALSE               </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o            FALSE               </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------             TRUE                </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o FALSE               </span></span>
+<span><span class="co">##      who usePatternUDS                       Ab_krupitskyA_2011</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                     FALSE             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o            TRUE              </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo            FALSE             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-             FALSE             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------            FALSE             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------            FALSE             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o            FALSE             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------             TRUE              </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o FALSE             </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-            FALSE</span></span></code></pre>
 </div>
 <div class="section level4">
@@ -559,7 +595,7 @@ Positive
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">mutate</span><span class="op">(</span></span>
-<span>        krupitsky2011B_abs <span class="op">=</span> <span class="fu"><a href="../reference/count_matches.html">count_matches</a></span><span class="op">(</span></span>
+<span>        Ab_krupitskyB_2011 <span class="op">=</span> <span class="fu"><a href="../reference/count_matches.html">count_matches</a></span><span class="op">(</span></span>
 <span>            use_pattern <span class="op">=</span> <span class="va">udsPattern</span>,</span>
 <span>            match_is <span class="op">=</span> <span class="st">"-"</span>,</span>
 <span>            start <span class="op">=</span> <span class="fl">5L</span>,</span>
@@ -567,14 +603,14 @@ Positive
 <span>            end <span class="op">=</span> <span class="fl">15L</span></span>
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">krupitsky2011B_abs</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">Ab_krupitskyB_2011</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesAbs_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">krupitsky2011B_abs</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">Ab_krupitskyB_2011</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 3</span></span></span>
-<span><span class="co">##      who usePatternUDS                       krupitsky2011B_abs</span></span>
+<span><span class="co">##      who usePatternUDS                       Ab_krupitskyB_2011</span></span>
 <span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                            <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                      0</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                            11</span></span>
@@ -592,45 +628,59 @@ Positive
 <h3 id="ling_buprenorphine_1998">
 <span class="citation">Ling et al. (1998)</span><a class="anchor" aria-label="anchor" href="#ling_buprenorphine_1998"></a>
 </h3>
-<p><strong>Definition</strong>: % of participants who maintained 13 consecutive negative UOS (1 month); urine was screened 3 times per week</p>
+<p><strong>Definition</strong>: % of participants who maintained 13
+consecutive negative UOS (1 month); urine was screened 3 times per
+week</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesAbs_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span></span>
 <span>  <span class="fu">rowwise</span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu">mutate</span><span class="op">(</span></span>
-<span>        ling1998_isAbs <span class="op">=</span> <span class="fu"><a href="../reference/detect_subpattern.html">detect_subpattern</a></span><span class="op">(</span></span>
+<span>        Ab_ling_1998 <span class="op">=</span> <span class="fu"><a href="../reference/detect_subpattern.html">detect_subpattern</a></span><span class="op">(</span></span>
 <span>            use_pattern <span class="op">=</span> <span class="va">usePatternUDS</span>,</span>
 <span>            <span class="co"># 13 consecutive UDS at 3x per week is 4.3 weeks</span></span>
 <span>            subpattern <span class="op">=</span> <span class="st">"----"</span></span>
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">ling1998_isAbs</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">Ab_ling_1998</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesAbs_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span>  </span>
 <span></span>
 <span><span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">ling1998_isAbs</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">Ab_ling_1998</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 3</span></span></span>
-<span><span class="co">##      who usePatternUDS                       ling1998_isAbs</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>         </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                     FALSE         </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o            TRUE          </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo            TRUE          </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-             FALSE         </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------            TRUE          </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------            TRUE          </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o            FALSE         </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------             TRUE          </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o TRUE          </span></span>
+<span><span class="co">##      who usePatternUDS                       Ab_ling_1998</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                     FALSE       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o            TRUE        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo            TRUE        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-             FALSE       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------            TRUE        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------            TRUE        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o            FALSE       </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------             TRUE        </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o TRUE        </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-            TRUE</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="lofwall_weekly_2018">
 <span class="citation">Lofwall et al. (2018)</span><a class="anchor" aria-label="anchor" href="#lofwall_weekly_2018"></a>
 </h3>
-<p><strong>Definition</strong>: No evidence of opioid use based on UOS (NOTE: minimal evidence of opioid use from UOS, not none)</p>
-<p><a href="https://doi.org/10.1001/jamainternmed.2018.1052" class="external-link">In their paper</a>, abstinence was defined as 2 of 3 negative UDS for weeks 9, 10, and 11; negative UDS in week 12; and 5 or 6 UDS negative during weeks 13-24 (with alternating week visits, yielding 6 visits in this Phase II period). Because we have 15 weeks of data guaranteed, we scale this window and lattice. Their definition of abstinence is quite complex. Because we only have 15 weeks of data for most subjects, we shift their 12-week Phase I endpoint to week 7, and treat weeks 8-15 as Phase II. Also, we calculate these as proportions and not counts; this is so that these rules can be applied to windows of other sizes. The proportions would be the same—only the window of observation would change.</p>
+<p><strong>Definition</strong>: No evidence of opioid use based on UOS
+(NOTE: minimal evidence of opioid use from UOS, not none)</p>
+<p><a href="https://doi.org/10.1001/jamainternmed.2018.1052" class="external-link">In their
+paper</a>, abstinence was defined as 2 of 3 negative UDS for weeks 9,
+10, and 11; negative UDS in week 12; and 5 or 6 UDS negative during
+weeks 13-24 (with alternating week visits, yielding 6 visits in this
+Phase II period). Because we have 15 weeks of data guaranteed, we scale
+this window and lattice. Their definition of abstinence is quite
+complex. Because we only have 15 weeks of data for most subjects, we
+shift their 12-week Phase I endpoint to week 7, and treat weeks 8-15 as
+Phase II. Also, we calculate these as proportions and not counts; this
+is so that these rules can be applied to windows of other sizes. The
+proportions would be the same—only the window of observation would
+change.</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">###  Define 15-week Lattice  ###</span></span>
 <span><span class="va">lofwallLattice_char</span> <span class="op">&lt;-</span> <span class="fu"><a href="../reference/collapse_lattice.html">collapse_lattice</a></span><span class="op">(</span></span>
@@ -699,33 +749,34 @@ Positive
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="co"># Check interval counts/proportions</span></span>
 <span>    <span class="fu">mutate</span><span class="op">(</span></span>
-<span>        lofwall2018_isAbs <span class="op">=</span> <span class="op">(</span><span class="va">prop57</span> <span class="op">&gt;=</span> <span class="fl">2</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">(</span><span class="va">clean8</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">(</span><span class="va">prop915</span> <span class="op">&gt;=</span> <span class="fl">5</span><span class="op">/</span><span class="fl">6</span><span class="op">)</span></span>
+<span>        Ab_lofwall_2018 <span class="op">=</span> <span class="op">(</span><span class="va">prop57</span> <span class="op">&gt;=</span> <span class="fl">2</span><span class="op">/</span><span class="fl">3</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">(</span><span class="va">clean8</span> <span class="op">==</span> <span class="fl">1</span><span class="op">)</span> <span class="op">&amp;</span> <span class="op">(</span><span class="va">prop915</span> <span class="op">&gt;=</span> <span class="fl">5</span><span class="op">/</span><span class="fl">6</span><span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">lofwall2018_isAbs</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">Ab_lofwall_2018</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesAbs_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">lofwall2018_isAbs</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">Ab_lofwall_2018</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 3</span></span></span>
-<span><span class="co">##      who usePatternUDS                       lofwall2018_isAbs</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                     FALSE            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o            TRUE             </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo            FALSE            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-             FALSE            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------            FALSE            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------            FALSE            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o            FALSE            </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------             TRUE             </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o FALSE            </span></span>
+<span><span class="co">##      who usePatternUDS                       Ab_lofwall_2018</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                     FALSE          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o            TRUE           </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo            FALSE          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-             FALSE          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------            FALSE          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------            FALSE          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o            FALSE          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------             TRUE           </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o FALSE          </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-            TRUE</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="mokri_medical_2016">
 <span class="citation">Mokri et al. (2016)</span><a class="anchor" aria-label="anchor" href="#mokri_medical_2016"></a>
 </h3>
-<p><strong>Definition</strong>: Days to 1st positive UOS; missing is positive</p>
+<p><strong>Definition</strong>: Days to 1st positive UOS; missing is
+positive</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesAbs_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span></span>
@@ -751,33 +802,38 @@ Positive
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>    <span class="fu">unnest</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"mokri2016_abs"</span>, names_sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"mokri2016_abs"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">rename</span><span class="op">(</span></span>
+<span>    AbT_mokri_2016 <span class="op">=</span> <span class="va">mokri2016_abs_time</span>,</span>
+<span>    AbE_mokri_2016 <span class="op">=</span> <span class="va">mokri2016_abs_event</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesAbs_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span>  </span>
 <span><span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"mokri2016_abs"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">"mokri_2016"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 4</span></span></span>
-<span><span class="co">##      who usePatternUDS                       mokri2016_abs_time mokri2016_abs_…¹</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                            <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                      1                1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                            20                1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                            13                1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                              3                1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                             2                1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                             2                1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                             1                1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                             23                0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o                  1                1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                             1                1</span></span>
-<span><span class="co">## <span style="color: #949494;"># … with abbreviated variable name ¹​mokri2016_abs_event</span></span></span></code></pre>
-<p>If you are more comfortable using “survival” or “time-to-event” data structures, then the above definition can be modified by the following code:</p>
+<span><span class="co">##      who usePatternUDS                       AbT_mokri_2016 AbE_mokri_2016</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                  1              1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                        20              1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                        13              1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                          3              1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                         2              1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                         2              1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                         1              1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                         23              0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o              1              1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                         1              1</span></span></code></pre>
+<p>If you are more comfortable using “survival” or “time-to-event” data
+structures, then the above definition can be modified by the following
+code:</p>
 <div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu">mutate</span><span class="op">(</span></span>
 <span>    mokri2016_wksAbst <span class="op">=</span> <span class="fu">survival</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/survival/man/Surv.html" class="external-link">Surv</a></span><span class="op">(</span></span>
-<span>      time <span class="op">=</span> <span class="va">mokri2016_abs_time</span>,</span>
-<span>      event <span class="op">=</span> <span class="va">mokri2016_abs_event</span></span>
+<span>      time <span class="op">=</span> <span class="va">AbT_mokri_2016</span>,</span>
+<span>      event <span class="op">=</span> <span class="va">AbE_mokri_2016</span></span>
 <span>    <span class="op">)</span></span>
 <span>  <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="co"># FOR PRINTING THE TABLE ONLY. DO NOT USE NEXT LINE IN PRACTICE!!!</span></span>
@@ -799,9 +855,11 @@ Positive
 </div>
 <div class="section level3">
 <h3 id="schottenfeld_methadone_2005">
-<span class="citation">Richard S. Schottenfeld et al. (2005)</span><a class="anchor" aria-label="anchor" href="#schottenfeld_methadone_2005"></a>
+<span class="citation">Richard S. Schottenfeld et al.
+(2005)</span><a class="anchor" aria-label="anchor" href="#schottenfeld_methadone_2005"></a>
 </h3>
-<p><strong>Definition</strong>: Max. number of consecutive weeks of negative UOS, missing is ignored</p>
+<p><strong>Definition</strong>: Max. number of consecutive weeks of
+negative UOS, missing is ignored</p>
 <div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesAbs_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span></span>
@@ -822,19 +880,19 @@ Positive
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="co"># Measure the length of the longest period of continuous abstinence</span></span>
 <span>    <span class="fu">mutate</span><span class="op">(</span></span>
-<span>        schottenfeld2005_abs <span class="op">=</span> <span class="fu"><a href="../reference/measure_abstinence_period.html">measure_abstinence_period</a></span><span class="op">(</span></span>
+<span>        Ab_schottenfeld_2005 <span class="op">=</span> <span class="fu"><a href="../reference/measure_abstinence_period.html">measure_abstinence_period</a></span><span class="op">(</span></span>
 <span>            use_pattern_binary <span class="op">=</span> <span class="va">udsPattern</span></span>
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">schottenfeld2005_abs</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">Ab_schottenfeld_2005</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesAbs_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span>  </span>
 <span></span>
 <span><span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">schottenfeld2005_abs</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">Ab_schottenfeld_2005</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 3</span></span></span>
-<span><span class="co">##      who usePatternUDS                       schottenfeld2005_abs</span></span>
+<span><span class="co">##      who usePatternUDS                       Ab_schottenfeld_2005</span></span>
 <span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                              <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                        0</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                              21</span></span>
@@ -849,13 +907,17 @@ Positive
 </div>
 <div class="section level3">
 <h3 id="schottenfeld_maintenance_2008-a-and-b">
-<span class="citation">Richard S. Schottenfeld, Chawarski, and Mazlan (2008)</span> (A) and (B)<a class="anchor" aria-label="anchor" href="#schottenfeld_maintenance_2008-a-and-b"></a>
+<span class="citation">Richard S. Schottenfeld, Chawarski, and
+Mazlan (2008)</span> (A) and (B)<a class="anchor" aria-label="anchor" href="#schottenfeld_maintenance_2008-a-and-b"></a>
 </h3>
-<p>There are two definitions from <a href="https://doi.org/10.1016/S0140-6736(08)60954-X" class="external-link">this paper</a> which we include in the reduction section our library: Longest period of negative UOS and Days to 1st positive UOS after randomization.</p>
+<p>There are two definitions from <a href="https://doi.org/10.1016/S0140-6736(08)60954-X" class="external-link">this paper</a>
+which we include in the reduction section our library: Longest period of
+negative UOS and Days to 1st positive UOS after randomization.</p>
 <div class="section level4">
 <h4 id="schottenfeld-chawarski-mazlan-2008-a">Schottenfeld, Chawarski, &amp; Mazlan, 2008 (A)<a class="anchor" aria-label="anchor" href="#schottenfeld-chawarski-mazlan-2008-a"></a>
 </h4>
-<p><strong>Definition</strong>: Days to 1st positive UOS after randomization, missing is positive</p>
+<p><strong>Definition</strong>: Days to 1st positive UOS after
+randomization, missing is positive</p>
 <div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesAbs_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span></span>
@@ -880,30 +942,35 @@ Positive
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">unnest</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"schottenfeld2008A_abs"</span>, names_sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"schottenfeld2008A_abs"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">rename</span><span class="op">(</span></span>
+<span>    AbT_schottenfeldA_2008 <span class="op">=</span> <span class="va">schottenfeld2008A_abs_time</span>,</span>
+<span>    AbE_schottenfeldA_2008 <span class="op">=</span> <span class="va">schottenfeld2008A_abs_event</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesAbs_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span>  </span>
 <span><span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"schottenfeld2008A_abs"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">"schottenfeldA_2008"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 4</span></span></span>
-<span><span class="co">##      who usePatternUDS                       schottenfeld2008A_abs_time schott…¹</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>    <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                              1        1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                                    20        1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                                    13        1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                                      3        1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                                     2        1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                                     2        1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                                     1        1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                                     23        0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o                          1        1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                                     1        1</span></span>
-<span><span class="co">## <span style="color: #949494;"># … with abbreviated variable name ¹​schottenfeld2008A_abs_event</span></span></span></code></pre>
+<span><span class="co">##      who usePatternUDS                       AbT_schottenfeldA_2008 AbE_schott…¹</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                          1            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                                20            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                                13            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                                  3            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                                 2            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                                 2            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                                 1            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                                 23            0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o                      1            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                                 1            1</span></span>
+<span><span class="co">## <span style="color: #949494;"># … with abbreviated variable name ¹​AbE_schottenfeldA_2008</span></span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="schottenfeld-et-al--2008-b">Schottenfeld et al., 2008 (B)<a class="anchor" aria-label="anchor" href="#schottenfeld-et-al--2008-b"></a>
 </h4>
-<p><strong>Definition</strong>: Longest period of negative UOS, missing is positive</p>
+<p><strong>Definition</strong>: Longest period of negative UOS, missing
+is positive</p>
 <div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesAbs_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span></span>
@@ -920,19 +987,19 @@ Positive
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span></span>
 <span>    <span class="fu">mutate</span><span class="op">(</span></span>
-<span>        schottenfeld2008B_abs <span class="op">=</span> <span class="fu"><a href="../reference/measure_abstinence_period.html">measure_abstinence_period</a></span><span class="op">(</span></span>
+<span>        Ab_schottenfeldB_2008 <span class="op">=</span> <span class="fu"><a href="../reference/measure_abstinence_period.html">measure_abstinence_period</a></span><span class="op">(</span></span>
 <span>            use_pattern_binary <span class="op">=</span> <span class="va">udsPattern</span></span>
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">schottenfeld2008B_abs</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">Ab_schottenfeldB_2008</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesAbs_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span>  </span>
 <span></span>
 <span><span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">schottenfeld2008B_abs</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">Ab_schottenfeldB_2008</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 3</span></span></span>
-<span><span class="co">##      who usePatternUDS                       schottenfeld2008B_abs</span></span>
+<span><span class="co">##      who usePatternUDS                       Ab_schottenfeldB_2008</span></span>
 <span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                               <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                         0</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                               19</span></span>
@@ -950,7 +1017,9 @@ Positive
 <h3 id="shufman_efficacy_1994">
 <span class="citation">Shufman et al. (1994)</span><a class="anchor" aria-label="anchor" href="#shufman_efficacy_1994"></a>
 </h3>
-<p><strong>Definition</strong>: Weeks between 1st day of NTX administration and 1st positive UOS, missing is ignored (but treated as negative in order to count the weeks properly)</p>
+<p><strong>Definition</strong>: Weeks between 1st day of NTX
+administration and 1st positive UOS, missing is ignored (but treated as
+negative in order to count the weeks properly)</p>
 <div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesAbs_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span></span>
@@ -978,33 +1047,45 @@ Positive
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">unnest</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"shufman1994_absN"</span>, names_sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"shufman1994_absN"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">rename</span><span class="op">(</span></span>
+<span>    AbT_shufman_1994 <span class="op">=</span> <span class="va">shufman1994_absN_time</span>,</span>
+<span>    AbE_shufman_1994 <span class="op">=</span> <span class="va">shufman1994_absN_event</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesAbs_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span>  </span>
 <span></span>
 <span><span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"shufman1994_absN"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">"shufman_1994"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 4</span></span></span>
-<span><span class="co">##      who usePatternUDS                       shufman1994_absN_time shufman1994…¹</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                               <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                        15             0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                               24             0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                               24             0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                                 3             1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                               14             1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                                2             1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                                1             1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                                23             0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o                     1             1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                                1             1</span></span>
-<span><span class="co">## <span style="color: #949494;"># … with abbreviated variable name ¹​shufman1994_absN_event</span></span></span></code></pre>
+<span><span class="co">##      who usePatternUDS                       AbT_shufman_1994 AbE_shufman_1994</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>            <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                   15                0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                          24                0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                          24                0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                            3                1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                          14                1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                           2                1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                           1                1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                           23                0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o                1                1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                           1                1</span></span></code></pre>
 </div>
 <div class="section level3">
-<h3 id="ctn-0030weiss_adjunctive_2011-ctn-0030">
-<span class="citation">Weiss et al. (2011, CTN–0030)</span><a class="anchor" aria-label="anchor" href="#ctn-0030weiss_adjunctive_2011-ctn-0030"></a>
+<h3 id="weiss_adjunctive_2011-ctn-0030">
+<span class="citation">Weiss et al. (2011, CTN–0030)</span><a class="anchor" aria-label="anchor" href="#weiss_adjunctive_2011-ctn-0030"></a>
 </h3>
-<p><strong>Definition</strong>: Negative UOS during the last week AND for at least 2 of the previous 3 weeks of the third month of BUP/NX treatment, missing is positive.</p>
-<p>Note: this definition is looking for one of the following four abstinence patterns in last 4 weeks: <code>"----"</code>, <code>"+---"</code>, <code>"-+--"</code>, or <code>"--+-"</code>. This definition is just an insanely strict measure of study retention. The first part of the definition (“negative in the last week”) already fails anyone who didn’t stay in the study for the entire protocol period (because their last week UDS will automatically be <code>"o"</code>).</p>
+<p><strong>Definition</strong>: Negative UOS during the last week AND
+for at least 2 of the previous 3 weeks of the third month of BUP/NX
+treatment, missing is positive.</p>
+<p>Note: this definition is looking for one of the following four
+abstinence patterns in last 4 weeks: <code>"----"</code>,
+<code>"+---"</code>, <code>"-+--"</code>, or <code>"--+-"</code>. This
+definition is just an insanely strict measure of study retention. The
+first part of the definition (“negative in the last week”) already fails
+anyone who didn’t stay in the study for the entire protocol period
+(because their last week UDS will automatically be
+<code>"o"</code>).</p>
 <div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesAbs_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span></span>
@@ -1037,26 +1118,26 @@ Positive
 <span>            end <span class="op">=</span> <span class="op">-</span><span class="fl">2L</span></span>
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>    <span class="fu">mutate</span><span class="op">(</span>weissLingCTN0030_isAbs <span class="op">=</span> <span class="va">cleanLastWeek</span> <span class="op">&amp;</span> <span class="op">(</span><span class="va">finalUseCount</span> <span class="op">&lt;=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">weissLingCTN0030_isAbs</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">mutate</span><span class="op">(</span>Ab_ctnThirty_2011 <span class="op">=</span> <span class="va">cleanLastWeek</span> <span class="op">&amp;</span> <span class="op">(</span><span class="va">finalUseCount</span> <span class="op">&lt;=</span> <span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">Ab_ctnThirty_2011</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesAbs_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span>  </span>
 <span></span>
 <span><span class="va">outcomesAbs_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">weissLingCTN0030_isAbs</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">Ab_ctnThirty_2011</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 3</span></span></span>
-<span><span class="co">##      who usePatternUDS                       weissLingCTN0030_isAbs</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>                 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                     FALSE                 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o            FALSE                 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo            FALSE                 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-             FALSE                 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------            TRUE                  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------            TRUE                  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o            FALSE                 </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------             TRUE                  </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o FALSE                 </span></span>
+<span><span class="co">##      who usePatternUDS                       Ab_ctnThirty_2011</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>            </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                     FALSE            </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o            FALSE            </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo            FALSE            </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-             FALSE            </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------            TRUE             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------            TRUE             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o            FALSE            </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------             TRUE             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o FALSE            </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-            TRUE</span></span></code></pre>
 <hr>
 <p></p>
@@ -1065,16 +1146,17 @@ Positive
 <div class="section level2">
 <h2 id="computing-environment">Computing Environment<a class="anchor" aria-label="anchor" href="#computing-environment"></a>
 </h2>
-<p>Here is the information concerning the system configuration, packages, and their versions used in this computation:</p>
+<p>Here is the information concerning the system configuration,
+packages, and their versions used in this computation:</p>
 <div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## R version 4.2.1 (2022-06-23)</span></span>
+<pre><code><span><span class="co">## R version 4.2.2 (2022-10-31)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
-<span><span class="co">## Running under: Ubuntu 20.04.5 LTS</span></span>
+<span><span class="co">## Running under: Ubuntu 22.04.1 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
-<span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0</span></span>
-<span><span class="co">## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0</span></span>
+<span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3</span></span>
+<span><span class="co">## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## locale:</span></span>
 <span><span class="co">##  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
@@ -1087,69 +1169,122 @@ Positive
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
 <span><span class="co">##  [1] forcats_0.5.2    stringr_1.4.1    dplyr_1.0.10     purrr_0.3.5     </span></span>
-<span><span class="co">##  [5] readr_2.1.3      tidyr_1.2.1      tibble_3.1.8     ggplot2_3.3.6   </span></span>
+<span><span class="co">##  [5] readr_2.1.3      tidyr_1.2.1      tibble_3.1.8     ggplot2_3.4.0   </span></span>
 <span><span class="co">##  [9] tidyverse_1.3.2  kableExtra_1.3.4 readxl_1.4.1     CTNote_0.1.0    </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##  [1] httr_1.4.4          sass_0.4.2          splines_4.2.1      </span></span>
-<span><span class="co">##  [4] jsonlite_1.8.2      viridisLite_0.4.1   modelr_0.1.9       </span></span>
-<span><span class="co">##  [7] bslib_0.4.0         assertthat_0.2.1    highr_0.9          </span></span>
-<span><span class="co">## [10] googlesheets4_1.0.1 cellranger_1.1.0    yaml_2.3.5         </span></span>
+<span><span class="co">##  [1] httr_1.4.4          sass_0.4.3          splines_4.2.2      </span></span>
+<span><span class="co">##  [4] jsonlite_1.8.3      viridisLite_0.4.1   modelr_0.1.10      </span></span>
+<span><span class="co">##  [7] bslib_0.4.1         assertthat_0.2.1    highr_0.9          </span></span>
+<span><span class="co">## [10] googlesheets4_1.0.1 cellranger_1.1.0    yaml_2.3.6         </span></span>
 <span><span class="co">## [13] lattice_0.20-45     pillar_1.8.1        backports_1.4.1    </span></span>
-<span><span class="co">## [16] glue_1.6.2          digest_0.6.29       rvest_1.0.3        </span></span>
-<span><span class="co">## [19] colorspace_2.0-3    Matrix_1.4-1        htmltools_0.5.3    </span></span>
+<span><span class="co">## [16] glue_1.6.2          digest_0.6.30       rvest_1.0.3        </span></span>
+<span><span class="co">## [19] colorspace_2.0-3    Matrix_1.5-1        htmltools_0.5.3    </span></span>
 <span><span class="co">## [22] pkgconfig_2.0.3     broom_1.0.1         haven_2.5.1        </span></span>
 <span><span class="co">## [25] scales_1.2.1        webshot_0.5.4       svglite_2.1.0      </span></span>
-<span><span class="co">## [28] tzdb_0.3.0          googledrive_2.0.0   generics_0.1.3     </span></span>
-<span><span class="co">## [31] ellipsis_0.3.2      cachem_1.0.6        withr_2.5.0        </span></span>
-<span><span class="co">## [34] cli_3.4.1           survival_3.3-1      magrittr_2.0.3     </span></span>
-<span><span class="co">## [37] crayon_1.5.2        memoise_2.0.1       evaluate_0.17      </span></span>
-<span><span class="co">## [40] fs_1.5.2            fansi_1.0.3         xml2_1.3.3         </span></span>
-<span><span class="co">## [43] textshaping_0.3.6   tools_4.2.1         hms_1.1.2          </span></span>
-<span><span class="co">## [46] gargle_1.2.1        lifecycle_1.0.3     munsell_0.5.0      </span></span>
-<span><span class="co">## [49] reprex_2.0.2        compiler_4.2.1      pkgdown_2.0.6      </span></span>
-<span><span class="co">## [52] jquerylib_0.1.4     systemfonts_1.0.4   rlang_1.0.6        </span></span>
-<span><span class="co">## [55] grid_4.2.1          rstudioapi_0.14     rmarkdown_2.17     </span></span>
-<span><span class="co">## [58] gtable_0.3.1        DBI_1.1.3           curl_4.3.3         </span></span>
-<span><span class="co">## [61] R6_2.5.1            lubridate_1.8.0     knitr_1.40         </span></span>
-<span><span class="co">## [64] fastmap_1.1.0       utf8_1.2.2          rprojroot_2.0.3    </span></span>
-<span><span class="co">## [67] ragg_1.2.3          desc_1.4.2          stringi_1.7.8      </span></span>
-<span><span class="co">## [70] vctrs_0.4.2         dbplyr_2.2.1        tidyselect_1.2.0   </span></span>
-<span><span class="co">## [73] xfun_0.33</span></span></code></pre>
+<span><span class="co">## [28] tzdb_0.3.0          timechange_0.1.1    googledrive_2.0.0  </span></span>
+<span><span class="co">## [31] generics_0.1.3      ellipsis_0.3.2      cachem_1.0.6       </span></span>
+<span><span class="co">## [34] withr_2.5.0         cli_3.4.1           survival_3.4-0     </span></span>
+<span><span class="co">## [37] magrittr_2.0.3      crayon_1.5.2        memoise_2.0.1      </span></span>
+<span><span class="co">## [40] evaluate_0.18       fs_1.5.2            fansi_1.0.3        </span></span>
+<span><span class="co">## [43] xml2_1.3.3          textshaping_0.3.6   tools_4.2.2        </span></span>
+<span><span class="co">## [46] hms_1.1.2           gargle_1.2.1        lifecycle_1.0.3    </span></span>
+<span><span class="co">## [49] munsell_0.5.0       reprex_2.0.2        compiler_4.2.2     </span></span>
+<span><span class="co">## [52] pkgdown_2.0.6       jquerylib_0.1.4     systemfonts_1.0.4  </span></span>
+<span><span class="co">## [55] rlang_1.0.6         grid_4.2.2          rstudioapi_0.14    </span></span>
+<span><span class="co">## [58] rmarkdown_2.18      gtable_0.3.1        DBI_1.1.3          </span></span>
+<span><span class="co">## [61] curl_4.3.3          R6_2.5.1            lubridate_1.9.0    </span></span>
+<span><span class="co">## [64] knitr_1.41          fastmap_1.1.0       utf8_1.2.2         </span></span>
+<span><span class="co">## [67] rprojroot_2.0.3     ragg_1.2.4          desc_1.4.2         </span></span>
+<span><span class="co">## [70] stringi_1.7.8       vctrs_0.5.1         dbplyr_2.2.1       </span></span>
+<span><span class="co">## [73] tidyselect_1.2.0    xfun_0.35</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-fiellin_counseling_2006" class="csl-entry">
-Fiellin, David A., Michael V. Pantalon, Marek C. Chawarski, Brent A. Moore, Lynn E. Sullivan, Patrick G. O’Connor, and Richard S. Schottenfeld. 2006. <span>“Counseling Plus <span>Buprenorphine</span>–<span>Naloxone</span> <span>Maintenance</span> <span>Therapy</span> for <span>Opioid</span> <span>Dependence</span>.”</span> <em>New England Journal of Medicine</em> 355 (4): 365–74. <a href="https://doi.org/10.1056/NEJMoa055255" class="external-link">https://doi.org/10.1056/NEJMoa055255</a>.
+Fiellin, David A., Michael V. Pantalon, Marek C. Chawarski, Brent A.
+Moore, Lynn E. Sullivan, Patrick G. O’Connor, and Richard S.
+Schottenfeld. 2006. <span>“Counseling Plus
+<span>Buprenorphine</span>–<span>Naloxone</span>
+<span>Maintenance</span> <span>Therapy</span> for <span>Opioid</span>
+<span>Dependence</span>.”</span> <em>New England Journal of
+Medicine</em> 355 (4): 365–74. <a href="https://doi.org/10.1056/NEJMoa055255" class="external-link">https://doi.org/10.1056/NEJMoa055255</a>.
 </div>
 <div id="ref-kosten_buprenorphine_1993" class="csl-entry">
-Kosten, Thomas R., Richard Schottenfeld, Douglas Ziedonis, and Jean Falcioni. 1993. <span>“Buprenorphine Versus <span>Methadone</span> <span>Maintenance</span> for <span>Opioid</span> <span>Dependence</span>.”</span> <em>The Journal of Nervous and Mental Disease</em> 181 (6): 358–64. <a href="https://doi.org/10.1097/00005053-199306000-00004" class="external-link">https://doi.org/10.1097/00005053-199306000-00004</a>.
+Kosten, Thomas R., Richard Schottenfeld, Douglas Ziedonis, and Jean
+Falcioni. 1993. <span>“Buprenorphine Versus <span>Methadone</span>
+<span>Maintenance</span> for <span>Opioid</span>
+<span>Dependence</span>.”</span> <em>The Journal of Nervous and Mental
+Disease</em> 181 (6): 358–64. <a href="https://doi.org/10.1097/00005053-199306000-00004" class="external-link">https://doi.org/10.1097/00005053-199306000-00004</a>.
 </div>
 <div id="ref-krupitsky_injectable_2011" class="csl-entry">
-Krupitsky, Evgeny, Edward V Nunes, Walter Ling, Ari Illeperuma, David R Gastfriend, and Bernard L Silverman. 2011. <span>“Injectable Extended-Release Naltrexone for Opioid Dependence: A Double-Blind, Placebo-Controlled, Multicentre Randomised Trial.”</span> <em>The Lancet</em> 377 (9776): 1506–13. <a href="https://doi.org/10.1016/S0140-6736(11)60358-9" class="external-link">https://doi.org/10.1016/S0140-6736(11)60358-9</a>.
+Krupitsky, Evgeny, Edward V Nunes, Walter Ling, Ari Illeperuma, David R
+Gastfriend, and Bernard L Silverman. 2011. <span>“Injectable
+Extended-Release Naltrexone for Opioid Dependence: A Double-Blind,
+Placebo-Controlled, Multicentre Randomised Trial.”</span> <em>The
+Lancet</em> 377 (9776): 1506–13. <a href="https://doi.org/10.1016/S0140-6736(11)60358-9" class="external-link">https://doi.org/10.1016/S0140-6736(11)60358-9</a>.
 </div>
 <div id="ref-ling_buprenorphine_1998" class="csl-entry">
-Ling, Walter, Charles Charuvastra, Joseph F. Collins, Steve Batki, Lawrence S. Brown Jr, Prudencia Kintaudi, Donald R. Wesson, et al. 1998. <span>“Buprenorphine Maintenance Treatment of Opiate Dependence: A Multicenter, Randomized Clinical Trial.”</span> <em>Addiction</em> 93 (4): 475–86. <a href="https://doi.org/10.1046/j.1360-0443.1998.9344753.x" class="external-link">https://doi.org/10.1046/j.1360-0443.1998.9344753.x</a>.
+Ling, Walter, Charles Charuvastra, Joseph F. Collins, Steve Batki,
+Lawrence S. Brown Jr, Prudencia Kintaudi, Donald R. Wesson, et al. 1998.
+<span>“Buprenorphine Maintenance Treatment of Opiate Dependence: A
+Multicenter, Randomized Clinical Trial.”</span> <em>Addiction</em> 93
+(4): 475–86. <a href="https://doi.org/10.1046/j.1360-0443.1998.9344753.x" class="external-link">https://doi.org/10.1046/j.1360-0443.1998.9344753.x</a>.
 </div>
 <div id="ref-lofwall_weekly_2018" class="csl-entry">
-Lofwall, Michelle R., Sharon L. Walsh, Edward V. Nunes, Genie L. Bailey, Stacey C. Sigmon, Kyle M. Kampman, Michael Frost, et al. 2018. <span>“Weekly and <span>Monthly</span> <span>Subcutaneous</span> <span>Buprenorphine</span> <span>Depot</span> <span>Formulations</span> Vs <span>Daily</span> <span>Sublingual</span> <span>Buprenorphine</span> <span>With</span> <span>Naloxone</span> for <span>Treatment</span> of <span>Opioid</span> <span>Use</span> <span>Disorder</span>: <span>A</span> <span>Randomized</span> <span>Clinical</span> <span>Trial</span>.”</span> <em>Journal of the American Medical Association: Internal Medicine</em> 178 (6): 764–73. <a href="https://doi.org/10.1001/jamainternmed.2018.1052" class="external-link">https://doi.org/10.1001/jamainternmed.2018.1052</a>.
+Lofwall, Michelle R., Sharon L. Walsh, Edward V. Nunes, Genie L. Bailey,
+Stacey C. Sigmon, Kyle M. Kampman, Michael Frost, et al. 2018.
+<span>“Weekly and <span>Monthly</span> <span>Subcutaneous</span>
+<span>Buprenorphine</span> <span>Depot</span> <span>Formulations</span>
+Vs <span>Daily</span> <span>Sublingual</span> <span>Buprenorphine</span>
+<span>With</span> <span>Naloxone</span> for <span>Treatment</span> of
+<span>Opioid</span> <span>Use</span> <span>Disorder</span>:
+<span>A</span> <span>Randomized</span> <span>Clinical</span>
+<span>Trial</span>.”</span> <em>Journal of the American Medical
+Association: Internal Medicine</em> 178 (6): 764–73. <a href="https://doi.org/10.1001/jamainternmed.2018.1052" class="external-link">https://doi.org/10.1001/jamainternmed.2018.1052</a>.
 </div>
 <div id="ref-mokri_medical_2016" class="csl-entry">
-Mokri, Azarakhsh, Marek C. Chawarski, Hamidreza Taherinakhost, and Richard S. Schottenfeld. 2016. <span>“Medical Treatments for Opioid Use Disorder in <span>Iran</span>: A Randomized, Double-Blind Placebo-Controlled Comparison of Buprenorphine/Naloxone and Naltrexone Maintenance Treatment.”</span> <em>Addiction</em> 111 (5): 874–82. <a href="https://doi.org/10.1111/add.13259" class="external-link">https://doi.org/10.1111/add.13259</a>.
+Mokri, Azarakhsh, Marek C. Chawarski, Hamidreza Taherinakhost, and
+Richard S. Schottenfeld. 2016. <span>“Medical Treatments for Opioid Use
+Disorder in <span>Iran</span>: A Randomized, Double-Blind
+Placebo-Controlled Comparison of Buprenorphine/Naloxone and Naltrexone
+Maintenance Treatment.”</span> <em>Addiction</em> 111 (5): 874–82. <a href="https://doi.org/10.1111/add.13259" class="external-link">https://doi.org/10.1111/add.13259</a>.
 </div>
 <div id="ref-schottenfeld_methadone_2005" class="csl-entry">
-Schottenfeld, Richard S., Marek C. Chawarski, Juliana R. Pakes, Michael V. Pantalon, Kathleen M. Carroll, and Thomas R. Kosten. 2005. <span>“Methadone <span>Versus</span> <span>Buprenorphine</span> <span>With</span> <span>Contingency</span> <span>Management</span> or <span>Performance</span> <span>Feedback</span> for <span>Cocaine</span> and <span>Opioid</span> <span>Dependence</span>.”</span> <em>American Journal of Psychiatry</em> 162 (2): 340–49. <a href="https://doi.org/10.1176/appi.ajp.162.2.340" class="external-link">https://doi.org/10.1176/appi.ajp.162.2.340</a>.
+Schottenfeld, Richard S., Marek C. Chawarski, Juliana R. Pakes, Michael
+V. Pantalon, Kathleen M. Carroll, and Thomas R. Kosten. 2005.
+<span>“Methadone <span>Versus</span> <span>Buprenorphine</span>
+<span>With</span> <span>Contingency</span> <span>Management</span> or
+<span>Performance</span> <span>Feedback</span> for <span>Cocaine</span>
+and <span>Opioid</span> <span>Dependence</span>.”</span> <em>American
+Journal of Psychiatry</em> 162 (2): 340–49. <a href="https://doi.org/10.1176/appi.ajp.162.2.340" class="external-link">https://doi.org/10.1176/appi.ajp.162.2.340</a>.
 </div>
 <div id="ref-schottenfeld_maintenance_2008" class="csl-entry">
-Schottenfeld, Richard S, Marek C Chawarski, and Mahmud Mazlan. 2008. <span>“Maintenance Treatment with Buprenorphine and Naltrexone for Heroin Dependence in <span>Malaysia</span>: A Randomised, Double-Blind, Placebo-Controlled Trial.”</span> <em>The Lancet</em> 371 (9631): 2192–2200. <a href="https://doi.org/10.1016/S0140-6736(08)60954-X" class="external-link">https://doi.org/10.1016/S0140-6736(08)60954-X</a>.
+Schottenfeld, Richard S, Marek C Chawarski, and Mahmud Mazlan. 2008.
+<span>“Maintenance Treatment with Buprenorphine and Naltrexone for
+Heroin Dependence in <span>Malaysia</span>: A Randomised, Double-Blind,
+Placebo-Controlled Trial.”</span> <em>The Lancet</em> 371 (9631):
+2192–2200. <a href="https://doi.org/10.1016/S0140-6736(08)60954-X" class="external-link">https://doi.org/10.1016/S0140-6736(08)60954-X</a>.
 </div>
 <div id="ref-shufman_efficacy_1994" class="csl-entry">
-Shufman, Emi N., Shai Porat, Eliezer Witztum, Dan Gandacu, Rachel Bar-Hamburger, and Yigal Ginath. 1994. <span>“The Efficacy of Naltrexone in Preventing Reabuse of Heroin After Detoxification.”</span> <em>Biological Psychiatry</em> 35 (12): 935–45. <a href="https://doi.org/10.1016/0006-3223(94)91240-8" class="external-link">https://doi.org/10.1016/0006-3223(94)91240-8</a>.
+Shufman, Emi N., Shai Porat, Eliezer Witztum, Dan Gandacu, Rachel
+Bar-Hamburger, and Yigal Ginath. 1994. <span>“The Efficacy of Naltrexone
+in Preventing Reabuse of Heroin After Detoxification.”</span>
+<em>Biological Psychiatry</em> 35 (12): 935–45. <a href="https://doi.org/10.1016/0006-3223(94)91240-8" class="external-link">https://doi.org/10.1016/0006-3223(94)91240-8</a>.
 </div>
 <div id="ref-weiss_adjunctive_2011" class="csl-entry">
-Weiss, Roger D., Jennifer Sharpe Potter, David A. Fiellin, Marilyn Byrne, Hilary S. Connery, William Dickinson, John Gardin, et al. 2011. <span>“Adjunctive <span>Counseling</span> <span>During</span> <span>Brief</span> and <span>Extended</span> <span>Buprenorphine</span>-<span>Naloxone</span> <span>Treatment</span> for <span>Prescription</span> <span>Opioid</span> <span>Dependence</span>: <span>A</span> 2-<span>Phase</span> <span>Randomized</span> <span>Controlled</span> <span>Trial</span>.”</span> <em>Archives of General Psychiatry</em> 68 (12): 1238–46. <a href="https://doi.org/10.1001/archgenpsychiatry.2011.121" class="external-link">https://doi.org/10.1001/archgenpsychiatry.2011.121</a>.
+Weiss, Roger D., Jennifer Sharpe Potter, David A. Fiellin, Marilyn
+Byrne, Hilary S. Connery, William Dickinson, John Gardin, et al. 2011.
+<span>“Adjunctive <span>Counseling</span> <span>During</span>
+<span>Brief</span> and <span>Extended</span>
+<span>Buprenorphine</span>-<span>Naloxone</span> <span>Treatment</span>
+for <span>Prescription</span> <span>Opioid</span>
+<span>Dependence</span>: <span>A</span> 2-<span>Phase</span>
+<span>Randomized</span> <span>Controlled</span>
+<span>Trial</span>.”</span> <em>Archives of General Psychiatry</em> 68
+(12): 1238–46. <a href="https://doi.org/10.1001/archgenpsychiatry.2011.121" class="external-link">https://doi.org/10.1001/archgenpsychiatry.2011.121</a>.
 </div>
 </div>
 </div>

@@ -71,9 +71,10 @@
 <div class="row">
   <main id="main" class="col-md-9"><div class="page-header">
       <img src="" class="logo" alt=""><h1>CTNote Library: Relapse Outcomes</h1>
-                        <h4 data-toc-skip class="author">Gabriel Odom, Laura Brandt, Sean Luo, and Ray Balise</h4>
+                        <h4 data-toc-skip class="author">Gabriel Odom,
+Laura Brandt, Sean Luo, and Ray Balise</h4>
             
-            <h4 data-toc-skip class="date">2022-10-12</h4>
+            <h4 data-toc-skip class="date">2022-11-23</h4>
       
       <small class="dont-index">Source: <a href="https://github.com/CTN-0094/CTNote/blob/HEAD/vignettes/library_relapse_20220711.Rmd" class="external-link"><code>vignettes/library_relapse_20220711.Rmd</code></a></small>
       <div class="d-none name"><code>library_relapse_20220711.Rmd</code></div>
@@ -84,7 +85,10 @@
 <div class="section level2">
 <h2 id="introduction">Introduction<a class="anchor" aria-label="anchor" href="#introduction"></a>
 </h2>
-<p>This document contains the algorithms necessary to code all the outcomes which measure “abstinence from substance use” or “relapse to substance use”. We only include outcomes which result in a single value per subject. These outcomes are:</p>
+<p>This document contains the algorithms necessary to code all the
+outcomes which measure “abstinence from substance use” or “relapse to
+substance use”. We only include outcomes which result in a single value
+per subject. These outcomes are:</p>
 <div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:1000px; ">
 <table class="table table table-striped lightable-minimal" style='font-size: 11px; margin-left: auto; margin-right: auto; font-family: "Trebuchet MS", verdana, sans-serif; margin-left: auto; margin-right: auto;'>
 <thead><tr>
@@ -222,7 +226,8 @@ survival
 Lee et al., 2016
 </td>
 <td style="text-align:left;width: 5cm; ">
-Weeks to relapse (≥10 days of opioid use in a 28‐day period [a positive UOS was computed as 5 days of opioid use])
+Weeks to relapse (≥10 days of opioid use in a 28‐day period [a positive
+UOS was computed as 5 days of opioid use])
 </td>
 <td style="text-align:left;">
 Positive
@@ -242,7 +247,8 @@ survival
 Lee et al., 2018 CTN-0051
 </td>
 <td style="text-align:left;width: 5cm; ">
-Weeks to relapse (starting at day 21 post-randomization: 4 consecutive weeks with positive UOS)
+Weeks to relapse (starting at day 21 post-randomization: 4 consecutive
+weeks with positive UOS)
 </td>
 <td style="text-align:left;">
 Positive
@@ -271,19 +277,31 @@ Positive
 </tbody>
 </table>
 </div>
-<p>We will use the table of participant opioid use patterns from the <code>ctn0094DataExtra</code> package to calculate these endpoints (we have a copy of the endpoints in the dataset <code>outcomesCTN0094</code>). Importantly, if you wish to apply these algorithms to calculate endpoints for your data, the participants’ substance use patterns must be stored in the “substance use pattern word” format shown here. We also show a subset of the data to visualize a variety of different real substance use patterns.</p>
+<p>We will use the table of participant opioid use patterns from the
+<code>ctn0094DataExtra</code> package to calculate these endpoints (we
+have a copy of the endpoints in the dataset
+<code>outcomesCTN0094</code>). Importantly, if you wish to apply these
+algorithms to calculate endpoints for your data, the participants’
+substance use patterns must be stored in the “substance use pattern
+word” format shown here. We also show a subset of the data to visualize
+a variety of different real substance use patterns.</p>
 <p>We first define the following five-value legend:</p>
 <ul>
 <li>
-<strong>+</strong>: positive for the substance(s) in a specified window of time (a day, week, month, etc.) by urine screen (or participant self report, if such data are of interest)</li>
+<strong>+</strong>: positive for the substance(s) in a specified
+window of time (a day, week, month, etc.) by urine screen (or
+participant self report, if such data are of interest)</li>
 <li>
 <strong>–</strong>: negative for the substance(s)</li>
 <li>
 <strong>o</strong>: subject failed to provide a urine sample</li>
 <li>
-<b>*</b>: inconclusive results or mixed results (e.g. subject provided more than one urine sample in the time interval and they did not agree)</li>
+<b>*</b>: inconclusive results or mixed results (e.g. subject
+provided more than one urine sample in the time interval and they did
+not agree)</li>
 <li>
-<b>_</b>: no specimens required (weekends, holidays, pre-randomization period, alternating visit days/weeks)</li>
+<b>_</b>: no specimens required (weekends, holidays,
+pre-randomization period, alternating visit days/weeks)</li>
 </ul>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co">###  Full Data  ###</span></span>
@@ -312,7 +330,14 @@ Positive
 <span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------            </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o</span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-</span></span></code></pre>
-<p>For example, participant 1 has a use pattern <code>ooooooooooooooo</code> (all missing UDS), which means that they dropped out of the study. In contrast, participant 233 has a use pattern <code>*+++++++++++o++++++++++o</code> (nearly all positive UDS): they did not drop out of the study, but the treatment was completely ineffective for them. Participant 2089 started the study in a rough patch, but greatly improved in treatment over time (<code>++++---+--------------o-</code>).</p>
+<p>For example, participant 1 has a use pattern
+<code>ooooooooooooooo</code> (all missing UDS), which means that they
+dropped out of the study. In contrast, participant 233 has a use pattern
+<code>*+++++++++++o++++++++++o</code> (nearly all positive UDS): they
+did not drop out of the study, but the treatment was completely
+ineffective for them. Participant 2089 started the study in a rough
+patch, but greatly improved in treatment over time
+(<code>++++---+--------------o-</code>).</p>
 <hr>
 <p></p>
 </div>
@@ -322,11 +347,15 @@ Positive
 <div class="section level3">
 <h3 id="ctn-0094-endpoints">CTN-0094 Endpoints<a class="anchor" aria-label="anchor" href="#ctn-0094-endpoints"></a>
 </h3>
-<p>Our <a href="http://ctndisseminationlibrary.org/protocols/ctn0094.htm" class="external-link">CTN-0094 research group</a> has two relapse outcomes: Weeks to relapse (4 consecutive weeks of positive UOS) and Weeks to study dropout (4 consecutive weeks of missing UOS).</p>
+<p>Our <a href="http://ctndisseminationlibrary.org/protocols/ctn0094.htm" class="external-link">CTN-0094
+research group</a> has two relapse outcomes: Weeks to relapse (4
+consecutive weeks of positive UOS) and Weeks to study dropout (4
+consecutive weeks of missing UOS).</p>
 <div class="section level4">
 <h4 id="ctn-0094-relapse">CTN-0094 Relapse<a class="anchor" aria-label="anchor" href="#ctn-0094-relapse"></a>
 </h4>
-<p><strong>Definition</strong>: Weeks to relapse (4 consecutive weeks of positive UOS); missing is positive</p>
+<p><strong>Definition</strong>: Weeks to relapse (4 consecutive weeks of
+positive UOS); missing is positive</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesRel_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesRel_df</span> <span class="op">%&gt;%</span></span>
@@ -351,30 +380,35 @@ Positive
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">unnest</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"ctn0094_relapse"</span>, names_sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"ctn0094_relapse"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">rename</span><span class="op">(</span></span>
+<span>    RsT_ctnNinetyFour_2023 <span class="op">=</span> <span class="va">ctn0094_relapse_time</span>,</span>
+<span>    RsE_ctnNinetyFour_2023 <span class="op">=</span> <span class="va">ctn0094_relapse_event</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesRel_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">outcomesRel_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"ctn0094_relapse"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">RsT_ctnNinetyFour_2023</span>, <span class="va">RsE_ctnNinetyFour_2023</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 4</span></span></span>
-<span><span class="co">##      who usePatternUDS                       ctn0094_relapse_time ctn0094_rela…¹</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                              <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                        1              1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                              21              0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                              15              1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                                3              1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                              21              0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                               2              1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                               1              1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                               20              0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o                   31              1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                               1              1</span></span>
-<span><span class="co">## <span style="color: #949494;"># … with abbreviated variable name ¹​ctn0094_relapse_event</span></span></span></code></pre>
+<span><span class="co">##      who usePatternUDS                       RsT_ctnNinetyFour_2023 RsE_ctnNin…¹</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                          1            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                                21            0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                                15            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                                  3            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                                21            0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                                 2            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                                 1            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                                 20            0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o                     31            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                                 1            1</span></span>
+<span><span class="co">## <span style="color: #949494;"># … with abbreviated variable name ¹​RsE_ctnNinetyFour_2023</span></span></span></code></pre>
 </div>
 <div class="section level4">
 <h4 id="ctn-0094-dropout">CTN-0094 Dropout<a class="anchor" aria-label="anchor" href="#ctn-0094-dropout"></a>
 </h4>
-<p><strong>Definition</strong>: Weeks to study dropout (4 consecutive weeks of missing UOS)</p>
+<p><strong>Definition</strong>: Weeks to study dropout (4 consecutive
+weeks of missing UOS)</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesRel_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesRel_df</span> <span class="op">%&gt;%</span></span>
@@ -390,32 +424,37 @@ Positive
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">unnest</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"ctn0094_dropout"</span>, names_sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"ctn0094_dropout"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">rename</span><span class="op">(</span></span>
+<span>    DrT_ctnNinetyFour_2023 <span class="op">=</span> <span class="va">ctn0094_dropout_time</span>,</span>
+<span>    DrE_ctnNinetyFour_2023 <span class="op">=</span> <span class="va">ctn0094_dropout_event</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesRel_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">outcomesRel_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"ctn0094_dropout"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">DrT_ctnNinetyFour_2023</span>, <span class="va">DrE_ctnNinetyFour_2023</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 4</span></span></span>
-<span><span class="co">##      who usePatternUDS                       ctn0094_dropout_time ctn0094_drop…¹</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                              <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                        1              1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                              21              0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                              15              1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                               20              0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                              21              0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                              21              0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                              21              0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                               20              0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o                   32              0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                              21              0</span></span>
-<span><span class="co">## <span style="color: #949494;"># … with abbreviated variable name ¹​ctn0094_dropout_event</span></span></span></code></pre>
+<span><span class="co">##      who usePatternUDS                       DrT_ctnNinetyFour_2023 DrE_ctnNin…¹</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                          1            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                                21            0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                                15            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                                 20            0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                                21            0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                                21            0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                                21            0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                                 20            0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o                     32            0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                                21            0</span></span>
+<span><span class="co">## <span style="color: #949494;"># … with abbreviated variable name ¹​DrE_ctnNinetyFour_2023</span></span></span></code></pre>
 </div>
 </div>
 <div class="section level3">
 <h3 id="johnson_controlled_1992">
 <span class="citation">Johnson, Jaffe, and Fudala (1992)</span><a class="anchor" aria-label="anchor" href="#johnson_controlled_1992"></a>
 </h3>
-<p><strong>Definition</strong>: Failure rate: 2 consecutive positive UOS following 4 weeks of treatment; missing is positive</p>
+<p><strong>Definition</strong>: Failure rate: 2 consecutive positive UOS
+following 4 weeks of treatment; missing is positive</p>
 <div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesRel_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesRel_df</span> <span class="op">%&gt;%</span></span>
@@ -432,38 +471,42 @@ Positive
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">mutate</span><span class="op">(</span></span>
-<span>        johnson1992_hasRel <span class="op">=</span> <span class="fu"><a href="../reference/detect_subpattern.html">detect_subpattern</a></span><span class="op">(</span></span>
+<span>        Rs_johnson_1992 <span class="op">=</span> <span class="fu"><a href="../reference/detect_subpattern.html">detect_subpattern</a></span><span class="op">(</span></span>
 <span>            use_pattern <span class="op">=</span> <span class="va">udsPattern</span>,</span>
 <span>            subpattern <span class="op">=</span> <span class="st">"++"</span>,</span>
 <span>            <span class="co"># Starting at 4 weeks of treatment</span></span>
 <span>            start <span class="op">=</span> <span class="fl">4L</span></span>
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">johnson1992_hasRel</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">Rs_johnson_1992</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesRel_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">outcomesRel_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">johnson1992_hasRel</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">Rs_johnson_1992</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 3</span></span></span>
-<span><span class="co">##      who usePatternUDS                       johnson1992_hasRel</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>             </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                     TRUE              </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o            FALSE             </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo            TRUE              </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-             TRUE              </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------            TRUE              </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------            TRUE              </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o            TRUE              </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------             FALSE             </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o TRUE              </span></span>
+<span><span class="co">##      who usePatternUDS                       Rs_johnson_1992</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                     TRUE           </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o            FALSE          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo            TRUE           </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-             TRUE           </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------            TRUE           </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------            TRUE           </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o            TRUE           </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------             FALSE          </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o TRUE           </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-            FALSE</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="krupitsky_naltrexone_2004-and-krupitsky_naltrexone_2006">
-<span class="citation">Evgeny M. Krupitsky et al. (2004)</span> and <span class="citation">Evgeny M. Krupitsky et al. (2006)</span><a class="anchor" aria-label="anchor" href="#krupitsky_naltrexone_2004-and-krupitsky_naltrexone_2006"></a>
+<span class="citation">Evgeny M. Krupitsky et al. (2004)</span> and
+<span class="citation">Evgeny M. Krupitsky et al. (2006)</span><a class="anchor" aria-label="anchor" href="#krupitsky_naltrexone_2004-and-krupitsky_naltrexone_2006"></a>
 </h3>
-<p><strong>Definition</strong>: Relapse rate (3 consecutive positive UOS); missing is positive (their papers do not explicitly state what to do with missing UDS, but their previous protocols treated missing as positive).</p>
+<p><strong>Definition</strong>: Relapse rate (3 consecutive positive
+UOS); missing is positive (their papers do not explicitly state what to
+do with missing UDS, but their previous protocols treated missing as
+positive).</p>
 <div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesRel_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesRel_df</span> <span class="op">%&gt;%</span></span>
@@ -480,37 +523,40 @@ Positive
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">mutate</span><span class="op">(</span></span>
-<span>        krupitsky2004_hasRel <span class="op">=</span> <span class="fu"><a href="../reference/detect_subpattern.html">detect_subpattern</a></span><span class="op">(</span></span>
+<span>        Rs_krupitsky_2004 <span class="op">=</span> <span class="fu"><a href="../reference/detect_subpattern.html">detect_subpattern</a></span><span class="op">(</span></span>
 <span>            use_pattern <span class="op">=</span> <span class="va">udsPattern</span>,</span>
 <span>            subpattern <span class="op">=</span> <span class="st">"+++"</span></span>
 <span>        <span class="op">)</span></span>
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">krupitsky2004_hasRel</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">Rs_krupitsky_2004</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesRel_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">outcomesRel_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">krupitsky2004_hasRel</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="va">Rs_krupitsky_2004</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 3</span></span></span>
-<span><span class="co">##      who usePatternUDS                       krupitsky2004_hasRel</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>               </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                     TRUE                </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o            FALSE               </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo            TRUE                </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-             TRUE                </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------            FALSE               </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------            TRUE                </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o            TRUE                </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------             FALSE               </span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o TRUE                </span></span>
+<span><span class="co">##      who usePatternUDS                       Rs_krupitsky_2004</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                               <span style="color: #949494; font-style: italic;">&lt;lgl&gt;</span>            </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                     TRUE             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o            FALSE            </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo            TRUE             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-             TRUE             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------            FALSE            </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------            TRUE             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o            TRUE             </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------             FALSE            </span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o TRUE             </span></span>
 <span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-            TRUE</span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="lee_extended-release_2016">
 <span class="citation">Joshua D. Lee et al. (2016)</span><a class="anchor" aria-label="anchor" href="#lee_extended-release_2016"></a>
 </h3>
-<p><strong>Definition</strong>: Weeks to relapse (≥10 days of opioid use in a 28‐day period [a positive UOS was computed as 5 days of opioid use]); missing is positive</p>
-<p>We interpret their outcome as “two or more positive weekly UDS in a 4-week window”.</p>
+<p><strong>Definition</strong>: Weeks to relapse (≥10 days of opioid use
+in a 28‐day period [a positive UOS was computed as 5 days of opioid
+use]); missing is positive</p>
+<p>We interpret their outcome as “two or more positive weekly UDS in a
+4-week window”.</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesRel_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesRel_df</span> <span class="op">%&gt;%</span></span>
@@ -535,30 +581,37 @@ Positive
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">unnest</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"lee2016_rel"</span>, names_sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"lee2016_rel"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">rename</span><span class="op">(</span></span>
+<span>    RsT_lee_2016 <span class="op">=</span> <span class="va">lee2016_rel_time</span>,</span>
+<span>    RsE_lee_2016 <span class="op">=</span> <span class="va">lee2016_rel_event</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesRel_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">outcomesRel_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"lee2016_rel"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">"lee_2016"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 4</span></span></span>
-<span><span class="co">##      who usePatternUDS                       lee2016_rel_time lee2016_rel_event</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                    3                 1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                          21                 1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                          14                 1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                            3                 1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                          12                 1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                           3                 1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                           3                 1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                           22                 0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o                3                 1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                           3                 1</span></span></code></pre>
+<span><span class="co">##      who usePatternUDS                       RsT_lee_2016 RsE_lee_2016</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                      <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>        <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                3            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                      21            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                      14            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                        3            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                      12            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                       3            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                       3            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                       22            0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o            3            1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                       3            1</span></span></code></pre>
 </div>
 <div class="section level3">
-<h3 id="lee_comparative_2018">
-<span class="citation">Joshua D. Lee et al. (2018)</span><a class="anchor" aria-label="anchor" href="#lee_comparative_2018"></a>
+<h3 id="lee_comparative_2018-ctn-0051">
+<span class="citation">Joshua D. Lee et al. (2018,
+CTN–0051)</span><a class="anchor" aria-label="anchor" href="#lee_comparative_2018-ctn-0051"></a>
 </h3>
-<p><strong>Definition</strong>: Weeks to relapse (starting at day 21 post-randomization: 4 consecutive weeks with positive UOS); missing is positive</p>
+<p><strong>Definition</strong>: Weeks to relapse (starting at day 21
+post-randomization: 4 consecutive weeks with positive UOS); missing is
+positive</p>
 <div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesRel_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesRel_df</span> <span class="op">%&gt;%</span></span>
@@ -588,30 +641,37 @@ Positive
 <span>    <span class="fu">unnest</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"lee2018_rel"</span>, names_sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">mutate</span><span class="op">(</span>lee2018_rel_time <span class="op">=</span> <span class="va">lee2018_rel_time</span> <span class="op">+</span> <span class="fl">2</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"lee2018_rel"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">rename</span><span class="op">(</span></span>
+<span>    RsT_ctnFiftyOne_2018 <span class="op">=</span> <span class="va">lee2018_rel_time</span>,</span>
+<span>    RsE_ctnFiftyOne_2018 <span class="op">=</span> <span class="va">lee2018_rel_event</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesRel_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">outcomesRel_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"lee2018_rel"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">"ctnFiftyOne_2018"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 4</span></span></span>
-<span><span class="co">##      who usePatternUDS                       lee2018_rel_time lee2018_rel_event</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                          <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>             <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                    3                 1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                          21                 0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                          15                 1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                            3                 1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                          21                 0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                           3                 1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                           3                 1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                           20                 0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o               31                 1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                          21                 0</span></span></code></pre>
+<span><span class="co">##      who usePatternUDS                       RsT_ctnFiftyOne_2018 RsE_ctnFifty…¹</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                              <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span>          <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                        3              1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                              21              0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                              15              1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                                3              1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                              21              0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                               3              1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                               3              1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                               20              0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o                   31              1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                              21              0</span></span>
+<span><span class="co">## <span style="color: #949494;"># … with abbreviated variable name ¹​RsE_ctnFiftyOne_2018</span></span></span></code></pre>
 </div>
 <div class="section level3">
 <h3 id="schottenfeld_maintenance_2008">
-<span class="citation">Schottenfeld, Chawarski, and Mazlan (2008)</span><a class="anchor" aria-label="anchor" href="#schottenfeld_maintenance_2008"></a>
+<span class="citation">Schottenfeld, Chawarski, and Mazlan
+(2008)</span><a class="anchor" aria-label="anchor" href="#schottenfeld_maintenance_2008"></a>
 </h3>
-<p><strong>Definition</strong>: Days to relapse (3 consecutive positive UOS); missing is positive</p>
+<p><strong>Definition</strong>: Days to relapse (3 consecutive positive
+UOS); missing is positive</p>
 <div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">outcomesRel_df</span> <span class="op">&lt;-</span> </span>
 <span>    <span class="va">outcomesRel_df</span> <span class="op">%&gt;%</span></span>
@@ -636,25 +696,29 @@ Positive
 <span>    <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">unnest</span><span class="op">(</span>cols <span class="op">=</span> <span class="st">"schottenfeld2008_rel"</span>, names_sep <span class="op">=</span> <span class="st">"_"</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"schottenfeld2008_rel"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
+<span>  <span class="fu">rename</span><span class="op">(</span></span>
+<span>    RsT_schottenfeld_2008 <span class="op">=</span> <span class="va">schottenfeld2008_rel_time</span>,</span>
+<span>    RsE_schottenfeld_2008 <span class="op">=</span> <span class="va">schottenfeld2008_rel_event</span></span>
+<span>  <span class="op">)</span> <span class="op">%&gt;%</span> </span>
 <span>    <span class="fu">left_join</span><span class="op">(</span><span class="va">outcomesRel_df</span>, <span class="va">.</span>, by <span class="op">=</span> <span class="st">"who"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">outcomesRel_df</span> <span class="op">%&gt;%</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">who</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">examplePeople_int</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="fu">starts_with</span><span class="op">(</span><span class="st">"schottenfeld2008_rel"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<span>  <span class="fu">select</span><span class="op">(</span><span class="va">who</span>, <span class="va">usePatternUDS</span>, <span class="fu">contains</span><span class="op">(</span><span class="st">"schottenfeld_2008"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
 <pre><code><span><span class="co">## <span style="color: #949494;"># A tibble: 10 × 4</span></span></span>
-<span><span class="co">##      who usePatternUDS                       schottenfeld2008_rel_time schotte…¹</span></span>
-<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                                   <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>     <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                             1         1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                                   22         0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                                   15         1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                                     3         1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                                   22         0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                                    2         1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                                    1         1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                                    21         0</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o                        31         1</span></span>
-<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                                    1         1</span></span>
-<span><span class="co">## <span style="color: #949494;"># … with abbreviated variable name ¹​schottenfeld2008_rel_event</span></span></span></code></pre>
+<span><span class="co">##      who usePatternUDS                       RsT_schottenfeld_2008 RsE_schotte…¹</span></span>
+<span><span class="co">##    <span style="color: #949494; font-style: italic;">&lt;dbl&gt;</span> <span style="color: #949494; font-style: italic;">&lt;chr&gt;</span>                                               <span style="color: #949494; font-style: italic;">&lt;int&gt;</span>         <span style="color: #949494; font-style: italic;">&lt;int&gt;</span></span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 1</span>     1 ooooooooooooooo                                         1             1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 2</span>     4 -------------------o-o-o                               22             0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 3</span>    13 ------------o-oooooooooo                               15             1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 4</span>    17 --++*++++++-++++++-+++-                                 3             1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 5</span>   163 -o---o---o--o+----------                               22             0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 6</span>   210 -++++++++-+++-----------                                2             1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 7</span>   233 *+++++++++++o++++++++++o                                1             1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 8</span>   242 -----------------------                                21             0</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;"> 9</span>  <span style="text-decoration: underline;">1</span>103 ++--oo--o-+-+--o----------o-o-oo++o                    31             1</span></span>
+<span><span class="co">## <span style="color: #BCBCBC;">10</span>  <span style="text-decoration: underline;">2</span>089 ++++---+--------------o-                                1             1</span></span>
+<span><span class="co">## <span style="color: #949494;"># … with abbreviated variable name ¹​RsE_schottenfeld_2008</span></span></span></code></pre>
 <hr>
 <p></p>
 </div>
@@ -662,16 +726,17 @@ Positive
 <div class="section level2">
 <h2 id="computing-environment">Computing Environment<a class="anchor" aria-label="anchor" href="#computing-environment"></a>
 </h2>
-<p>Here is the information concerning the system configuration, packages, and their versions used in this computation:</p>
+<p>Here is the information concerning the system configuration,
+packages, and their versions used in this computation:</p>
 <div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<pre><code><span><span class="co">## R version 4.2.1 (2022-06-23)</span></span>
+<pre><code><span><span class="co">## R version 4.2.2 (2022-10-31)</span></span>
 <span><span class="co">## Platform: x86_64-pc-linux-gnu (64-bit)</span></span>
-<span><span class="co">## Running under: Ubuntu 20.04.5 LTS</span></span>
+<span><span class="co">## Running under: Ubuntu 22.04.1 LTS</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## Matrix products: default</span></span>
-<span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/blas/libblas.so.3.9.0</span></span>
-<span><span class="co">## LAPACK: /usr/lib/x86_64-linux-gnu/lapack/liblapack.so.3.9.0</span></span>
+<span><span class="co">## BLAS:   /usr/lib/x86_64-linux-gnu/openblas-pthread/libblas.so.3</span></span>
+<span><span class="co">## LAPACK: /usr/lib/x86_64-linux-gnu/openblas-pthread/libopenblasp-r0.3.20.so</span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## locale:</span></span>
 <span><span class="co">##  [1] LC_CTYPE=C.UTF-8       LC_NUMERIC=C           LC_TIME=C.UTF-8       </span></span>
@@ -684,55 +749,84 @@ Positive
 <span><span class="co">## </span></span>
 <span><span class="co">## other attached packages:</span></span>
 <span><span class="co">##  [1] forcats_0.5.2    stringr_1.4.1    dplyr_1.0.10     purrr_0.3.5     </span></span>
-<span><span class="co">##  [5] readr_2.1.3      tidyr_1.2.1      tibble_3.1.8     ggplot2_3.3.6   </span></span>
+<span><span class="co">##  [5] readr_2.1.3      tidyr_1.2.1      tibble_3.1.8     ggplot2_3.4.0   </span></span>
 <span><span class="co">##  [9] tidyverse_1.3.2  kableExtra_1.3.4 readxl_1.4.1     CTNote_0.1.0    </span></span>
 <span><span class="co">## </span></span>
 <span><span class="co">## loaded via a namespace (and not attached):</span></span>
-<span><span class="co">##  [1] lubridate_1.8.0     svglite_2.1.0       assertthat_0.2.1   </span></span>
-<span><span class="co">##  [4] rprojroot_2.0.3     digest_0.6.29       utf8_1.2.2         </span></span>
-<span><span class="co">##  [7] R6_2.5.1            cellranger_1.1.0    backports_1.4.1    </span></span>
-<span><span class="co">## [10] reprex_2.0.2        evaluate_0.17       highr_0.9          </span></span>
-<span><span class="co">## [13] httr_1.4.4          pillar_1.8.1        rlang_1.0.6        </span></span>
-<span><span class="co">## [16] googlesheets4_1.0.1 curl_4.3.3          rstudioapi_0.14    </span></span>
-<span><span class="co">## [19] jquerylib_0.1.4     rmarkdown_2.17      pkgdown_2.0.6      </span></span>
-<span><span class="co">## [22] textshaping_0.3.6   desc_1.4.2          webshot_0.5.4      </span></span>
-<span><span class="co">## [25] googledrive_2.0.0   munsell_0.5.0       broom_1.0.1        </span></span>
-<span><span class="co">## [28] modelr_0.1.9        compiler_4.2.1      xfun_0.33          </span></span>
-<span><span class="co">## [31] pkgconfig_2.0.3     systemfonts_1.0.4   htmltools_0.5.3    </span></span>
-<span><span class="co">## [34] tidyselect_1.2.0    fansi_1.0.3         viridisLite_0.4.1  </span></span>
-<span><span class="co">## [37] crayon_1.5.2        withr_2.5.0         tzdb_0.3.0         </span></span>
-<span><span class="co">## [40] dbplyr_2.2.1        grid_4.2.1          jsonlite_1.8.2     </span></span>
-<span><span class="co">## [43] gtable_0.3.1        lifecycle_1.0.3     DBI_1.1.3          </span></span>
-<span><span class="co">## [46] magrittr_2.0.3      scales_1.2.1        cli_3.4.1          </span></span>
-<span><span class="co">## [49] stringi_1.7.8       cachem_1.0.6        fs_1.5.2           </span></span>
-<span><span class="co">## [52] xml2_1.3.3          bslib_0.4.0         ellipsis_0.3.2     </span></span>
-<span><span class="co">## [55] ragg_1.2.3          generics_0.1.3      vctrs_0.4.2        </span></span>
-<span><span class="co">## [58] tools_4.2.1         glue_1.6.2          hms_1.1.2          </span></span>
-<span><span class="co">## [61] fastmap_1.1.0       yaml_2.3.5          colorspace_2.0-3   </span></span>
-<span><span class="co">## [64] gargle_1.2.1        rvest_1.0.3         memoise_2.0.1      </span></span>
-<span><span class="co">## [67] haven_2.5.1         knitr_1.40          sass_0.4.2</span></span></code></pre>
+<span><span class="co">##  [1] httr_1.4.4          sass_0.4.3          jsonlite_1.8.3     </span></span>
+<span><span class="co">##  [4] viridisLite_0.4.1   modelr_0.1.10       bslib_0.4.1        </span></span>
+<span><span class="co">##  [7] assertthat_0.2.1    highr_0.9           googlesheets4_1.0.1</span></span>
+<span><span class="co">## [10] cellranger_1.1.0    yaml_2.3.6          pillar_1.8.1       </span></span>
+<span><span class="co">## [13] backports_1.4.1     glue_1.6.2          digest_0.6.30      </span></span>
+<span><span class="co">## [16] rvest_1.0.3         colorspace_2.0-3    htmltools_0.5.3    </span></span>
+<span><span class="co">## [19] pkgconfig_2.0.3     broom_1.0.1         haven_2.5.1        </span></span>
+<span><span class="co">## [22] scales_1.2.1        webshot_0.5.4       svglite_2.1.0      </span></span>
+<span><span class="co">## [25] tzdb_0.3.0          timechange_0.1.1    googledrive_2.0.0  </span></span>
+<span><span class="co">## [28] generics_0.1.3      ellipsis_0.3.2      cachem_1.0.6       </span></span>
+<span><span class="co">## [31] withr_2.5.0         cli_3.4.1           magrittr_2.0.3     </span></span>
+<span><span class="co">## [34] crayon_1.5.2        memoise_2.0.1       evaluate_0.18      </span></span>
+<span><span class="co">## [37] fs_1.5.2            fansi_1.0.3         xml2_1.3.3         </span></span>
+<span><span class="co">## [40] textshaping_0.3.6   tools_4.2.2         hms_1.1.2          </span></span>
+<span><span class="co">## [43] gargle_1.2.1        lifecycle_1.0.3     munsell_0.5.0      </span></span>
+<span><span class="co">## [46] reprex_2.0.2        compiler_4.2.2      pkgdown_2.0.6      </span></span>
+<span><span class="co">## [49] jquerylib_0.1.4     systemfonts_1.0.4   rlang_1.0.6        </span></span>
+<span><span class="co">## [52] grid_4.2.2          rstudioapi_0.14     rmarkdown_2.18     </span></span>
+<span><span class="co">## [55] gtable_0.3.1        DBI_1.1.3           curl_4.3.3         </span></span>
+<span><span class="co">## [58] R6_2.5.1            lubridate_1.9.0     knitr_1.41         </span></span>
+<span><span class="co">## [61] fastmap_1.1.0       utf8_1.2.2          rprojroot_2.0.3    </span></span>
+<span><span class="co">## [64] ragg_1.2.4          desc_1.4.2          stringi_1.7.8      </span></span>
+<span><span class="co">## [67] vctrs_0.5.1         dbplyr_2.2.1        tidyselect_1.2.0   </span></span>
+<span><span class="co">## [70] xfun_0.35</span></span></code></pre>
 </div>
 <div class="section level2">
 <h2 class="unnumbered" id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h2>
 <div id="refs" class="references csl-bib-body hanging-indent">
 <div id="ref-johnson_controlled_1992" class="csl-entry">
-Johnson, Rolley E., Jerome H. Jaffe, and Paul J. Fudala. 1992. <span>“A <span>Controlled</span> <span>Trial</span> of <span>Buprenorphine</span> <span>Treatment</span> for <span>Opioid</span> <span>Dependence</span>.”</span> <em>Journal of the American Medical Association</em> 267 (20): 2750–55. <a href="https://doi.org/10.1001/jama.1992.03480200058024" class="external-link">https://doi.org/10.1001/jama.1992.03480200058024</a>.
+Johnson, Rolley E., Jerome H. Jaffe, and Paul J. Fudala. 1992. <span>“A
+<span>Controlled</span> <span>Trial</span> of <span>Buprenorphine</span>
+<span>Treatment</span> for <span>Opioid</span>
+<span>Dependence</span>.”</span> <em>Journal of the American Medical
+Association</em> 267 (20): 2750–55. <a href="https://doi.org/10.1001/jama.1992.03480200058024" class="external-link">https://doi.org/10.1001/jama.1992.03480200058024</a>.
 </div>
 <div id="ref-krupitsky_naltrexone_2006" class="csl-entry">
-Krupitsky, Evgeny M., Edwin E. Zvartau, Dimitry V. Masalov, Marina V. Tsoy, Andrey M. Burakov, Valentina Y. Egorova, Tatyana Y. Didenko, et al. 2006. <span>“Naltrexone with or Without Fluoxetine for Preventing Relapse to Heroin Addiction in <span>St</span>. <span>Petersburg</span>, <span>Russia</span>.”</span> <em>Journal of Substance Abuse Treatment</em> 31 (4): 319–28. <a href="https://doi.org/10.1016/j.jsat.2006.05.005" class="external-link">https://doi.org/10.1016/j.jsat.2006.05.005</a>.
+Krupitsky, Evgeny M., Edwin E. Zvartau, Dimitry V. Masalov, Marina V.
+Tsoy, Andrey M. Burakov, Valentina Y. Egorova, Tatyana Y. Didenko, et
+al. 2006. <span>“Naltrexone with or Without Fluoxetine for Preventing
+Relapse to Heroin Addiction in <span>St</span>. <span>Petersburg</span>,
+<span>Russia</span>.”</span> <em>Journal of Substance Abuse
+Treatment</em> 31 (4): 319–28. <a href="https://doi.org/10.1016/j.jsat.2006.05.005" class="external-link">https://doi.org/10.1016/j.jsat.2006.05.005</a>.
 </div>
 <div id="ref-krupitsky_naltrexone_2004" class="csl-entry">
-Krupitsky, Evgeny M, Edwin E Zvartau, Dimitry V Masalov, Marina V Tsoi, Andrey M Burakov, Valentina Y Egorova, Tatyana Y Didenko, et al. 2004. <span>“Naltrexone for Heroin Dependence Treatment in <span>St</span>. <span>Petersburg</span>, <span>Russia</span>.”</span> <em>Journal of Substance Abuse Treatment</em> 26 (4): 285–94. <a href="https://doi.org/10.1016/j.jsat.2004.02.002" class="external-link">https://doi.org/10.1016/j.jsat.2004.02.002</a>.
+Krupitsky, Evgeny M, Edwin E Zvartau, Dimitry V Masalov, Marina V Tsoi,
+Andrey M Burakov, Valentina Y Egorova, Tatyana Y Didenko, et al. 2004.
+<span>“Naltrexone for Heroin Dependence Treatment in <span>St</span>.
+<span>Petersburg</span>, <span>Russia</span>.”</span> <em>Journal of
+Substance Abuse Treatment</em> 26 (4): 285–94. <a href="https://doi.org/10.1016/j.jsat.2004.02.002" class="external-link">https://doi.org/10.1016/j.jsat.2004.02.002</a>.
 </div>
 <div id="ref-lee_extended-release_2016" class="csl-entry">
-Lee, Joshua D., Peter D. Friedmann, Timothy W. Kinlock, Edward V. Nunes, Tamara Y. Boney, Randall A. Hoskinson, Donna Wilson, et al. 2016. <span>“Extended-<span>Release</span> <span>Naltrexone</span> to <span>Prevent</span> <span>Opioid</span> <span>Relapse</span> in <span>Criminal</span> <span>Justice</span> <span>Offenders</span>.”</span> <em>New England Journal of Medicine</em> 374 (13): 1232–42. <a href="https://doi.org/10.1056/NEJMoa1505409" class="external-link">https://doi.org/10.1056/NEJMoa1505409</a>.
+Lee, Joshua D., Peter D. Friedmann, Timothy W. Kinlock, Edward V. Nunes,
+Tamara Y. Boney, Randall A. Hoskinson, Donna Wilson, et al. 2016.
+<span>“Extended-<span>Release</span> <span>Naltrexone</span> to
+<span>Prevent</span> <span>Opioid</span> <span>Relapse</span> in
+<span>Criminal</span> <span>Justice</span>
+<span>Offenders</span>.”</span> <em>New England Journal of Medicine</em>
+374 (13): 1232–42. <a href="https://doi.org/10.1056/NEJMoa1505409" class="external-link">https://doi.org/10.1056/NEJMoa1505409</a>.
 </div>
 <div id="ref-lee_comparative_2018" class="csl-entry">
-Lee, Joshua D, Edward V Nunes, Patricia Novo, Ken Bachrach, Genie L Bailey, Snehal Bhatt, Sarah Farkas, et al. 2018. <span>“Comparative Effectiveness of Extended-Release Naltrexone Versus Buprenorphine-Naloxone for Opioid Relapse Prevention (<span>X</span>:<span>BOT</span>): A Multicentre, Open-Label, Randomised Controlled Trial.”</span> <em>The Lancet</em> 391 (10118): 309–18. <a href="https://doi.org/10.1016/S0140-6736(17)32812-X" class="external-link">https://doi.org/10.1016/S0140-6736(17)32812-X</a>.
+Lee, Joshua D, Edward V Nunes, Patricia Novo, Ken Bachrach, Genie L
+Bailey, Snehal Bhatt, Sarah Farkas, et al. 2018. <span>“Comparative
+Effectiveness of Extended-Release Naltrexone Versus
+Buprenorphine-Naloxone for Opioid Relapse Prevention
+(<span>X</span>:<span>BOT</span>): A Multicentre, Open-Label, Randomised
+Controlled Trial.”</span> <em>The Lancet</em> 391 (10118): 309–18. <a href="https://doi.org/10.1016/S0140-6736(17)32812-X" class="external-link">https://doi.org/10.1016/S0140-6736(17)32812-X</a>.
 </div>
 <div id="ref-schottenfeld_maintenance_2008" class="csl-entry">
-Schottenfeld, Richard S, Marek C Chawarski, and Mahmud Mazlan. 2008. <span>“Maintenance Treatment with Buprenorphine and Naltrexone for Heroin Dependence in <span>Malaysia</span>: A Randomised, Double-Blind, Placebo-Controlled Trial.”</span> <em>The Lancet</em> 371 (9631): 2192–2200. <a href="https://doi.org/10.1016/S0140-6736(08)60954-X" class="external-link">https://doi.org/10.1016/S0140-6736(08)60954-X</a>.
+Schottenfeld, Richard S, Marek C Chawarski, and Mahmud Mazlan. 2008.
+<span>“Maintenance Treatment with Buprenorphine and Naltrexone for
+Heroin Dependence in <span>Malaysia</span>: A Randomised, Double-Blind,
+Placebo-Controlled Trial.”</span> <em>The Lancet</em> 371 (9631):
+2192–2200. <a href="https://doi.org/10.1016/S0140-6736(08)60954-X" class="external-link">https://doi.org/10.1016/S0140-6736(08)60954-X</a>.
 </div>
 </div>
 </div>
