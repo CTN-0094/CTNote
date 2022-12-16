@@ -10,7 +10,7 @@ Description: The Clinical Trials Network (CTN) of the U.S. National Institute
   Note that we abbreviate urine drug screen as "UDS" and urine opioid screen as
   "UOS". For the example data sets (based on clinical trials data harmonized by
   the CTN-0094 research team), UDS and UOS are largely interchangeable.
-Version: 0.1.0
+Version: 0.1.1
 Authors@R:
   c(
     person(

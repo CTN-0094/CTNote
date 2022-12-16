@@ -168,17 +168,17 @@ outcomesRed_df <-
 	# non-participation penalty: if the participant didn't stay in the study the
   #   whole time, then the treatment was a failure
 	mutate(
-		Ab_eissenberg_1997 = case_when(
+		Rd_eissenberg_1997 = case_when(
 			completedProtocol  ~ consecNeg,
 			!completedProtocol ~ FALSE
 		)
 	) %>% 
-	select(who, Ab_eissenberg_1997) %>% 
+	select(who, Rd_eissenberg_1997) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, Ab_eissenberg_1997)
+  select(who, usePatternUDS, Rd_eissenberg_1997)
 ```
 
 
@@ -492,14 +492,14 @@ outcomesRed_df <-
 			inductFail  ~ 120,
 			!inductFail ~ ling1976o22_use
 		),
-		Ab_lingA_1976 = 120 - ling1976o22_use
+		Rd_lingA_1976 = 120 - ling1976o22_use
 	) %>%
-	select(who, Ab_lingA_1976) %>% 
+	select(who, Rd_lingA_1976) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, Ab_lingA_1976)
+  select(who, usePatternUDS, Rd_lingA_1976)
 ```
 
 ### A Variant
@@ -530,14 +530,14 @@ outcomesRed_df <-
 			inductFail  ~ 120,
 			!inductFail ~ ling1976o100_use
 		),
-		Ab_lingB_1976 = 120 - ling1976o100_use
+		Rd_lingB_1976 = 120 - ling1976o100_use
 	) %>%
-	select(who, Ab_lingB_1976) %>% 
+	select(who, Rd_lingB_1976) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, Ab_lingB_1976)
+  select(who, usePatternUDS, Rd_lingB_1976)
 ```
 
 
@@ -747,14 +747,14 @@ outcomesRed_df <-
 		)
 	) %>% 
 	mutate(
-		Ab_petitjean_2001 = 1 - petitjean2001_use
+		Rd_petitjean_2001 = 1 - petitjean2001_use
 	) %>% 
-	select(who, Ab_petitjean_2001) %>% 
+	select(who, Rd_petitjean_2001) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, Ab_petitjean_2001)
+  select(who, usePatternUDS, Rd_petitjean_2001)
 ```
 
 
@@ -819,7 +819,7 @@ outcomesRed_df %>%
 ## @schwartz_randomized_2006
 **Definition**: `r defns_char["Schwartz et al., 2006"]`
 
-This definition is a cohort-level definition, not an individual definition. The individual endpoint would be "was this participant abstinent from the substance of interest at the 120-day follow-up? (17 weeks from randomization). Our participants do not uniformly have 17 weeks of data, so we will assess them at week 15 instead.
+This definition is a cohort-level definition, not an individual definition. The individual endpoint would be "was this participant abstinent from the substance of interest at the 120-day follow-up? (17 weeks from randomization). Our participants do not uniformly have 17 weeks of data, so we will assess them at week 15 instead. NOTE: while the authors classified their outcome as a "reduction" metric (and therefore we include it here in the "reduction" section of the outcomes library), we label this outcome with the prefix "Ab" for abstinence.
 ```{r}
 outcomesRed_df <- 
 	outcomesRed_df %>%
@@ -860,13 +860,13 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(Ab_shufman_1994 = 1 - shufman1994_useP) %>% 
-	select(who, Ab_shufman_1994) %>% 
+	mutate(Rd_shufman_1994 = 1 - shufman1994_useP) %>% 
+	select(who, Rd_shufman_1994) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, Ab_shufman_1994)
+  select(who, usePatternUDS, Rd_shufman_1994)
 ```
 
 
@@ -895,14 +895,14 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(Ab_soyka_2008 = 1 - soyka2008_use) %>% 
+	mutate(Rd_soyka_2008 = 1 - soyka2008_use) %>% 
 	ungroup() %>% 
-	select(who, Ab_soyka_2008) %>% 
+	select(who, Rd_soyka_2008) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, Ab_soyka_2008)
+  select(who, usePatternUDS, Rd_soyka_2008)
 ```
 
 
@@ -925,13 +925,13 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(Ab_strain_1993 = 1 - strain1993_use) %>% 
-	select(who, Ab_strain_1993) %>% 
+	mutate(Rd_strain_1993 = 1 - strain1993_use) %>% 
+	select(who, Rd_strain_1993) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, Ab_strain_1993)
+  select(who, usePatternUDS, Rd_strain_1993)
 ```
 
 
@@ -959,13 +959,13 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(Ab_strain_1994 = 1 - strain1994_use) %>% 
-	select(who, Ab_strain_1994) %>% 
+	mutate(Rd_strain_1994 = 1 - strain1994_use) %>% 
+	select(who, Rd_strain_1994) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, Ab_strain_1994)
+  select(who, usePatternUDS, Rd_strain_1994)
 ``` 
 
 
@@ -993,13 +993,13 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(Ab_strain_1996 = 1 - strain1996_use) %>% 
-	select(who, Ab_strain_1996) %>% 
+	mutate(Rd_strain_1996 = 1 - strain1996_use) %>% 
+	select(who, Rd_strain_1996) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, Ab_strain_1996)
+  select(who, usePatternUDS, Rd_strain_1996)
 ```
 
 
@@ -1027,13 +1027,13 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(Ab_strain_1999 = 1 - strain1999_use) %>% 
-	select(who, Ab_strain_1999) %>% 
+	mutate(Rd_strain_1999 = 1 - strain1999_use) %>% 
+	select(who, Rd_strain_1999) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, Ab_strain_1999)
+  select(who, usePatternUDS, Rd_strain_1999)
 ```
 
 
@@ -1199,13 +1199,13 @@ outcomesRed_df <-
 			proportion = TRUE
 		)
 	) %>% 
-	mutate(Ab_woody_2008 = 1 - woody2008_use) %>% 
-	select(who, Ab_woody_2008) %>% 
+	mutate(Rd_woody_2008 = 1 - woody2008_use) %>% 
+	select(who, Rd_woody_2008) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, Ab_woody_2008)
+  select(who, usePatternUDS, Rd_woody_2008)
 ```
 
 
@@ -1232,14 +1232,14 @@ outcomesRed_df <-
 	) %>% 
   # For each participant, the "abstinent" metric is the number of total weeks
   #   of study participation - the number of positive weeks
-	mutate(Ab_zaks_1972 = str_length(udsPattern) - zaks1972_use) %>% 
+	mutate(Rd_zaks_1972 = str_length(udsPattern) - zaks1972_use) %>% 
 	ungroup() %>% 
-	select(who, Ab_zaks_1972) %>% 
+	select(who, Rd_zaks_1972) %>% 
 	left_join(outcomesRed_df, ., by = "who")
 
 outcomesRed_df %>% 
   filter(who %in% examplePeople_int) %>% 
-  select(who, usePatternUDS, Ab_zaks_1972)
+  select(who, usePatternUDS, Rd_zaks_1972)
 ```
 
 
@@ -1261,7 +1261,7 @@ sessionInfo()
 ```{r, include=FALSE, eval=FALSE}
 # write_csv(
 #   outcomesRed_df,
-#   file = "../inst/extdata/outcomes_reduction_20221123.csv"
+#   file = "inst/extdata/outcomes_reduction_20221216.csv"
 # )
 ```
 
