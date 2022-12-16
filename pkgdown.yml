@@ -1,11 +1,11 @@
 pandoc: 2.19.2
-pkgdown: 2.0.6
+pkgdown: 2.0.7
 pkgdown_sha: ~
 articles:
   library_abstinence_20220711: library_abstinence_20220711.html
   library_reduction_20220630: library_reduction_20220630.html
   library_relapse_20220711: library_relapse_20220711.html
-last_built: 2022-11-25T16:31Z
+last_built: 2022-12-16T17:39Z
 urls:
   reference: https://ctn-0094.github.io/CTNote/reference
   article: https://ctn-0094.github.io/CTNote/articles
