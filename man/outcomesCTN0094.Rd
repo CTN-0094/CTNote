@@ -33,6 +33,6 @@ clinical trials. The harmonized data from these trials are contained in
 the packages \code{ctn0094data} and \code{ctn0094DataExtra}. These outcomes are
 calculated in the three abstinence, relapse, and reduction "library"
 vignettes of this package. The data dictionary is currently stored as an
-Excel spreadsheet in \code{inst/suppl_docs/definitions_20220405.xlsx}.
+Excel spreadsheet in \code{inst/suppl_docs/definitions_20221123.xlsx}.
 }
 \keyword{datasets}

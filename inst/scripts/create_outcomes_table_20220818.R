@@ -1,14 +1,15 @@
 # Create All Outcomes Table
 # Gabriel Odom
 # 2022-08-18
+# UPDATED: 2023-01-25
 
 # Following the 3 abstinence, relapse, and reduction "library" vignettes, we 
 #   need to join these files and save them as a data set for this package.
 
 library(tidyverse)
-outcomesAbs_df <- read_csv("inst/extdata/outcomes_abstinence_20220818.csv")
-outcomesRed_df <- read_csv("inst/extdata/outcomes_reduction_20220818.csv")
-outcomesRel_df <- read_csv("inst/extdata/outcomes_relapse_20220818.csv")
+outcomesAbs_df <- read_csv("inst/extdata/outcomes_abstinence_20221123.csv")
+outcomesRed_df <- read_csv("inst/extdata/outcomes_reduction_20221216.csv")
+outcomesRel_df <- read_csv("inst/extdata/outcomes_relapse_20221123.csv")
 
 outcomesCTN0094 <- 
   outcomesAbs_df %>% 

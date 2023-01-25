@@ -73,6 +73,7 @@ vignettes/*.pdf
 !inst/extdata/outcomes_reduction_*.csv
 !inst/extdata/outcomes_abstinence_*.csv
 !inst/extdata/outcomes_relapse_*.csv
+!inst/extdata/outcomesCTN0094_*.rda
 
 # sas data
 *.sas7bdat

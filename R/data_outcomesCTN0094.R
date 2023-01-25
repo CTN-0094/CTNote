@@ -9,7 +9,7 @@
 #'    the packages `ctn0094data` and `ctn0094DataExtra`. These outcomes are
 #'    calculated in the three abstinence, relapse, and reduction "library"
 #'    vignettes of this package. The data dictionary is currently stored as an
-#'    Excel spreadsheet in `inst/suppl_docs/definitions_20220405.xlsx`.
+#'    Excel spreadsheet in `inst/suppl_docs/definitions_20221123.xlsx`.
 #'
 #' @docType data
 #'
