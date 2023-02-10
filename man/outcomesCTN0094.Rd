@@ -6,7 +6,7 @@
 \title{All Treatment Outcomes for CTN-0094 Participants}
 \format{
 A tibble with 3,560 rows and
-63 columns. These columns include
+64 columns. These columns include
 \describe{
 \item{who}{Patient ID}
 \item{usePatternUDS}{A character string containing the "use pattern

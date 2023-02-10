@@ -108,6 +108,40 @@ For example, participant 1 has a use pattern `ooooooooooooooo` (all missing UDS)
 
 # Abstinence from Substance Use Endpoints
 
+
+## CTN-0094 Abstinence
+Our [CTN-0094 research group](http://ctndisseminationlibrary.org/protocols/ctn0094.htm) has one abstinence outcome, which we consider a "fair" metric for end-of-treatment abstinence. **Definition**: in the last four weeks of treatment, 0 positive and no more than 1 missing UDS. *Note*: we intend this definition as a measure of "soft" abstinence; specifically, we allow the participant to miss one of the scheduled meetings in their last four weeks of treatment, as long as the UDS pattern for the remaining three weeks is all present and negative.
+```{r}
+outcomesAbs_df <- 
+	outcomesAbs_df %>%
+  rowwise() %>% 
+  # mixed results != abstinence
+	mutate(
+		udsPattern = recode_missing_visits(
+			use_pattern = usePatternUDS,
+			missing_is = "*"
+		)
+	) %>% 
+	mutate(
+		Ab_ctnNinetyFour_2023 = any(
+		  detect_subpattern(
+			  use_pattern = udsPattern,
+			  subpattern = c("----", "o---", "-o--", "--o-", "---o"),
+			  start = 12,
+			  end = 15
+		  )
+		)
+	) %>% 
+	select(who, Ab_ctnNinetyFour_2023) %>% 
+	left_join(outcomesAbs_df, ., by = "who")
+
+outcomesAbs_df %>% 
+  filter(who %in% examplePeople_int) %>% 
+  select(who, usePatternUDS, Ab_ctnNinetyFour_2023)
+```
+
+
+
 ## @fiellin_counseling_2006
 **Definition**: `r defns_char["Fiellin et al., 2006"]`; missing is positive
 ```{r}
@@ -623,7 +657,7 @@ sessionInfo()
 ```{r, include=FALSE, eval=FALSE}
 # write_csv(
 #   outcomesAbs_df,
-#   file = "../inst/extdata/outcomes_abstinence_20221123.csv"
+#   file = "inst/extdata/outcomes_abstinence_20230210.csv"
 # )
 ```
 
