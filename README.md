@@ -8,7 +8,13 @@ title: CTNote
 
 # Introduction to CTNote: The CTN Outcomes, Treatments, and Endpoints Library
 
-The package `CTNote` exists as a comprehensive implementation of *outcomes*, *treatments*, and *endpoints* used in clinical trials to evaluate the efficacy of medication-assisted treatment of substance use disorders (SUDs). The functions in this package are programmatic building blocks with which to construct algorithms which calculate single-value summaries of clinical trial participants' substance use patterns. We assume that these substance use patterns are symbolized as a "word" (see below). The vignettes for this package include a standard and code-based library of algorithms for treatment outcome definitions useful to evaluate medication-based treatments for SUDs.
+The package `CTNote` exists as a comprehensive implementation of *outcomes*, *treatments*, and *endpoints* used in clinical trials to evaluate the efficacy of medication-assisted treatment of substance use disorders (SUDs).
+
+- The functions in this package are programmatic building blocks with which to construct algorithms which calculate single-value summaries of clinical trial participants' substance use patterns.
+- We assume that these person-specific substance use patterns over time are symbolized as a "word" (see below).
+- The vignettes for this package include a standard and code-based library of algorithms for treatment outcome definitions useful to evaluate medication-based treatments for SUDs. We envision these vignettes as a "library", in the sense that someone interested in using the endpoint from a previously-published study can simply "borrow" (i.e., copy and paste) the code from these vignettes into their own analysis scripts. In these cases, we simply ask that you cite the original paper for the endpoint of your choice and this package.
+
+
 
 ## Installation
 
@@ -16,6 +22,16 @@ You can install the released version of CTNote from [CRAN](https://CRAN.R-projec
 
 ``` r
 install.packages("CTNote")
+```
+
+## Citing this Package
+We expect the paper corresponding to this package will be published shortly in PLOS One. The expected citation would be
+
+> Odom GJ/Brandt L, Castro C, Luo SX, Feaster DJ, Balise, RR, and the CTN-0094 Team. (*Under Review*, expected 2023). Capturing drug use patterns at a glance: An n-ary word sufficient statistic for repeated univariate categorical values. *PLOS One*.
+
+To find citation information for this package, call the following code:
+```r
+citation("CTNote")
 ```
 
 -------------------------------------------------------------------------------
