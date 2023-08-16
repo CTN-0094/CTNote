@@ -87,13 +87,29 @@
 <div class="section level1">
 <div class="page-header"><h1 id="introduction-to-ctnote-the-ctn-outcomes-treatments-and-endpoints-library">Introduction to CTNote: The CTN Outcomes, Treatments, and Endpoints Library<a class="anchor" aria-label="anchor" href="#introduction-to-ctnote-the-ctn-outcomes-treatments-and-endpoints-library"></a>
 </h1></div>
-<p>The package <code>CTNote</code> exists as a comprehensive implementation of <em>outcomes</em>, <em>treatments</em>, and <em>endpoints</em> used in clinical trials to evaluate the efficacy of medication-assisted treatment of substance use disorders (SUDs). The functions in this package are programmatic building blocks with which to construct algorithms which calculate single-value summaries of clinical trial participants’ substance use patterns. We assume that these substance use patterns are symbolized as a “word” (see below). The vignettes for this package include a standard and code-based library of algorithms for treatment outcome definitions useful to evaluate medication-based treatments for SUDs.</p>
+<p>The package <code>CTNote</code> exists as a comprehensive implementation of <em>outcomes</em>, <em>treatments</em>, and <em>endpoints</em> used in clinical trials to evaluate the efficacy of medication-assisted treatment of substance use disorders (SUDs).</p>
+<ul>
+<li>The functions in this package are programmatic building blocks with which to construct algorithms which calculate single-value summaries of clinical trial participants’ substance use patterns.</li>
+<li>We assume that these person-specific substance use patterns over time are symbolized as a “word” (see below).</li>
+<li>The vignettes for this package include a standard and code-based library of algorithms for treatment outcome definitions useful to evaluate medication-based treatments for SUDs. We envision these vignettes as a “library”, in the sense that someone interested in using the endpoint from a previously-published study can simply “borrow” (i.e., copy and paste) the code from these vignettes into their own analysis scripts. In these cases, we simply ask that you cite the original paper for the endpoint of your choice and this package.</li>
+</ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
 <p>You can install the released version of CTNote from <a href="https://CRAN.R-project.org" class="external-link">CRAN</a> with:</p>
 <div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/install.packages.html" class="external-link">install.packages</a></span><span class="op">(</span><span class="st">"CTNote"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="citing-this-package">Citing this Package<a class="anchor" aria-label="anchor" href="#citing-this-package"></a>
+</h2>
+<p>We expect the paper corresponding to this package will be published shortly in PLOS One. The expected citation would be</p>
+<blockquote>
+<p>Odom GJ/Brandt L, Castro C, Luo SX, Feaster DJ, Balise, RR, and the CTN-0094 Team. (<em>Under Review</em>, expected 2023). Capturing drug use patterns at a glance: An n-ary word sufficient statistic for repeated univariate categorical values. <em>PLOS One</em>.</p>
+</blockquote>
+<p>To find citation information for this package, call the following code:</p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/utils/citation.html" class="external-link">citation</a></span><span class="op">(</span><span class="st">"CTNote"</span><span class="op">)</span></span></code></pre></div>
 <hr>
 <p></p>
 </div>
@@ -125,7 +141,7 @@
 <h2 id="example">Example<a class="anchor" aria-label="anchor" href="#example"></a>
 </h2>
 <p>This is a basic example which shows how to measure a participant’s duration in the study:</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://ctn-0094.github.io/CTNote/">CTNote</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">usePattern_char</span> <span class="op">&lt;-</span> <span class="st">"__++++*o-------+--+-o-o-o+o+oooooo"</span></span>
