@@ -32,7 +32,7 @@ Authors@R:
   )
 License: GPL-3
 Encoding: UTF-8
-RoxygenNote: 7.2.1
+RoxygenNote: 7.2.3
 Depends:
   R (>= 3.1.0)
 Imports: 
